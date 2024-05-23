@@ -1,0 +1,5 @@
+regression-finder/.gradle
+regression-finder/build/
+
+/out/
+/.idea/
