@@ -5,4 +5,4 @@ regression-finder/build/
 .idea/
 .DS_Store
 
-regression-finder/.idea/.gitignore
+regression-finder/src/main/java/com/main/resources/repository
