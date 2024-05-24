@@ -2,4 +2,7 @@ regression-finder/.gradle
 regression-finder/build/
 
 /out/
-/.idea/
+.idea/
+.DS_Store
+
+regression-finder/.idea/.gitignore
