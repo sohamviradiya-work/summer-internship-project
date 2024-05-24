@@ -6,3 +6,4 @@ regression-finder/build/
 .DS_Store
 
 regression-finder/src/main/java/com/main/resources/repository
+.vscode/
