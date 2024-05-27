@@ -5,11 +5,32 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+
+import com.tool.templates.GitCommit;
+
 import java.io.File;
 
 public class GitFetcher {
 
-    static Repository getRemoteRepository(String path, String link) {
+    private Repository repository;
+    private RevWalk revWalk;
+
+    public GitFetcher(Repository repository) {
+        this.repository = repository;
+        this.revWalk = new RevWalk(repository);
+    }
+
+    public Repository getRepository(){
+        return this.repository;
+    }
+
+    public void close(){
+        revWalk.close();
+    }
+
+    static GitFetcher getRemoteRepository(String path, String link) {
         File dir = new File(path);
         try {
             System.out.println("Cloning Repository");
@@ -20,7 +41,8 @@ public class GitFetcher {
                     .call()
                     .getRepository();
             System.out.println("Cloning Complete");
-            return repository;
+            return new GitFetcher(repository);
+
         } catch (InvalidRemoteException e) {
             System.err.println("Invalid Remote link" + e.getMessage());
         } catch (TransportException e) {
@@ -30,5 +52,27 @@ public class GitFetcher {
         }
 
         return null;
+    }
+
+    public void checkoutToCommit(Repository repository,String commitTag){
+        try (Git git = new Git(repository)) {
+                RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
+                git.checkout().setName(commit.getName()).call();
+                System.out.println("Checked out to commit: " + commit.getName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+    }
+
+    public void listCommits(ResultsWriter resultsWriter){
+        try {
+            Iterable<RevCommit> commits = new Git(repository).log().call();
+            
+            for (RevCommit commit : commits) {
+                resultsWriter.writeCommit(new GitCommit(commit.getAuthorIdent().getEmailAddress(), commit.getId().toString(),commit.getParent(0).getId().toString(),"", commit.getCommitTime()));
+            }
+        } catch (GitAPIException e) {
+            e.printStackTrace();
+        }
     }
 }

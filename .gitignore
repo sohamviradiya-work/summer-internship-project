@@ -5,6 +5,7 @@ regression-finder/build/
 .idea/
 .DS_Store
 
-regression-finder/src/main/java/com/main/resources/repository
 .vscode/
 regression-finder/test_results.csv
+regression-finder/test-area/*
+regression-finder/commmit-list.csv
