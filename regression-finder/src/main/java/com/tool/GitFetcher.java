@@ -7,17 +7,9 @@ import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.Repository;
 import java.io.File;
 
-public class LocalRepository {
+public class GitFetcher {
 
-    public String path;
-    public Repository repository;
-
-    private LocalRepository(String path, Repository repository) {
-        this.path = path;
-        this.repository = repository;
-    }
-
-    static LocalRepository getRemoteRepository(String path, String link) {
+    static Repository getRemoteRepository(String path, String link) {
         File dir = new File(path);
         try {
             System.out.println("Cloning Repository");
@@ -28,7 +20,7 @@ public class LocalRepository {
                     .call()
                     .getRepository();
             System.out.println("Cloning Complete");
-            return new LocalRepository(path, repository);
+            return repository;
         } catch (InvalidRemoteException e) {
             System.err.println("Invalid Remote link" + e.getMessage());
         } catch (TransportException e) {
