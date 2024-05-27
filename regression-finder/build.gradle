@@ -12,12 +12,22 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    
+    implementation 'org.gradle:gradle-tooling-api:7.3-20210825160000+0000' 
 
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r'
 
     implementation 'org.eclipse.jgit:org.eclipse.jgit.ssh.apache:6.4.0.202211300538-r'
 
     implementation 'org.eclipse.jgit:org.eclipse.jgit.gpg.bc:6.4.0.202211300538-r'
+}
+
+
+task run(type: JavaExec) {
+    dependsOn('build')
+    main = 'com.tool.Main' 
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
 }
 
 test {
