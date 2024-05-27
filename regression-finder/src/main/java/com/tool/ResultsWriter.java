@@ -6,5 +6,5 @@ import com.tool.templates.TestResult;
 
 public interface ResultsWriter {
 
-    public void writeTestResult(TestResult testResult) throws IOException;
+    public void writeTestResult(TestResult testResult);
 }

@@ -16,7 +16,8 @@ public class CSVWriter implements ResultsWriter {
     }
 
     public void close() throws IOException {
-        this.writer.close();
+        
+        writer.close();
     }
 
     public static CSVWriter createNewWriter(String filePath) throws IOException{
@@ -24,8 +25,14 @@ public class CSVWriter implements ResultsWriter {
         return new CSVWriter(filePath, bufferedWriter);
     }
 
-    public void writeTestResult(TestResult testResult) throws IOException {
+    public void writeTestResult(TestResult testResult) {
+        try{
         writer.append(testResult.getTestClass() + "," + testResult.getTestMethod() + "," + testResult.getResult() + "\n");
+        writer.flush();
+        }
+        catch(IOException e){
+            System.out.println(e.getStackTrace());
+        }
     }
 }
 

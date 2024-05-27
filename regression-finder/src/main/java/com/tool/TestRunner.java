@@ -24,48 +24,51 @@ public class TestRunner {
         this.projectConnection = projectConnection;
     }
 
-    void runClassTests(String testClassName, List<String> testMethodNames,ResultsWriter resultsWriter) {
+    void runClassTests(String testClassName, List<String> testMethodNames, ResultsWriter resultsWriter) {
 
         TestLauncher testLauncher = projectConnection.newTestLauncher();
         testLauncher.setColorOutput(true);
         testLauncher.withTaskAndTestMethods("test", testClassName, testMethodNames);
-
         testLauncher.addProgressListener(new ProgressListener() {
             @Override
             public void statusChanged(ProgressEvent event) {
                 TestResult testResult = testLogger(event);
                 if(testResult != null) {
-                    try {
-                        resultsWriter.writeTestResult(testResult);
-                    } catch (IOException e) {
-                        
-                    }
+                    resultsWriter.writeTestResult(testResult);
                 }
             }
         },OperationType.TEST);
-
-        testLauncher.run();
+        try{
+            testLauncher.run();
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     void runAlltests(ResultsWriter resultsWriter) {
          BuildLauncher buildLauncher = projectConnection.newBuild();
             
          buildLauncher.forTasks("test");
-
+         buildLauncher.withArguments("--continue","--quiet");
          buildLauncher.addProgressListener(new ProgressListener() {
+            
             @Override
             public void statusChanged(ProgressEvent event){
+                
+
                 TestResult testResult = testLogger(event);
                 if(testResult != null)
-                    try {
-                        resultsWriter.writeTestResult(testResult);
-                    } catch (IOException e) {
-
-                    }
+                    resultsWriter.writeTestResult(testResult);
             }
          },OperationType.TEST);
 
-         buildLauncher.run();
+        try{
+            buildLauncher.run();
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private TestResult testLogger(ProgressEvent event) {

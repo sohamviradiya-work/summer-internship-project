@@ -8,10 +8,11 @@ public class Main {
     public static void main(String[] args) {
         
         
-        String repositoryLink = getRepositoryLink();
-
+     // String repositoryLink = getRepositoryLink();
+    // LocalRepository.getRemoteRepository(path, repositoryLink);
 
         try {
+           
             TargetProject targetProject = TargetProject.mountLocalProject(path, "7.6.4");   
             TestRunner testRunner = new TestRunner(targetProject.getConnection());
 
@@ -19,6 +20,7 @@ public class Main {
 
             testRunner.runAlltests(csvWriter);
             
+            csvWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

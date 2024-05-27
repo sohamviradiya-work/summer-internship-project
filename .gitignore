@@ -7,3 +7,4 @@ regression-finder/build/
 
 regression-finder/src/main/java/com/main/resources/repository
 .vscode/
+regression-finder/test_results.csv
