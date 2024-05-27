@@ -15,36 +15,35 @@ public class TargetProject {
     private ProjectConnection connection;
     private Repository repository;
 
-    private TargetProject(String path,ProjectConnection connection, Repository repository) {
+    private TargetProject(String path, ProjectConnection connection, Repository repository) {
         this.path = path;
         this.connection = connection;
         this.repository = repository;
     }
 
-    public static TargetProject mountLocalProject(String path, String version) throws IOException { 
-        
-        if(version.length()==0) 
-            version = DEFAULT_GRADLE_VERSION;
+    public static TargetProject mountLocalProject(String path, String gradleVersion) throws IOException {
+
+        if (gradleVersion.length() == 0)
+            gradleVersion = DEFAULT_GRADLE_VERSION;
 
         File directory = new File(path);
 
-        GradleConnector connector = GradleConnector.newConnector().useGradleVersion(version);
+        GradleConnector connector = GradleConnector.newConnector().useGradleVersion(gradleVersion);
         connector.forProjectDirectory(directory);
 
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
 
         Repository repository = builder.findGitDir(directory).build();
-    
-        return new TargetProject(path,connector.connect(),repository);
+
+        return new TargetProject(path, connector.connect(), repository);
     }
-    
-    public ProjectConnection getConnection(){
+
+    public ProjectConnection getConnection() {
         return this.connection;
     }
 
-    public Repository getRepository(){
+    public Repository getRepository() {
         return this.repository;
     }
-
 
 }
