@@ -1,9 +1,9 @@
 package com.tool;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
-import org.gradle.tooling.GradleConnector;
+import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.TestLauncher;
 import org.gradle.tooling.events.OperationType;
@@ -24,43 +24,67 @@ public class TestRunner {
         this.projectConnection = projectConnection;
     }
 
-    ArrayList<TestResult> runClassTests(String testClassName, List<String> testMethodNames) {
+    void runClassTests(String testClassName, List<String> testMethodNames,ResultsWriter resultsWriter) {
 
         TestLauncher testLauncher = projectConnection.newTestLauncher();
         testLauncher.setColorOutput(true);
         testLauncher.withTaskAndTestMethods("test", testClassName, testMethodNames);
-        ArrayList<TestResult> testResults = new ArrayList<TestResult>(testMethodNames.size());
-
 
         testLauncher.addProgressListener(new ProgressListener() {
             @Override
             public void statusChanged(ProgressEvent event) {
-                if (event instanceof DefaultTestFinishEvent) {
-                    DefaultJvmTestOperationDescriptor descriptor = (DefaultJvmTestOperationDescriptor) event
-                            .getDescriptor();
-                    TestOperationResult result = ((DefaultTestFinishEvent) event).getResult();
-                    String resultString;
-
-                    if (descriptor.getClassName() == null || descriptor.getMethodName() == null)
-                        return;
-
-                    if (result instanceof DefaultTestFailureResult)
-                        resultString = "FAILED";
-                    else
-                        resultString = "PASSED";
-                    TestResult testResult = new TestResult(descriptor.getClassName(), descriptor.getMethodName(), resultString) ;
-                    testResults.add(testResult);
+                TestResult testResult = testLogger(event);
+                if(testResult != null) {
+                    try {
+                        resultsWriter.writeTestResult(testResult);
+                    } catch (IOException e) {
+                        
+                    }
                 }
             }
         },OperationType.TEST);
-        return testResults;
+
+        testLauncher.run();
     }
 
-    ArrayList<TestResult> runAlltests() {
-        TestLauncher testLauncher = projectConnection.newTestLauncher();
-        ArrayList<TestResult> testResults = new ArrayList<TestResult>();
+    void runAlltests(ResultsWriter resultsWriter) {
+         BuildLauncher buildLauncher = projectConnection.newBuild();
+            
+         buildLauncher.forTasks("test");
 
+         buildLauncher.addProgressListener(new ProgressListener() {
+            @Override
+            public void statusChanged(ProgressEvent event){
+                TestResult testResult = testLogger(event);
+                if(testResult != null)
+                    try {
+                        resultsWriter.writeTestResult(testResult);
+                    } catch (IOException e) {
 
-        return testResults;
+                    }
+            }
+         },OperationType.TEST);
+
+         buildLauncher.run();
+    }
+
+    private TestResult testLogger(ProgressEvent event) {
+        if (event instanceof DefaultTestFinishEvent) {
+            DefaultJvmTestOperationDescriptor descriptor = (DefaultJvmTestOperationDescriptor) event
+                    .getDescriptor();
+            TestOperationResult result = ((DefaultTestFinishEvent) event).getResult();
+            String resultString;
+
+            if (descriptor.getClassName() == null || descriptor.getMethodName() == null)
+                return null;
+
+            if (result instanceof DefaultTestFailureResult)
+                resultString = "FAILED";
+            else
+                resultString = "PASSED";
+            TestResult testResult = new TestResult(descriptor.getClassName(), descriptor.getMethodName(), resultString) ;
+           return testResult;
+        }
+        return null;
     }
 }
