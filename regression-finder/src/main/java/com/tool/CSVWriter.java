@@ -7,11 +7,9 @@ import com.tool.templates.TestResult;
 
 public class CSVWriter implements ResultsWriter {
 
-    private String filePath;
     private BufferedWriter writer;
 
     CSVWriter(String filePath,BufferedWriter writer){
-        this.filePath = filePath;
         this.writer = writer;
     }
 

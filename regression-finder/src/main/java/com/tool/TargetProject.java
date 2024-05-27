@@ -11,12 +11,10 @@ import org.gradle.tooling.ProjectConnection;
 public class TargetProject {
 
     private static String DEFAULT_GRADLE_VERSION = "7.6.4";
-    private String path;
     private ProjectConnection connection;
     private Repository repository;
 
     private TargetProject(String path, ProjectConnection connection, Repository repository) {
-        this.path = path;
         this.connection = connection;
         this.repository = repository;
     }
