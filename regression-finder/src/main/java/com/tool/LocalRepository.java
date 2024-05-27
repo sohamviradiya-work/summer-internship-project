@@ -20,18 +20,6 @@ public class LocalRepository {
         this.repository = repository;
     }
 
-    static LocalRepository getLocalRepository(String path) {
-        File dir = new File(path);
-        FileRepositoryBuilder builder = new FileRepositoryBuilder();
-
-        try (Repository repository = builder.findGitDir(dir).build()) {
-            return new LocalRepository(path, repository);
-        } catch (IOException e) {
-            System.out.println("Unable to open" + path);
-            return null;
-        }
-    }
-
     static LocalRepository getRemoteRepository(String path, String link) {
         File dir = new File(path);
         try {
