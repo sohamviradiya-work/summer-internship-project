@@ -40,14 +40,7 @@ public class TestRunner {
         testLauncher.addProgressListener(new ProgressListener() {
             @Override
             public void statusChanged(ProgressEvent event) {
-                TestResult testResult = testLogger(event);
-                if (testResult != null) {
-                    try {
-                        resultsWriter.write(testResult);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+                testLogger(event, resultsWriter);
             }
         }, OperationType.TEST);
         try {
@@ -66,14 +59,7 @@ public class TestRunner {
 
             @Override
             public void statusChanged(ProgressEvent event) {
-
-                TestResult testResult = testLogger(event);
-                if (testResult != null)
-                    try {
-                        resultsWriter.write(testResult);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                testLogger(event, resultsWriter);
             }
         }, OperationType.TEST);
 
@@ -84,7 +70,7 @@ public class TestRunner {
         }
     }
 
-    private TestResult testLogger(ProgressEvent event) {
+    private void testLogger(ProgressEvent event, ItemWriter<TestResult> resultsWriter) {
         if (event instanceof DefaultTestFinishEvent) {
             DefaultJvmTestOperationDescriptor descriptor = (DefaultJvmTestOperationDescriptor) event
                     .getDescriptor();
@@ -92,15 +78,20 @@ public class TestRunner {
             String resultString;
 
             if (descriptor.getClassName() == null || descriptor.getMethodName() == null)
-                return null;
+                return;
 
             if (result instanceof DefaultTestFailureResult)
                 resultString = "FAILED";
             else
                 resultString = "PASSED";
             TestResult testResult = new TestResult(descriptor.getClassName(), descriptor.getMethodName(), resultString);
-            return testResult;
+            if (testResult != null) {
+                try {
+                    resultsWriter.write(testResult);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return null;
     }
 }
