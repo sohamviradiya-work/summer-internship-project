@@ -13,6 +13,7 @@ import org.gradle.tooling.events.test.TestOperationResult;
 import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
 
 import com.tool.templates.TestResult;
+import com.tool.templates.TestResult.TestIndentifier;
 import com.tool.writers.ArrayListWriter;
 import com.tool.writers.ItemWriter;
 
@@ -26,8 +27,10 @@ public class ProjectRunner {
         this.projectConnection = projectConnection;
     }
 
-    TestResult runSingleTest(String testClassName, String testMethodName) {
+    TestResult runSingleTest(TestIndentifier testIndentifier) {
         ArrayListWriter<TestResult> arrayListWriter = new ArrayListWriter<>();
+        String testClassName = testIndentifier.getTestClass();
+        String testMethodName = testIndentifier.getTestMethod();
         runClassTests(testClassName, List.of(testMethodName), arrayListWriter);
         return arrayListWriter.getList().get(0);
     }
