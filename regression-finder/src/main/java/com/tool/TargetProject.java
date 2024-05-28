@@ -6,16 +6,15 @@ import java.io.IOException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.tooling.GradleConnector;
-import org.gradle.tooling.ProjectConnection;
 
 public class TargetProject {
 
     private static String DEFAULT_GRADLE_VERSION = "7.6.4";
-    private ProjectConnection connection;
+    private ProjectRunner projectRunner;
     private GitWorker gitWorker;
 
-    private TargetProject(String path, ProjectConnection connection, GitWorker gitWorker) {
-        this.connection = connection;
+    private TargetProject(String path, ProjectRunner projectRunner, GitWorker gitWorker) {
+        this.projectRunner = projectRunner;
         this.gitWorker = gitWorker;
     }
 
@@ -33,11 +32,12 @@ public class TargetProject {
 
         Repository repository = builder.findGitDir(directory).build();
         GitWorker gitFetcher = new GitWorker(repository);
-        return new TargetProject(path, connector.connect(), gitFetcher);
+        ProjectRunner projectRunner = new ProjectRunner(connector.connect());
+        return new TargetProject(path, projectRunner, gitFetcher);
     }
 
-    public ProjectConnection getConnection() {
-        return this.connection;
+    public ProjectRunner getRunner() {
+        return this.projectRunner;
     }
 
     public GitWorker getGitWorker(){
