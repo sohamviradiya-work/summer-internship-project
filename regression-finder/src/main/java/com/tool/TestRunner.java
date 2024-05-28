@@ -13,6 +13,7 @@ import org.gradle.tooling.events.test.TestOperationResult;
 import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
 
 import com.tool.templates.TestResult;
+import com.tool.writers.ArrayListWriter;
 import com.tool.writers.ItemWriter;
 
 import org.gradle.tooling.events.test.internal.DefaultJvmTestOperationDescriptor;
@@ -25,6 +26,12 @@ public class TestRunner {
         this.projectConnection = projectConnection;
     }
 
+    TestResult runSingleTest(String testClassName, String testMethodName) {
+        ArrayListWriter<TestResult> arrayListWriter = new ArrayListWriter<>();
+        runClassTests(testClassName, List.of(testMethodName), arrayListWriter);
+        return arrayListWriter.getList().get(0);
+    }
+
     void runClassTests(String testClassName, List<String> testMethodNames, ItemWriter<TestResult> resultsWriter) {
 
         TestLauncher testLauncher = projectConnection.newTestLauncher();
@@ -34,7 +41,7 @@ public class TestRunner {
             @Override
             public void statusChanged(ProgressEvent event) {
                 TestResult testResult = testLogger(event);
-                if(testResult != null) {
+                if (testResult != null) {
                     try {
                         resultsWriter.write(testResult);
                     } catch (IOException e) {
@@ -42,40 +49,37 @@ public class TestRunner {
                     }
                 }
             }
-        },OperationType.TEST);
-        try{
+        }, OperationType.TEST);
+        try {
             testLauncher.run();
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     void runAlltests(ItemWriter<TestResult> resultsWriter) {
-         BuildLauncher buildLauncher = projectConnection.newBuild();
-            
-         buildLauncher.forTasks("test");
-         buildLauncher.withArguments("--continue","--quiet");
-         buildLauncher.addProgressListener(new ProgressListener() {
-            
+        BuildLauncher buildLauncher = projectConnection.newBuild();
+
+        buildLauncher.forTasks("test");
+        buildLauncher.withArguments("--continue", "--quiet");
+        buildLauncher.addProgressListener(new ProgressListener() {
+
             @Override
-            public void statusChanged(ProgressEvent event){
-                
+            public void statusChanged(ProgressEvent event) {
 
                 TestResult testResult = testLogger(event);
-                if(testResult != null)
+                if (testResult != null)
                     try {
                         resultsWriter.write(testResult);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
             }
-         },OperationType.TEST);
+        }, OperationType.TEST);
 
-        try{
+        try {
             buildLauncher.run();
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -94,8 +98,8 @@ public class TestRunner {
                 resultString = "FAILED";
             else
                 resultString = "PASSED";
-            TestResult testResult = new TestResult(descriptor.getClassName(), descriptor.getMethodName(), resultString) ;
-           return testResult;
+            TestResult testResult = new TestResult(descriptor.getClassName(), descriptor.getMethodName(), resultString);
+            return testResult;
         }
         return null;
     }
