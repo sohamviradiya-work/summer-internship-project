@@ -16,6 +16,6 @@ public class RegressionBlame implements CSVItem{
     
     @Override
     public String toCSVString() {
-        return testClass + "," + testMethod + "," + commit + "," + author + "\n"; 
+        return testClass + "," + testMethod + "," + commit + "," + author; 
     }
 }
