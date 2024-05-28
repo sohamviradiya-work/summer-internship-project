@@ -22,6 +22,10 @@ public class GitCommit implements CSVItem {
         this.message = message;
     }
 
+    public static GitCommit createNullCommit(){
+        return new GitCommit(null, null, null, null, null, null);
+    }
+
     @Override
     public String toCSVString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -32,5 +36,9 @@ public class GitCommit implements CSVItem {
     
     public String getCommitId(){
         return commitId;
+    }
+
+    public String getAuthor(){
+        return authorMail;
     }
 }
