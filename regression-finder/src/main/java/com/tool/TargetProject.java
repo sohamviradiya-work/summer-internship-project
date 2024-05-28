@@ -12,11 +12,11 @@ public class TargetProject {
 
     private static String DEFAULT_GRADLE_VERSION = "7.6.4";
     private ProjectConnection connection;
-    private Repository repository;
+    private GitFetcher gitFetcher;
 
-    private TargetProject(String path, ProjectConnection connection, Repository repository) {
+    private TargetProject(String path, ProjectConnection connection, GitFetcher gitFetcher) {
         this.connection = connection;
-        this.repository = repository;
+        this.gitFetcher = gitFetcher;
     }
 
     public static TargetProject mountLocalProject(String path, String gradleVersion) throws IOException {
@@ -32,16 +32,16 @@ public class TargetProject {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
 
         Repository repository = builder.findGitDir(directory).build();
-
-        return new TargetProject(path, connector.connect(), repository);
+        GitFetcher gitFetcher = new GitFetcher(repository);
+        return new TargetProject(path, connector.connect(), gitFetcher);
     }
 
     public ProjectConnection getConnection() {
         return this.connection;
     }
 
-    public Repository getRepository() {
-        return this.repository;
+    public Repository getGitFetcher(){
+        return this.getGitFetcher();
     }
 
 }
