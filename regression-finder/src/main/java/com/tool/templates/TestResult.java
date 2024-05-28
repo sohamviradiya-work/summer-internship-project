@@ -6,13 +6,21 @@ public class TestResult {
         FAILED
     }
 
-    private String testClass;
-    private String testMethod;
+    public final class TestIndentifier {
+        public String testClass;
+        public String testMethod;
+
+        public TestIndentifier(String testClass, String testMethod) {
+            this.testClass = testClass;
+            this.testMethod = testMethod;
+        }
+    }
+
     private Result result;
+    private TestIndentifier testIndentifier;
 
     public TestResult(String testClass, String testMethod, String result) {
-        this.testClass = testClass;
-        this.testMethod = testMethod;
+        this.testIndentifier = new TestIndentifier(testClass,testMethod);
         this.result = parseResult(result);
     }
 
@@ -27,10 +35,14 @@ public class TestResult {
     }
 
     public String toCSVString() {
-        return testClass + "," + testMethod + "," + result.name();
+        return testIndentifier.testClass + "," + testIndentifier.testMethod + "," + result.name();
     }
 
     public Result getResult(){
         return result;
+    }
+
+    public TestIndentifier getUniqueIdentifier(){
+        return testIndentifier;
     }
 }
