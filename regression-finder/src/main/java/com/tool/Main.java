@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import com.tool.templates.CSVItem;
 import com.tool.templates.GitCommit;
 import com.tool.templates.RegressionBlame;
 import com.tool.writers.ArrayListWriter;

@@ -1,13 +1,8 @@
 package com.tool;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.tooling.GradleConnector;
@@ -15,9 +10,7 @@ import org.gradle.tooling.GradleConnector;
 import com.tool.templates.GitCommit;
 import com.tool.templates.RegressionBlame;
 import com.tool.templates.TestResult;
-import com.tool.templates.TestResult.Result;
 import com.tool.templates.TestResult.TestIndentifier;
-import com.tool.writers.ArrayListWriter;
 import com.tool.writers.ItemWriter;
 
 public class TargetProject {
@@ -59,7 +52,7 @@ public class TargetProject {
 
     void runFailedTests(ArrayList<GitCommit> gitCommits,ItemWriter<RegressionBlame> writer)
             throws IOException {
-        ArrayList<TestResult.TestIndentifier> failingTests = getInitialResults();
+        ArrayList<TestResult.TestIndentifier> failingTests = projectRunner.getFailingTests();
     
         GitCommit lastCommit = GitCommit.createNullCommit();
     
@@ -69,7 +62,7 @@ public class TargetProject {
             for(TestIndentifier testIndentifier:failingTests){
                TestResult testResult = projectRunner.runSingleTest(testIndentifier);
                 if(testResult.getResult()==TestResult.Result.PASSED){
-                    writer.write(new RegressionBlame(testIndentifier,gitCommit));
+                    writer.write(new RegressionBlame(testIndentifier,lastCommit));
                     toBeRemoved.add(testIndentifier);
                 }
             }
@@ -81,22 +74,6 @@ public class TargetProject {
     
             lastCommit = gitCommit;
         }
-    }
-
-    private ArrayList<TestResult.TestIndentifier> getInitialResults() {
-        ArrayList<TestResult.TestIndentifier> failingTests = new ArrayList<TestResult.TestIndentifier>();
-    
-        ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<TestResult>();
-    
-        projectRunner.runAlltests(testResultsWriter);
-        ArrayList<TestResult> testResults = testResultsWriter.getList();
-    
-        for (TestResult testResult : testResults) {
-            if(testResult.getResult()==TestResult.Result.FAILED){
-                failingTests.add(testResult.getUniqueIdentifier());
-            }
-        }
-        return failingTests;
     }
 
 }

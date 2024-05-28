@@ -1,6 +1,7 @@
 package com.tool;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gradle.tooling.BuildLauncher;
@@ -96,5 +97,22 @@ public class ProjectRunner {
                 }
             }
         }
+    }
+
+    public ArrayList<TestIndentifier> getFailingTests() {
+        ArrayList<TestIndentifier> failingTests = new ArrayList<TestIndentifier>();
+    
+        ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<TestResult>();
+    
+        runAlltests(testResultsWriter);
+        
+        ArrayList<TestResult> testResults = testResultsWriter.getList();
+    
+        for (TestResult testResult : testResults) {
+            if(testResult.getResult()==TestResult.Result.FAILED){
+                failingTests.add(testResult.getUniqueIdentifier());
+            }
+        }
+        return failingTests;
     }
 }
