@@ -1,4 +1,4 @@
-package com.tool;
+package com.tool.writers;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -16,7 +16,6 @@ public class CSVWriter implements ResultsWriter {
     }
 
     public void close() throws IOException {
-
         writer.close();
     }
 
@@ -25,23 +24,19 @@ public class CSVWriter implements ResultsWriter {
         return new CSVWriter(filePath, bufferedWriter);
     }
 
-    @Override
-    public void writeLine(String line){
-        try {
-            writer.append(line);
-            writer.flush();
-        } catch (IOException e) {
-            System.out.println(e.getStackTrace());
-        }
+    public void writeLine(String line) throws IOException {
+        writer.append(line);
+        writer.flush();
     }
 
     @Override
-    public void writeTestResult(TestResult testResult) {
+    public void writeTestResult(TestResult testResult) throws IOException {
         writeLine(testResult.getTestClass() + "," + testResult.getTestMethod() + "," + testResult.getResult() + "\n");
     }
 
     @Override
-    public void writeCommit(GitCommit gitCommit) {
-        writeLine(gitCommit.commitId + "," + gitCommit.parentCommitId + "," + gitCommit.authorMail + "," + gitCommit.branch + "\n");  
+    public void writeCommit(GitCommit gitCommit) throws IOException {
+        writeLine(gitCommit.commitId + "," + gitCommit.parentCommitId + "," + gitCommit.authorMail + ","
+                + gitCommit.branch + "," + gitCommit.message + "\n");
     }
 }
