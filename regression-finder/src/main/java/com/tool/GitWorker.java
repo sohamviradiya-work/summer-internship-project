@@ -4,24 +4,24 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.revwalk.DepthWalk.Commit;
 
 import com.tool.templates.GitCommit;
 import com.tool.writers.ItemWriter;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
+import java.util.List;
 
-public class GitFetcher {
+public class GitWorker {
 
     private Repository repository;
     private RevWalk revWalk;
 
-    public GitFetcher(Repository repository) {
+    public GitWorker(Repository repository) {
         this.repository = repository;
         this.revWalk = new RevWalk(repository);
     }
@@ -34,7 +34,7 @@ public class GitFetcher {
         revWalk.close();
     }
 
-    static GitFetcher getRemoteRepository(String path, String link) {
+    static GitWorker getRemoteRepository(String path, String link) {
         File dir = new File(path);
         try {
             System.out.println("Cloning Repository");
@@ -45,7 +45,7 @@ public class GitFetcher {
                     .call()
                     .getRepository();
             System.out.println("Cloning Complete");
-            return new GitFetcher(repository);
+            return new GitWorker(repository);
 
         } catch (InvalidRemoteException e) {
             System.err.println("Invalid Remote link" + e.getMessage());
@@ -66,29 +66,38 @@ public class GitFetcher {
                 e.printStackTrace();
             }
     }
+public void listCommits(ItemWriter<GitCommit> commitsWriter) throws IOException {
+    try (Git git = new Git(repository)) {
+        List<Ref> branches = git.branchList().call();
+        for (Ref branch : branches) {
+            String branchName = branch.getName();
 
-    public void listCommits(ItemWriter<GitCommit> commitsWriter) throws IOException{
-
-        try (Git git = new Git(repository)) {
-                Iterable<RevCommit> commits = git.log().call();
-                
-                for (RevCommit commit : commits) {
-
-                    String parentId;
-                    if(commit.getParentCount()>0){
-                        RevCommit parent = commit.getParent(0);
-                        parentId = parent.getName();
-                    }
-                    else{
-                        parentId = "HEAD";
-                    }
-
-                    commitsWriter.write(new GitCommit(commit.getAuthorIdent().getEmailAddress(), commit.getName(),parentId,"", commit.getCommitTime(),commit.getShortMessage()));
+            Iterable<RevCommit> commits = git.log().add(repository.resolve(branchName)).call();
+            
+            for (RevCommit commit : commits) {
+                String parentId;
+                if (commit.getParentCount() > 0) {
+                    RevCommit parent = commit.getParent(0);
+                    parentId = parent.getName();
+                } else {
+                    parentId = "HEAD";
                 }
-        } catch (GitAPIException e) {
-            e.printStackTrace();
+
+                commitsWriter.write(new GitCommit(
+                        commit.getAuthorIdent().getEmailAddress(),
+                        commit.getName(),
+                        parentId,
+                        branchName,
+                        commit.getAuthorIdent().getWhen(),
+                        commit.getShortMessage()
+                ));
+            }
         }
+    } catch (GitAPIException e) {
+        e.printStackTrace();
     }
+}
+
 
 
 }

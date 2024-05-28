@@ -1,19 +1,18 @@
 package com.tool.templates;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class GitCommit implements CSVItem {
     private String authorMail;
     private String commitId;
     private String parentCommitId;
     private String branch;
-    private int time;
+    private Date time;
     private String message;
 
-    public GitCommit(String authorMail, String commitId, String parentCommitId, String branch, int time,
+    public GitCommit(String authorMail, String commitId, String parentCommitId, String branch, Date time,
                      String message) {
         this.authorMail = authorMail;
         this.commitId = commitId;
@@ -25,11 +24,12 @@ public class GitCommit implements CSVItem {
 
     @Override
     public String toCSVString() {
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
-        String formattedTime = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        return authorMail + "," + commitId + "," + parentCommitId + "," + branch + "," + formattedTime + "," + message;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                dateFormat.setTimeZone(TimeZone.getDefault()); 
+                
+        return authorMail + "," + commitId + "," + parentCommitId + "," + branch + "," + dateFormat.format(time) + "," + message;
     }
-
+    
     public String getCommitId(){
         return commitId;
     }
