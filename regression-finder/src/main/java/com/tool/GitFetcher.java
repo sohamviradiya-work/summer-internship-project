@@ -7,6 +7,7 @@ import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.revwalk.DepthWalk.Commit;
 
 import com.tool.templates.GitCommit;
 
@@ -50,7 +51,6 @@ public class GitFetcher {
         } catch (GitAPIException e) {
             System.err.println(e.getMessage());
         }
-
         return null;
     }
 
@@ -65,14 +65,27 @@ public class GitFetcher {
     }
 
     public void listCommits(ResultsWriter resultsWriter){
-        try {
-            Iterable<RevCommit> commits = new Git(repository).log().call();
-            
-            for (RevCommit commit : commits) {
-                resultsWriter.writeCommit(new GitCommit(commit.getAuthorIdent().getEmailAddress(), commit.getId().toString(),commit.getParent(0).getId().toString(),"", commit.getCommitTime()));
-            }
+        
+        try (Git git = new Git(repository)) {
+                Iterable<RevCommit> commits = git.log().call();
+                
+                for (RevCommit commit : commits) {
+
+                    String parentId;
+                    if(commit.getParentCount()>0){
+                        RevCommit parent = commit.getParent(0);
+                        parentId = parent.getName();
+                    }
+                    else{
+                        parentId = "HEAD";
+                    }
+
+                    resultsWriter.writeCommit(new GitCommit(commit.getAuthorIdent().getEmailAddress(), commit.getName(),parentId,"", commit.getCommitTime()));
+                }
         } catch (GitAPIException e) {
             e.printStackTrace();
         }
     }
+
+
 }

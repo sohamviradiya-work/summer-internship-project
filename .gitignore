@@ -7,5 +7,6 @@ regression-finder/build/
 
 .vscode/
 regression-finder/test_results.csv
-regression-finder/test-area/*
+regression-finder/test-area/
 regression-finder/commmit-list.csv
+regression-finder/test-area/repository
