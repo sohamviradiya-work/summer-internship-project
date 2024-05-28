@@ -1,7 +1,8 @@
 package com.tool;
 
+import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
@@ -40,14 +41,21 @@ public class GitWorker {
         File dir = new File(path);
         try {
             System.out.println("Cloning Repository");
-            Repository repository = Git.cloneRepository()
+            Git git = Git.cloneRepository()
                     .setURI(link)
                     .setDirectory(dir)
-                    .setCloneAllBranches(true)
-                    .call()
-                    .getRepository();
+                    .setCloneAllBranches(false)
+                    .call();
+
+            git.fetch().call();
+
+            List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
+            for (Ref ref : remoteBranches) {
+                cloneBranchToLocal(git, ref);
+            }
             System.out.println("Cloning Complete");
-            return new GitWorker(repository);
+
+            return new GitWorker(git.getRepository());
 
         } catch (InvalidRemoteException e) {
             System.err.println("Invalid Remote link" + e.getMessage());
@@ -57,6 +65,21 @@ public class GitWorker {
             System.err.println(e.getMessage());
         }
         return null;
+    }
+
+    private static void cloneBranchToLocal(Git git, Ref ref) {
+        try{
+        String branchName = ref.getName().replace("refs/remotes/origin/", "");
+        git.branchCreate()
+                .setName(branchName)
+                .setStartPoint(ref.getName())
+                .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                .call();
+            System.out.println("Cloned branch " + branchName);
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     public void checkoutToCommit(String commitTag) {
@@ -72,7 +95,7 @@ public class GitWorker {
     public void listCommits(ItemWriter<GitCommit> commitsWriter) throws IOException {
         try (Git git = new Git(repository)) {
             
-            List<Ref> branches = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call();
+            List<Ref> branches = git.branchList().call();
 
             for (Ref branch : branches) {
                 String branchName = branch.getName();
