@@ -7,12 +7,20 @@ public class TestResult {
     }
 
     public final class TestIndentifier {
-        public String testClass;
-        public String testMethod;
+        private String testClass;
+        private String testMethod;
 
         public TestIndentifier(String testClass, String testMethod) {
             this.testClass = testClass;
             this.testMethod = testMethod;
+        }
+
+        public String getTestClass(){
+            return testClass;
+        }
+
+        public String getTestMethod(){
+            return testMethod;
         }
     }
 
