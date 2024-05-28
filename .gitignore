@@ -6,7 +6,6 @@ regression-finder/build/
 .DS_Store
 
 .vscode/
-regression-finder/test_results.csv
 regression-finder/test-area/
-regression-finder/commmit-list.csv
-regression-finder/test-area/repository
+
+regression-finder/results/
