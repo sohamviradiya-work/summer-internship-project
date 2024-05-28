@@ -19,10 +19,10 @@ import com.tool.writers.ItemWriter;
 import org.gradle.tooling.events.test.internal.DefaultJvmTestOperationDescriptor;
 import org.gradle.tooling.events.test.internal.DefaultTestFailureResult;
 
-public class TestRunner {
+public class ProjectRunner {
     private ProjectConnection projectConnection;
 
-    TestRunner(ProjectConnection projectConnection) {
+    ProjectRunner(ProjectConnection projectConnection) {
         this.projectConnection = projectConnection;
     }
 
