@@ -40,8 +40,8 @@ public class TargetProject {
         return this.connection;
     }
 
-    public Repository getGitFetcher(){
-        return this.getGitFetcher();
+    public GitFetcher getGitFetcher(){
+        return this.gitFetcher;
     }
 
 }

@@ -10,8 +10,11 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.DepthWalk.Commit;
 
 import com.tool.templates.GitCommit;
+import com.tool.writers.ItemWriter;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 
 public class GitFetcher {
 
@@ -54,7 +57,7 @@ public class GitFetcher {
         return null;
     }
 
-    public void checkoutToCommit(Repository repository,String commitTag){
+    public void checkoutToCommit(String commitTag){
         try (Git git = new Git(repository)) {
                 RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
                 git.checkout().setName(commit.getName()).call();
@@ -64,8 +67,8 @@ public class GitFetcher {
             }
     }
 
-    public void listCommits(ResultsWriter resultsWriter){
-        
+    public void listCommits(ItemWriter<GitCommit> commitsWriter) throws IOException{
+
         try (Git git = new Git(repository)) {
                 Iterable<RevCommit> commits = git.log().call();
                 
@@ -80,7 +83,7 @@ public class GitFetcher {
                         parentId = "HEAD";
                     }
 
-                    resultsWriter.writeCommit(new GitCommit(commit.getAuthorIdent().getEmailAddress(), commit.getName(),parentId,"", commit.getCommitTime()));
+                    commitsWriter.write(new GitCommit(commit.getAuthorIdent().getEmailAddress(), commit.getName(),parentId,"", commit.getCommitTime(),commit.getShortMessage()));
                 }
         } catch (GitAPIException e) {
             e.printStackTrace();

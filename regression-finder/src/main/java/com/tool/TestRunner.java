@@ -1,5 +1,6 @@
 package com.tool;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.gradle.tooling.BuildLauncher;
@@ -12,6 +13,7 @@ import org.gradle.tooling.events.test.TestOperationResult;
 import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
 
 import com.tool.templates.TestResult;
+import com.tool.writers.ItemWriter;
 
 import org.gradle.tooling.events.test.internal.DefaultJvmTestOperationDescriptor;
 import org.gradle.tooling.events.test.internal.DefaultTestFailureResult;
@@ -23,7 +25,7 @@ public class TestRunner {
         this.projectConnection = projectConnection;
     }
 
-    void runClassTests(String testClassName, List<String> testMethodNames, ResultsWriter resultsWriter) {
+    void runClassTests(String testClassName, List<String> testMethodNames, ItemWriter<TestResult> resultsWriter) {
 
         TestLauncher testLauncher = projectConnection.newTestLauncher();
         testLauncher.setColorOutput(true);
@@ -33,7 +35,11 @@ public class TestRunner {
             public void statusChanged(ProgressEvent event) {
                 TestResult testResult = testLogger(event);
                 if(testResult != null) {
-                    resultsWriter.writeTestResult(testResult);
+                    try {
+                        resultsWriter.write(testResult);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         },OperationType.TEST);
@@ -45,7 +51,7 @@ public class TestRunner {
         }
     }
 
-    void runAlltests(ResultsWriter resultsWriter) {
+    void runAlltests(ItemWriter<TestResult> resultsWriter) {
          BuildLauncher buildLauncher = projectConnection.newBuild();
             
          buildLauncher.forTasks("test");
@@ -58,7 +64,11 @@ public class TestRunner {
 
                 TestResult testResult = testLogger(event);
                 if(testResult != null)
-                    resultsWriter.writeTestResult(testResult);
+                    try {
+                        resultsWriter.write(testResult);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
             }
          },OperationType.TEST);
 

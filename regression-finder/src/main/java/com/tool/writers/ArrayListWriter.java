@@ -1,37 +1,21 @@
 package com.tool.writers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
-import com.tool.templates.GitCommit;
-import com.tool.templates.TestResult;
-
-public class ArrayListWriter implements ResultsWriter {
-
-    private ArrayList<TestResult> testResults;
-    private ArrayList<GitCommit> gitCommits;
+public class ArrayListWriter<T> implements ItemWriter<T> {
+    private ArrayList<T> list;
 
     public ArrayListWriter() {
-        this.testResults = new ArrayList<TestResult>();
-        this.gitCommits = new ArrayList<GitCommit>();
+        this.list = new ArrayList<>();
     }
 
     @Override
-    public void writeTestResult(TestResult testResult) {
-        testResults.add(testResult);
+    public void write(T item) throws IOException {
+        list.add(item);
     }
 
-    @Override
-    public void writeCommit(GitCommit gitCommit) {
-        gitCommits.add(gitCommit);
+    public ArrayList<T> getList() {
+        return list;
     }
-
-    public ArrayList<TestResult> getTestResults(){
-        return testResults;
-    }
-
-
-    public ArrayList<GitCommit> getGitCommits(){
-        return gitCommits;
-    }
-    
 }

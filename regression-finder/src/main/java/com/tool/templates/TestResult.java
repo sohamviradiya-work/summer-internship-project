@@ -26,15 +26,11 @@ public class TestResult {
         }
     }
 
-    public String getTestClass() {
-        return testClass;
+    public String toCSVString() {
+        return testClass + "," + testMethod + "," + result.name();
     }
 
-    public String getTestMethod() {
-        return testMethod;
-    }
-
-    public Result getResult() {
+    public Result getResult(){
         return result;
     }
 }
