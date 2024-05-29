@@ -47,34 +47,39 @@ public class TargetProject {
         return this.gradleWorker;
     }
 
-    public GitWorker getGitWorker(){
+    public GitWorker getGitWorker() {
         return this.gitWorker;
     }
 
-    void runFailedTests(ArrayList<GitCommit> gitCommits,ItemWriter<RegressionBlame> regressionBlameWriter)
+    void runFailedTestsCommitWise(ArrayList<GitCommit> gitCommits, ItemWriter<RegressionBlame> regressionBlameWriter)
             throws IOException {
-        ArrayList<TestResult.TestIndentifier> failingTests = gradleWorker.getFailingTests();
-    
+
+        ArrayList<TestIndentifier> failingTests = gradleWorker.getFailingTests();
+
         GitCommit lastCommit = GitCommit.createNullCommit();
-    
+
         for (GitCommit gitCommit : gitCommits) {
+      
             gitWorker.checkoutToCommit(gitCommit.getCommitId());
-            
+
             ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<>();
+            gradleWorker.runTests(failingTests, testResultsWriter);
 
-            gradleWorker.runTests(failingTests, testResultsWriter);            
-            
-            for(TestResult testResults: testResultsWriter.getList()){
-                if(testResults.getResult()==TestResult.Result.PASSED){
+            for (TestResult testResult : testResultsWriter.getList()) {
+                if (testResult.getResult() == TestResult.Result.PASSED) {
 
-                    RegressionBlame regressionBlame = new RegressionBlame(testResults.getIdentifier(), lastCommit);
+                    RegressionBlame regressionBlame = new RegressionBlame(testResult.getIdentifier(), lastCommit);
                     regressionBlameWriter.write(regressionBlame);
-                    failingTests.remove(testResults.getIdentifier());
+
+                    failingTests.removeIf(testIdentifier -> testIdentifier.getTestClass()
+                            .equals(testResult.getIdentifier().getTestClass()) &&
+                            testIdentifier.getTestMethod().equals(testResult.getIdentifier().getTestMethod()));
                 }
             }
-            
-            if(failingTests.isEmpty()) break;
-    
+
+            if (failingTests.isEmpty())
+                break;
+
             lastCommit = gitCommit;
         }
     }

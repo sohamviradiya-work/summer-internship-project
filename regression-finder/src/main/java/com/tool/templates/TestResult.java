@@ -50,7 +50,7 @@ public class TestResult {
         return result;
     }
 
-    public TestIndentifier getUniqueIdentifier(){
+    public TestIndentifier getIdentifier(){
         return testIndentifier;
     }
 }

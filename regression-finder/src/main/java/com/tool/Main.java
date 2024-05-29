@@ -43,7 +43,7 @@ public class Main {
 
         CSVWriter<RegressionBlame> csvWriter = CSVWriter.create("./results/blame-tests.csv");
 
-        targetProject.runFailedTests(gitCommits,csvWriter);
+        targetProject.runFailedTestsCommitWise(gitCommits,csvWriter);
     }
 
     private static String getRepositoryLink() {
