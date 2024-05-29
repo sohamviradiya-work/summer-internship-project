@@ -17,7 +17,6 @@ public class CSVWriter<T extends CSVItem> implements ItemWriter<T> {
     public void write(T item) throws IOException {
         writer.write(item.toCSVString());
         writer.newLine();
-        writer.flush();
     }
 
     public static <T extends CSVItem> CSVWriter<T> create(String filePath) throws IOException {
@@ -27,6 +26,7 @@ public class CSVWriter<T extends CSVItem> implements ItemWriter<T> {
 
     public void close() throws IOException {
         if (writer != null) {
+            writer.flush();
             writer.close();
         }
     }
