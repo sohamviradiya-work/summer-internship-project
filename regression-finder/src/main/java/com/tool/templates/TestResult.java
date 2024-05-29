@@ -32,7 +32,7 @@ public class TestResult {
         this.result = parseResult(result);
     }
 
-    private Result parseResult(String result) {
+    private static Result parseResult(String result) {
         if (result.equalsIgnoreCase("PASSED")) {
             return Result.PASSED;
         } else if (result.equalsIgnoreCase("FAILED")) {
