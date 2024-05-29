@@ -55,7 +55,7 @@ public class TargetProject {
 
         ArrayList<TestIndentifier> failingTests = gradleWorker.getFailingTests();
 
-        GitCommit lastCommit = GitCommit.createNullCommit();
+        GitCommit commitAfter = GitCommit.createNullCommit();
 
         for (GitCommit gitCommit : branchCommits) {
 
@@ -67,7 +67,7 @@ public class TargetProject {
             for (TestResult testResult : testResultsWriter.getList()) {
                 if (testResult.getResult() != TestResult.Result.FAILED) {
 
-                    RegressionBlame regressionBlame = new RegressionBlame(testResult.getIdentifier(), lastCommit);
+                    RegressionBlame regressionBlame = new RegressionBlame(testResult.getIdentifier(), commitAfter);
                     regressionBlameWriter.write(regressionBlame);
 
                     failingTests.removeIf(testIdentifier -> testIdentifier.getTestClass().equals(testResult.getIdentifier().getTestClass()) && testIdentifier.getTestMethod().equals(testResult.getIdentifier().getTestMethod()));
@@ -77,7 +77,7 @@ public class TargetProject {
             if (failingTests.isEmpty())
                 break;
 
-            lastCommit = gitCommit;
+            commitAfter = gitCommit;
         }
 
         gitWorker.checkoutToCommit(branchCommits.get(0).getCommitId());
