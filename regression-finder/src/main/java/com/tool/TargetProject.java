@@ -11,16 +11,17 @@ import com.tool.templates.GitCommit;
 import com.tool.templates.RegressionBlame;
 import com.tool.templates.TestResult;
 import com.tool.templates.TestResult.TestIndentifier;
+import com.tool.writers.ArrayListWriter;
 import com.tool.writers.ItemWriter;
 
 public class TargetProject {
 
     private static String DEFAULT_GRADLE_VERSION = "7.6.4";
-    private ProjectRunner projectRunner;
+    private GradleWorker gradleWorker;
     private GitWorker gitWorker;
 
-    private TargetProject(String path, ProjectRunner projectRunner, GitWorker gitWorker) {
-        this.projectRunner = projectRunner;
+    private TargetProject(String path, GradleWorker gradleWorker, GitWorker gitWorker) {
+        this.gradleWorker = gradleWorker;
         this.gitWorker = gitWorker;
     }
 
@@ -38,38 +39,40 @@ public class TargetProject {
 
         Repository repository = builder.findGitDir(directory).build();
         GitWorker gitWorker = new GitWorker(repository);
-        ProjectRunner projectRunner = new ProjectRunner(connector.connect());
-        return new TargetProject(path, projectRunner, gitWorker);
+        GradleWorker gradleWorker = new GradleWorker(connector.connect());
+        return new TargetProject(path, gradleWorker, gitWorker);
     }
 
-    public ProjectRunner getRunner() {
-        return this.projectRunner;
+    public GradleWorker getRunner() {
+        return this.gradleWorker;
     }
 
     public GitWorker getGitWorker(){
         return this.gitWorker;
     }
 
-    void runFailedTests(ArrayList<GitCommit> gitCommits,ItemWriter<RegressionBlame> writer)
+    void runFailedTests(ArrayList<GitCommit> gitCommits,ItemWriter<RegressionBlame> regressionBlameWriter)
             throws IOException {
-        ArrayList<TestResult.TestIndentifier> failingTests = projectRunner.getFailingTests();
+        ArrayList<TestResult.TestIndentifier> failingTests = gradleWorker.getFailingTests();
     
         GitCommit lastCommit = GitCommit.createNullCommit();
     
         for (GitCommit gitCommit : gitCommits) {
             gitWorker.checkoutToCommit(gitCommit.getCommitId());
-            ArrayList<TestResult.TestIndentifier> toBeRemoved = new ArrayList<>();
-            for(TestIndentifier testIndentifier:failingTests){
-               TestResult testResult = projectRunner.runSingleTest(testIndentifier);
-                if(testResult.getResult()==TestResult.Result.PASSED){
-                    writer.write(new RegressionBlame(testIndentifier,lastCommit));
-                    toBeRemoved.add(testIndentifier);
+            
+            ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<>();
+
+            gradleWorker.runTests(failingTests, testResultsWriter);            
+            
+            for(TestResult testResults: testResultsWriter.getList()){
+                if(testResults.getResult()==TestResult.Result.PASSED){
+
+                    RegressionBlame regressionBlame = new RegressionBlame(testResults.getIdentifier(), lastCommit);
+                    regressionBlameWriter.write(regressionBlame);
+                    failingTests.remove(testResults.getIdentifier());
                 }
             }
-    
-            for(TestIndentifier testIndentifier:toBeRemoved){
-                failingTests.remove(testIndentifier);
-            }
+            
             if(failingTests.isEmpty()) break;
     
             lastCommit = gitCommit;

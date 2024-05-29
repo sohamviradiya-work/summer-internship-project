@@ -21,26 +21,27 @@ import com.tool.writers.ItemWriter;
 import org.gradle.tooling.events.test.internal.DefaultJvmTestOperationDescriptor;
 import org.gradle.tooling.events.test.internal.DefaultTestFailureResult;
 
-public class ProjectRunner {
+public class GradleWorker {
     private ProjectConnection projectConnection;
 
-    ProjectRunner(ProjectConnection projectConnection) {
+    GradleWorker(ProjectConnection projectConnection) {
         this.projectConnection = projectConnection;
     }
 
     TestResult runSingleTest(TestIndentifier testIndentifier) {
         ArrayListWriter<TestResult> arrayListWriter = new ArrayListWriter<>();
-        String testClassName = testIndentifier.getTestClass();
-        String testMethodName = testIndentifier.getTestMethod();
-        runClassTests(testClassName, List.of(testMethodName), arrayListWriter);
+        runTests(List.of(testIndentifier), arrayListWriter);
         return arrayListWriter.getList().get(0);
     }
 
-    void runClassTests(String testClassName, List<String> testMethodNames, ItemWriter<TestResult> resultsWriter) {
+    void runTests(List<TestIndentifier> testIndentifiers, ItemWriter<TestResult> resultsWriter) {
 
         TestLauncher testLauncher = projectConnection.newTestLauncher();
         testLauncher.setColorOutput(true);
-        testLauncher.withTaskAndTestMethods("test", testClassName, testMethodNames);
+        
+        for(TestIndentifier testIndentifier:testIndentifiers){
+            testLauncher.withTaskAndTestMethods("test", testIndentifier.getTestClass(), List.of(testIndentifier.getTestMethod()));
+        }
         testLauncher.addProgressListener(new ProgressListener() {
             @Override
             public void statusChanged(ProgressEvent event) {
@@ -110,7 +111,7 @@ public class ProjectRunner {
     
         for (TestResult testResult : testResults) {
             if(testResult.getResult()==TestResult.Result.FAILED){
-                failingTests.add(testResult.getUniqueIdentifier());
+                failingTests.add(testResult.getIdentifier());
             }
         }
         return failingTests;
