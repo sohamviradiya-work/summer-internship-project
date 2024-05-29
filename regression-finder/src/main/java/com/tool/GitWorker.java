@@ -17,6 +17,9 @@ import com.tool.writers.ItemWriter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class GitWorker {
@@ -128,5 +131,21 @@ public class GitWorker {
         } catch (GitAPIException e) {
             e.printStackTrace();
         }
+    }
+
+    static HashMap<String, ArrayList<GitCommit>> groupCommitsByBranch(ArrayList<GitCommit> gitCommits) {
+        HashMap<String,ArrayList<GitCommit>> branchCommitMap = new HashMap<>();
+        HashSet<String> assignedCommits = new HashSet<String>();
+    
+        for(GitCommit gitCommit: gitCommits){
+            if(assignedCommits.contains(gitCommit.getCommitId()))
+                continue;
+            if(!branchCommitMap.containsKey(gitCommit.getBranch())){
+                branchCommitMap.put(gitCommit.getBranch(), new ArrayList<>());
+            }
+            branchCommitMap.get(gitCommit.getBranch()).add(gitCommit);
+            assignedCommits.add(gitCommit.getCommitId());
+        }
+        return branchCommitMap;
     }
 }
