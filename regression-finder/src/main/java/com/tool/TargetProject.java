@@ -58,6 +58,8 @@ public class TargetProject {
 
         GitCommit lastCommit = GitCommit.createNullCommit();
 
+        
+
         for (GitCommit gitCommit : gitCommits) {
       
             gitWorker.checkoutToCommit(gitCommit.getCommitId());
@@ -82,6 +84,8 @@ public class TargetProject {
 
             lastCommit = gitCommit;
         }
+
+        gitWorker.checkoutToCommit(gitCommits.get(0).getCommitId());
     }
 
 }
