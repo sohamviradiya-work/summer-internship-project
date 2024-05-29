@@ -41,4 +41,8 @@ public class GitCommit implements CSVItem {
     public String getAuthor(){
         return authorMail;
     }
+
+    public String getBranch(){
+        return branch;
+    }
 }
