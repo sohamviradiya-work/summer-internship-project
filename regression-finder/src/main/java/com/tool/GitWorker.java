@@ -101,13 +101,17 @@ public class GitWorker {
         return new GitWorker(git);
     }
 
-    private static void cloneBranchToLocal(Git git, Ref ref) throws GitAPIException {
-        String branchName = ref.getName().replace("refs/remotes/origin/", "");
-        git.branchCreate()
-                .setName(branchName)
-                .setStartPoint(ref.getName())
-                .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-                .call();
-        System.out.println("Cloned branch " + branchName);
+    private static void cloneBranchToLocal(Git git, Ref ref) {
+        try {
+            String branchName = ref.getName().replace("refs/remotes/origin/", "");
+            git.branchCreate()
+                    .setName(branchName)
+                    .setStartPoint(ref.getName())
+                    .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                    .call();
+            System.out.println("Cloned branch " + branchName);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
