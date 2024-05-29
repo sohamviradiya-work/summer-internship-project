@@ -14,13 +14,10 @@ public class Main {
     public static String path = "./test-area/repository";
 
     public static void main(String[] args) {
-        // String repositoryLink = getRepositoryLink();
         String repositoryLink = "https://github.com/sohamviradiya-work/test-repo";
-        
         clean(path);
-        
         GitWorker.getRemoteRepository(path, repositoryLink);
-        
+
         try {
             run();
         } catch (IOException e) {
@@ -33,17 +30,16 @@ public class Main {
 
         GitWorker gitFetcher = targetProject.getGitWorker();
 
-        ArrayListWriter<GitCommit> arrayListWriter = new ArrayListWriter<GitCommit>();
-        
-        // CSVWriter<GitCommit> csvWriter = CSVWriter.create("./results/commits-list.csv");
+        // CSVWriter<GitCommit> csvWriter =
+        // CSVWriter.create("./results/commits-list.csv");
 
+        ArrayListWriter<GitCommit> arrayListWriter = new ArrayListWriter<GitCommit>();
         gitFetcher.listCommits(arrayListWriter);
 
         ArrayList<GitCommit> gitCommits = arrayListWriter.getList();
 
         CSVWriter<RegressionBlame> csvWriter = CSVWriter.create("./results/blame-tests.csv");
-
-        targetProject.runFailedTestsCommitWise(gitCommits,csvWriter);
+        targetProject.runFailedTestsBranchWise(gitCommits, csvWriter);
     }
 
     private static String getRepositoryLink() {
@@ -67,9 +63,9 @@ public class Main {
         if (files != null) {
             for (File file : files) {
                 if (file.isDirectory()) {
-                    cleanDirectory(file); 
+                    cleanDirectory(file);
                 }
-                file.delete(); 
+                file.delete();
             }
         }
     }

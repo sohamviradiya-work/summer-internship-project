@@ -3,6 +3,7 @@ package com.tool;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.tooling.GradleConnector;
@@ -51,17 +52,31 @@ public class TargetProject {
         return this.gitWorker;
     }
 
-    void runFailedTestsCommitWise(ArrayList<GitCommit> gitCommits, ItemWriter<RegressionBlame> regressionBlameWriter)
+    void runFailedTestsBranchWise(ArrayList<GitCommit> gitCommits, ItemWriter<RegressionBlame> regressionBlameWriter)
             throws IOException {
+
+        HashMap<String, ArrayList<GitCommit>> branchCommitMap = GitWorker.groupCommitsByBranch(gitCommits);
+        
+        for (String branch : branchCommitMap.keySet()) {
+
+            ArrayList<GitCommit> branchCommits = branchCommitMap.get(branch);
+
+            runFailedTestsForCommits(branchCommits,regressionBlameWriter);
+        }
+        gitWorker.checkoutToCommit(gitCommits.get(0).getCommitId());
+    }
+
+    private void runFailedTestsForCommits(ArrayList<GitCommit> branchCommits,ItemWriter<RegressionBlame> regressionBlameWriter)
+            throws IOException {
+
+        gitWorker.checkoutToCommit(branchCommits.get(0).getCommitId());
 
         ArrayList<TestIndentifier> failingTests = gradleWorker.getFailingTests();
 
         GitCommit lastCommit = GitCommit.createNullCommit();
 
-        
+        for (GitCommit gitCommit : branchCommits) {
 
-        for (GitCommit gitCommit : gitCommits) {
-      
             gitWorker.checkoutToCommit(gitCommit.getCommitId());
 
             ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<>();
@@ -73,9 +88,7 @@ public class TargetProject {
                     RegressionBlame regressionBlame = new RegressionBlame(testResult.getIdentifier(), lastCommit);
                     regressionBlameWriter.write(regressionBlame);
 
-                    failingTests.removeIf(testIdentifier -> testIdentifier.getTestClass()
-                            .equals(testResult.getIdentifier().getTestClass()) &&
-                            testIdentifier.getTestMethod().equals(testResult.getIdentifier().getTestMethod()));
+                    failingTests.removeIf(testIdentifier -> testIdentifier.getTestClass().equals(testResult.getIdentifier().getTestClass()) && testIdentifier.getTestMethod().equals(testResult.getIdentifier().getTestMethod()));
                 }
             }
 
@@ -84,8 +97,6 @@ public class TargetProject {
 
             lastCommit = gitCommit;
         }
-
-        gitWorker.checkoutToCommit(gitCommits.get(0).getCommitId());
     }
 
 }
