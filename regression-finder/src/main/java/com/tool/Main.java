@@ -2,12 +2,10 @@ package com.tool;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.tool.templates.GitCommit;
 import com.tool.templates.RegressionBlame;
-import com.tool.writers.ArrayListWriter;
 import com.tool.writers.CSVWriter;
 
 public class Main {
@@ -28,18 +26,14 @@ public class Main {
     private static void run() throws IOException {
         TargetProject targetProject = TargetProject.mountLocalProject(path, "7.6.4");
 
-        GitWorker gitFetcher = targetProject.getGitWorker();
+        GitWorker gitWorker = targetProject.getGitWorker();
 
-        // CSVWriter<GitCommit> csvWriter =
-        // CSVWriter.create("./results/commits-list.csv");
+        CSVWriter<GitCommit> csvWriter = CSVWriter.create("./results/commits-list.csv");
 
-        ArrayListWriter<GitCommit> arrayListWriter = new ArrayListWriter<GitCommit>();
-        gitFetcher.listCommits(arrayListWriter);
+        gitWorker.listCommits(csvWriter);
 
-        ArrayList<GitCommit> gitCommits = arrayListWriter.getList();
-
-        CSVWriter<RegressionBlame> csvWriter = CSVWriter.create("./results/blame-tests.csv");
-        targetProject.runFailedTestsBranchWise(gitCommits, csvWriter);
+        CSVWriter<RegressionBlame> blameCSVWriter = CSVWriter.create("./results/blame-tests.csv");
+        targetProject.runFailedTestsBranchWise(blameCSVWriter);
     }
 
     private static String getRepositoryLink() {

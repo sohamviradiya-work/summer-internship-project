@@ -52,15 +52,18 @@ public class TargetProject {
         return this.gitWorker;
     }
 
-    void runFailedTestsBranchWise(ArrayList<GitCommit> gitCommits, ItemWriter<RegressionBlame> regressionBlameWriter)
+    void runFailedTestsBranchWise(ItemWriter<RegressionBlame> regressionBlameWriter)
             throws IOException {
+
+        ArrayListWriter<GitCommit> arrayListWriter = new ArrayListWriter<GitCommit>();
+        gitWorker.listCommits(arrayListWriter);
+        ArrayList<GitCommit> gitCommits = arrayListWriter.getList();
+
 
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = GitWorker.groupCommitsByBranch(gitCommits);
         
         for (String branch : branchCommitMap.keySet()) {
-
             ArrayList<GitCommit> branchCommits = branchCommitMap.get(branch);
-
             runFailedTestsForCommits(branchCommits,regressionBlameWriter);
         }
         gitWorker.checkoutToCommit(gitCommits.get(0).getCommitId());
