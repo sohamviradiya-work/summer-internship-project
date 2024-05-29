@@ -1,7 +1,5 @@
 package com.tool.templates;
 
-import com.tool.templates.TestResult.TestIndentifier;
-
 public class RegressionBlame implements CSVItem{
     private String author;
     private String commit;

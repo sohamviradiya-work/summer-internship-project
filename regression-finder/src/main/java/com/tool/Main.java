@@ -2,7 +2,9 @@ package com.tool;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Map.Entry;
@@ -12,6 +14,7 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 
 import com.tool.templates.GitCommit;
 import com.tool.templates.RegressionBlame;
+import com.tool.templates.TestIndentifier;
 import com.tool.writers.CSVWriter;
 
 public class Main {
@@ -20,6 +23,7 @@ public class Main {
     public static void main(String[] args) {
         String repositoryLink = "https://github.com/sohamviradiya-work/test-repo";
         clean(path);
+        clean("./results");
 
         try {
             GitWorker.getRemoteRepository(path, repositoryLink);
@@ -42,9 +46,13 @@ public class Main {
                 csvWriter.write(gitCommit);
             }
         }
+        csvWriter.close();
 
         CSVWriter<RegressionBlame> blameCSVWriter = CSVWriter.create("./results/blame-tests.csv");
+        blameCSVWriter.write(new RegressionBlame(new TestIndentifier("testClass", "testMethod"),new GitCommit("author", "commit", "parent", "branch",Date.from(Instant.now()), "message")));
+
         targetProject.runFailedTestsBranchWise(blameCSVWriter);
+        blameCSVWriter.close();
     }
 
     private static String getRepositoryLink() {

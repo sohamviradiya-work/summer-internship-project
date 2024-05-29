@@ -13,8 +13,8 @@ import org.gradle.tooling.GradleConnector;
 
 import com.tool.templates.GitCommit;
 import com.tool.templates.RegressionBlame;
+import com.tool.templates.TestIndentifier;
 import com.tool.templates.TestResult;
-import com.tool.templates.TestResult.TestIndentifier;
 import com.tool.writers.ArrayListWriter;
 import com.tool.writers.ItemWriter;
 

@@ -13,8 +13,8 @@ import org.gradle.tooling.events.ProgressListener;
 import org.gradle.tooling.events.test.TestOperationResult;
 import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
 
+import com.tool.templates.TestIndentifier;
 import com.tool.templates.TestResult;
-import com.tool.templates.TestResult.TestIndentifier;
 import com.tool.writers.ArrayListWriter;
 import com.tool.writers.ItemWriter;
 
