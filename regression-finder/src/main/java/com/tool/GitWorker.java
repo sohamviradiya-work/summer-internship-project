@@ -101,29 +101,20 @@ public class GitWorker {
     public static GitWorker getRemoteRepository(String path, String link) throws GitAPIException {
         File dir = new File(path);
         System.out.println("Cloning Repository");
-        Git git = cloneRemoteRepository(link, dir);
-        System.out.println("Cloning Complete");
-
-        return new GitWorker(git);
-    }
-
-    private static Git cloneRemoteRepository(String link, File dir)
-            throws GitAPIException, InvalidRemoteException, TransportException {
-
         Git git = Git.cloneRepository()
                 .setURI(link)
                 .setDirectory(dir)
                 .setCloneAllBranches(false)
                 .call();
-
+        
         git.fetch().call();
-
+        
         List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
         for (Ref ref : remoteBranches) {
             cloneBranchToLocal(git, ref);
         }
-
-        return git;
+        System.out.println("Cloning Complete");
+        return new GitWorker(git);
     }
 
     private static void cloneBranchToLocal(Git git, Ref ref) throws GitAPIException {
