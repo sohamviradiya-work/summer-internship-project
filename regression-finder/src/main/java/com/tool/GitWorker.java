@@ -4,9 +4,7 @@ import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -68,21 +66,7 @@ public class GitWorker {
             }
             Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
             for (RevCommit commit : commits) {
-                String parentId;
-                if (commit.getParentCount() > 0) {
-                    RevCommit parent = commit.getParent(0);
-                    parentId = parent.getName();
-                } else {
-                    parentId = "HEAD";
-                }
-
-                GitCommit gitCommit = new GitCommit(
-                        commit.getAuthorIdent().getEmailAddress(),
-                        commit.getName(),
-                        parentId,
-                        branchName,
-                        commit.getAuthorIdent().getWhen(),
-                        commit.getShortMessage());
+                GitCommit gitCommit = GitCommit.getGitCommitFromRevCommit(branchName, commit);
 
                 if (assignedCommits.contains(gitCommit.getCommitId()))
                     continue;

@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.eclipse.jgit.revwalk.RevCommit;
+
 public class GitCommit implements CSVItem {
     private String authorMail;
     private String commitId;
@@ -44,5 +46,23 @@ public class GitCommit implements CSVItem {
 
     public String getBranch(){
         return branch;
+    }
+
+    public static GitCommit getGitCommitFromRevCommit(String branchName, RevCommit commit) {
+        String parentId;
+        if (commit.getParentCount() > 0) {
+            RevCommit parent = commit.getParent(0);
+            parentId = parent.getName();
+        } else {
+            parentId = "HEAD";
+        }
+
+        return new GitCommit(
+                commit.getAuthorIdent().getEmailAddress(),
+                commit.getName(),
+                parentId,
+                branchName,
+                commit.getAuthorIdent().getWhen(),
+                commit.getShortMessage());
     }
 }
