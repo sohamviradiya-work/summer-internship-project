@@ -2,7 +2,13 @@ package com.tool;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
+import java.util.Map.Entry;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
 
 import com.tool.templates.GitCommit;
 import com.tool.templates.RegressionBlame;
@@ -18,19 +24,24 @@ public class Main {
 
         try {
             run();
-        } catch (IOException e) {
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static void run() throws IOException {
+    private static void run() throws IOException, NoHeadException, GitAPIException {
         TargetProject targetProject = TargetProject.mountLocalProject(path, "7.6.4");
-
-        GitWorker gitWorker = targetProject.getGitWorker();
 
         CSVWriter<GitCommit> csvWriter = CSVWriter.create("./results/commits-list.csv");
 
-        gitWorker.listCommits(csvWriter);
+        HashMap<String, ArrayList<GitCommit>> branchCommitMap = targetProject.getGitWorker().listCommitsByBranch();
+
+        for(Entry<String, ArrayList<GitCommit>> entry:branchCommitMap.entrySet()){
+            for(GitCommit gitCommit:entry.getValue()){
+                csvWriter.write(gitCommit);
+            }
+        }
 
         CSVWriter<RegressionBlame> blameCSVWriter = CSVWriter.create("./results/blame-tests.csv");
         targetProject.runFailedTestsBranchWise(blameCSVWriter);

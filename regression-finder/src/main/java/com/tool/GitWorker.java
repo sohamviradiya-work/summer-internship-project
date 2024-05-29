@@ -5,6 +5,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
@@ -13,8 +14,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 
 import com.tool.templates.GitCommit;
-import com.tool.writers.ItemWriter;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,9 +25,17 @@ public class GitWorker {
 
     private Repository repository;
     private RevWalk revWalk;
+    private Git git;
 
     public GitWorker(Repository repository) {
         this.repository = repository;
+        this.revWalk = new RevWalk(repository);
+        this.git = new Git(repository);
+    }
+
+    public GitWorker(Git git){
+        this.git = git;
+        this.repository = git.getRepository();
         this.revWalk = new RevWalk(repository);
     }
 
@@ -58,7 +65,7 @@ public class GitWorker {
             }
             System.out.println("Cloning Complete");
 
-            return new GitWorker(git.getRepository());
+            return new GitWorker(git);
 
         } catch (InvalidRemoteException e) {
             System.err.println("Invalid Remote link" + e.getMessage());
@@ -71,16 +78,15 @@ public class GitWorker {
     }
 
     private static void cloneBranchToLocal(Git git, Ref ref) {
-        try{
-        String branchName = ref.getName().replace("refs/remotes/origin/", "");
-        git.branchCreate()
-                .setName(branchName)
-                .setStartPoint(ref.getName())
-                .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-                .call();
+        try {
+            String branchName = ref.getName().replace("refs/remotes/origin/", "");
+            git.branchCreate()
+                    .setName(branchName)
+                    .setStartPoint(ref.getName())
+                    .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                    .call();
             System.out.println("Cloned branch " + branchName);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -95,56 +101,46 @@ public class GitWorker {
         }
     }
 
-    public void listCommits(ItemWriter<GitCommit> commitsWriter) throws IOException {
-        try (Git git = new Git(repository)) {
-            
-            List<Ref> branches = git.branchList().call();
+    public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch() throws IOException, NoHeadException, GitAPIException {
+        List<Ref> branches = git.branchList().call();
 
-            for (Ref branch : branches) {
-                String branchName = branch.getName();
-                
-                ObjectId branchObjectId = repository.resolve(branchName);
-                if (branchObjectId == null) {
-                    continue;
-                }
-
-                Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
-
-                for (RevCommit commit : commits) {
-                    String parentId;
-                    if (commit.getParentCount() > 0) {
-                        RevCommit parent = commit.getParent(0);
-                        parentId = parent.getName();
-                    } else {
-                        parentId = "HEAD";
-                    }
-
-                    commitsWriter.write(new GitCommit(
-                            commit.getAuthorIdent().getEmailAddress(),
-                            commit.getName(),
-                            parentId,
-                            branchName,
-                            commit.getAuthorIdent().getWhen(),
-                            commit.getShortMessage()));
-                }
-            }
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-        }
-    }
-
-    static HashMap<String, ArrayList<GitCommit>> groupCommitsByBranch(ArrayList<GitCommit> gitCommits) {
-        HashMap<String,ArrayList<GitCommit>> branchCommitMap = new HashMap<>();
+        HashMap<String, ArrayList<GitCommit>> branchCommitMap = new HashMap<>();
         HashSet<String> assignedCommits = new HashSet<String>();
-    
-        for(GitCommit gitCommit: gitCommits){
-            if(assignedCommits.contains(gitCommit.getCommitId()))
+
+        for (Ref branch : branches) {
+            String branchName = branch.getName();
+            ObjectId branchObjectId = repository.resolve(branchName);
+            if (branchObjectId == null) {
                 continue;
-            if(!branchCommitMap.containsKey(gitCommit.getBranch())){
-                branchCommitMap.put(gitCommit.getBranch(), new ArrayList<>());
             }
-            branchCommitMap.get(gitCommit.getBranch()).add(gitCommit);
-            assignedCommits.add(gitCommit.getCommitId());
+            Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
+            for (RevCommit commit : commits) {
+                String parentId;
+                if (commit.getParentCount() > 0) {
+                    RevCommit parent = commit.getParent(0);
+                    parentId = parent.getName();
+                } else {
+                    parentId = "HEAD";
+                }
+
+                GitCommit gitCommit = new GitCommit(
+                        commit.getAuthorIdent().getEmailAddress(),
+                        commit.getName(),
+                        parentId,
+                        branchName,
+                        commit.getAuthorIdent().getWhen(),
+                        commit.getShortMessage());
+
+                if (assignedCommits.contains(gitCommit.getCommitId()))
+                    continue;
+
+                if (!branchCommitMap.containsKey(gitCommit.getBranch()))
+                    branchCommitMap.put(gitCommit.getBranch(), new ArrayList<>());
+
+                branchCommitMap.get(gitCommit.getBranch()).add(gitCommit);
+                assignedCommits.add(gitCommit.getCommitId());
+
+            }
         }
         return branchCommitMap;
     }

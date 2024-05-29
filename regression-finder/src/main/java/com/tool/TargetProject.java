@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.tooling.GradleConnector;
@@ -53,20 +56,14 @@ public class TargetProject {
     }
 
     void runFailedTestsBranchWise(ItemWriter<RegressionBlame> regressionBlameWriter)
-            throws IOException {
+            throws IOException, NoHeadException, GitAPIException {
 
-        ArrayListWriter<GitCommit> arrayListWriter = new ArrayListWriter<GitCommit>();
-        gitWorker.listCommits(arrayListWriter);
-        ArrayList<GitCommit> gitCommits = arrayListWriter.getList();
-
-
-        HashMap<String, ArrayList<GitCommit>> branchCommitMap = GitWorker.groupCommitsByBranch(gitCommits);
+        HashMap<String, ArrayList<GitCommit>> branchCommitMap = gitWorker.listCommitsByBranch();
         
         for (String branch : branchCommitMap.keySet()) {
             ArrayList<GitCommit> branchCommits = branchCommitMap.get(branch);
             runFailedTestsForCommits(branchCommits,regressionBlameWriter);
         }
-        gitWorker.checkoutToCommit(gitCommits.get(0).getCommitId());
     }
 
     private void runFailedTestsForCommits(ArrayList<GitCommit> branchCommits,ItemWriter<RegressionBlame> regressionBlameWriter)
@@ -100,6 +97,8 @@ public class TargetProject {
 
             lastCommit = gitCommit;
         }
+
+        gitWorker.checkoutToCommit(branchCommits.get(0).getCommitId());
     }
 
 }
