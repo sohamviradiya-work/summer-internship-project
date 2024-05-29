@@ -65,7 +65,7 @@ public class TargetProject {
             gradleWorker.runTests(failingTests, testResultsWriter);
 
             for (TestResult testResult : testResultsWriter.getList()) {
-                if (testResult.getResult() == TestResult.Result.PASSED) {
+                if (testResult.getResult() != TestResult.Result.FAILED) {
 
                     RegressionBlame regressionBlame = new RegressionBlame(testResult.getIdentifier(), lastCommit);
                     regressionBlameWriter.write(regressionBlame);
