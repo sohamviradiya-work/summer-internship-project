@@ -49,7 +49,7 @@ public class TargetProject {
     }
 
     private void runFailedTestsForCommits(ArrayList<GitCommit> branchCommits,ItemWriter<RegressionBlame> regressionBlameWriter)
-            throws IOException {
+            throws IOException, IllegalArgumentException, GitAPIException {
 
         gitWorker.checkoutToCommit(branchCommits.get(0).getCommitId());
 

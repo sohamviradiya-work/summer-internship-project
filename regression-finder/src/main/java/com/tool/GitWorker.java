@@ -33,7 +33,7 @@ public class GitWorker {
         this.git = new Git(repository);
     }
 
-    public GitWorker(Git git){
+    public GitWorker(Git git) {
         this.git = git;
         this.repository = git.getRepository();
         this.revWalk = new RevWalk(repository);
@@ -47,17 +47,14 @@ public class GitWorker {
         revWalk.close();
     }
 
-    public void checkoutToCommit(String commitTag) {
-        try (Git git = new Git(repository)) {
-            RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
-            git.checkout().setName(commit.getName()).call();
-            System.out.println("Checked out to commit: " + commit.getName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void checkoutToCommit(String commitTag) throws GitAPIException, IllegalArgumentException, IOException {
+        RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
+        git.checkout().setName(commit.getName()).call();
+        System.out.println("Checked out to commit: " + commit.getName());
     }
 
-    public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch() throws IOException, NoHeadException, GitAPIException {
+    public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch()
+            throws IOException, NoHeadException, GitAPIException {
         List<Ref> branches = git.branchList().call();
 
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = new HashMap<>();
@@ -101,29 +98,18 @@ public class GitWorker {
         return branchCommitMap;
     }
 
-    
-    static GitWorker getRemoteRepository(String path, String link) {
+    public static GitWorker getRemoteRepository(String path, String link) throws GitAPIException {
         File dir = new File(path);
-        try {
-            System.out.println("Cloning Repository");
-            Git git = cloneRemoteRepository(link, dir);
-            System.out.println("Cloning Complete");
+        System.out.println("Cloning Repository");
+        Git git = cloneRemoteRepository(link, dir);
+        System.out.println("Cloning Complete");
 
-            return new GitWorker(git);
-
-        } catch (InvalidRemoteException e) {
-            System.err.println("Invalid Remote link" + e.getMessage());
-        } catch (TransportException e) {
-            System.err.println("Unable to clone the Repository" + e.getMessage());
-        } catch (GitAPIException e) {
-            System.err.println(e.getMessage());
-        }
-        return null;
+        return new GitWorker(git);
     }
 
     private static Git cloneRemoteRepository(String link, File dir)
             throws GitAPIException, InvalidRemoteException, TransportException {
-                
+
         Git git = Git.cloneRepository()
                 .setURI(link)
                 .setDirectory(dir)
@@ -140,17 +126,13 @@ public class GitWorker {
         return git;
     }
 
-    private static void cloneBranchToLocal(Git git, Ref ref) {
-        try {
-            String branchName = ref.getName().replace("refs/remotes/origin/", "");
-            git.branchCreate()
-                    .setName(branchName)
-                    .setStartPoint(ref.getName())
-                    .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-                    .call();
-            System.out.println("Cloned branch " + branchName);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    private static void cloneBranchToLocal(Git git, Ref ref) throws GitAPIException {
+        String branchName = ref.getName().replace("refs/remotes/origin/", "");
+        git.branchCreate()
+                .setName(branchName)
+                .setStartPoint(ref.getName())
+                .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                .call();
+        System.out.println("Cloned branch " + branchName);
     }
 }

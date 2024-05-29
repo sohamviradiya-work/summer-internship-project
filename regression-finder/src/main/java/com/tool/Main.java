@@ -20,9 +20,9 @@ public class Main {
     public static void main(String[] args) {
         String repositoryLink = "https://github.com/sohamviradiya-work/test-repo";
         clean(path);
-        GitWorker.getRemoteRepository(path, repositoryLink);
 
         try {
+            GitWorker.getRemoteRepository(path, repositoryLink);
             run();
         } catch (Exception e) {
             System.out.println(e.getMessage());
