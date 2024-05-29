@@ -29,24 +29,6 @@ public class TargetProject {
         this.gitWorker = gitWorker;
     }
 
-    public static TargetProject mountLocalProject(String path, String gradleVersion) throws IOException {
-
-        if (gradleVersion.length() == 0)
-            gradleVersion = DEFAULT_GRADLE_VERSION;
-
-        File directory = new File(path);
-
-        GradleConnector connector = GradleConnector.newConnector().useGradleVersion(gradleVersion);
-        connector.forProjectDirectory(directory);
-
-        FileRepositoryBuilder builder = new FileRepositoryBuilder();
-
-        Repository repository = builder.findGitDir(directory).build();
-        GitWorker gitWorker = new GitWorker(repository);
-        GradleWorker gradleWorker = new GradleWorker(connector.connect());
-        return new TargetProject(path, gradleWorker, gitWorker);
-    }
-
     public GradleWorker getRunner() {
         return this.gradleWorker;
     }
@@ -55,7 +37,7 @@ public class TargetProject {
         return this.gitWorker;
     }
 
-    void runFailedTestsBranchWise(ItemWriter<RegressionBlame> regressionBlameWriter)
+    public void runFailedTestsBranchWise(ItemWriter<RegressionBlame> regressionBlameWriter)
             throws IOException, NoHeadException, GitAPIException {
 
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = gitWorker.listCommitsByBranch();
@@ -101,4 +83,21 @@ public class TargetProject {
         gitWorker.checkoutToCommit(branchCommits.get(0).getCommitId());
     }
 
+    public static TargetProject mountLocalProject(String path, String gradleVersion) throws IOException {
+
+        if (gradleVersion.length() == 0)
+            gradleVersion = DEFAULT_GRADLE_VERSION;
+
+        File directory = new File(path);
+
+        GradleConnector connector = GradleConnector.newConnector().useGradleVersion(gradleVersion);
+        connector.forProjectDirectory(directory);
+
+        FileRepositoryBuilder builder = new FileRepositoryBuilder();
+
+        Repository repository = builder.findGitDir(directory).build();
+        GitWorker gitWorker = new GitWorker(repository);
+        GradleWorker gradleWorker = new GradleWorker(connector.connect());
+        return new TargetProject(path, gradleWorker, gitWorker);
+    }
 }

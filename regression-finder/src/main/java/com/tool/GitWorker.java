@@ -47,50 +47,6 @@ public class GitWorker {
         revWalk.close();
     }
 
-    static GitWorker getRemoteRepository(String path, String link) {
-        File dir = new File(path);
-        try {
-            System.out.println("Cloning Repository");
-            Git git = Git.cloneRepository()
-                    .setURI(link)
-                    .setDirectory(dir)
-                    .setCloneAllBranches(false)
-                    .call();
-
-            git.fetch().call();
-
-            List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
-            for (Ref ref : remoteBranches) {
-                cloneBranchToLocal(git, ref);
-            }
-            System.out.println("Cloning Complete");
-
-            return new GitWorker(git);
-
-        } catch (InvalidRemoteException e) {
-            System.err.println("Invalid Remote link" + e.getMessage());
-        } catch (TransportException e) {
-            System.err.println("Unable to clone the Repository" + e.getMessage());
-        } catch (GitAPIException e) {
-            System.err.println(e.getMessage());
-        }
-        return null;
-    }
-
-    private static void cloneBranchToLocal(Git git, Ref ref) {
-        try {
-            String branchName = ref.getName().replace("refs/remotes/origin/", "");
-            git.branchCreate()
-                    .setName(branchName)
-                    .setStartPoint(ref.getName())
-                    .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-                    .call();
-            System.out.println("Cloned branch " + branchName);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
     public void checkoutToCommit(String commitTag) {
         try (Git git = new Git(repository)) {
             RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
@@ -143,5 +99,58 @@ public class GitWorker {
             }
         }
         return branchCommitMap;
+    }
+
+    
+    static GitWorker getRemoteRepository(String path, String link) {
+        File dir = new File(path);
+        try {
+            System.out.println("Cloning Repository");
+            Git git = cloneRemoteRepository(link, dir);
+            System.out.println("Cloning Complete");
+
+            return new GitWorker(git);
+
+        } catch (InvalidRemoteException e) {
+            System.err.println("Invalid Remote link" + e.getMessage());
+        } catch (TransportException e) {
+            System.err.println("Unable to clone the Repository" + e.getMessage());
+        } catch (GitAPIException e) {
+            System.err.println(e.getMessage());
+        }
+        return null;
+    }
+
+    private static Git cloneRemoteRepository(String link, File dir)
+            throws GitAPIException, InvalidRemoteException, TransportException {
+                
+        Git git = Git.cloneRepository()
+                .setURI(link)
+                .setDirectory(dir)
+                .setCloneAllBranches(false)
+                .call();
+
+        git.fetch().call();
+
+        List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
+        for (Ref ref : remoteBranches) {
+            cloneBranchToLocal(git, ref);
+        }
+
+        return git;
+    }
+
+    private static void cloneBranchToLocal(Git git, Ref ref) {
+        try {
+            String branchName = ref.getName().replace("refs/remotes/origin/", "");
+            git.branchCreate()
+                    .setName(branchName)
+                    .setStartPoint(ref.getName())
+                    .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                    .call();
+            System.out.println("Cloned branch " + branchName);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

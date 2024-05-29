@@ -77,8 +77,8 @@ public class GradleWorker {
 
     private void testLogger(ProgressEvent event, ItemWriter<TestResult> resultsWriter) {
         if (event instanceof DefaultTestFinishEvent) {
-            DefaultJvmTestOperationDescriptor descriptor = (DefaultJvmTestOperationDescriptor) event
-                    .getDescriptor();
+            DefaultJvmTestOperationDescriptor descriptor = (DefaultJvmTestOperationDescriptor) event.getDescriptor();
+            
             TestOperationResult result = ((DefaultTestFinishEvent) event).getResult();
             String resultString;
 
@@ -89,6 +89,7 @@ public class GradleWorker {
                 resultString = "FAILED";
             else
                 resultString = "PASSED";
+                
             TestResult testResult = new TestResult(descriptor.getClassName(), descriptor.getMethodName(), resultString);
             if (testResult != null) {
                 try {
