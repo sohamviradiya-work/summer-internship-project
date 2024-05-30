@@ -10,6 +10,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 import com.tool.items.GitCommit;
 
@@ -83,6 +84,14 @@ public class GitWorker {
             }
         }
         return branchCommitMap;
+    }
+
+    public static GitWorker mountGitWorker(File directory) throws IOException {
+        FileRepositoryBuilder builder = new FileRepositoryBuilder();
+    
+        Repository repository = builder.findGitDir(directory).build();
+        GitWorker gitWorker = new GitWorker(repository);
+        return gitWorker;
     }
 
     public static GitWorker getRemoteRepository(String path, String link) throws GitAPIException {

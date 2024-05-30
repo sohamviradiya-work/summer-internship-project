@@ -8,10 +8,6 @@ import java.util.HashMap;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-
-import org.gradle.tooling.GradleConnector;
 
 import com.tool.items.GitCommit;
 import com.tool.items.RegressionBlame;
@@ -102,14 +98,8 @@ public class TargetProject {
 
         File directory = new File(path);
 
-        GradleConnector connector = GradleConnector.newConnector().useGradleVersion(gradleVersion);
-        connector.forProjectDirectory(directory);
-
-        FileRepositoryBuilder builder = new FileRepositoryBuilder();
-
-        Repository repository = builder.findGitDir(directory).build();
-        GitWorker gitWorker = new GitWorker(repository);
-        GradleWorker gradleWorker = new GradleWorker(connector.connect());
+        GradleWorker gradleWorker = GradleWorker.mountGradleWorker(gradleVersion, directory);
+        GitWorker gitWorker = GitWorker.mountGitWorker(directory);
         return new TargetProject(path, gradleWorker, gitWorker);
     }
 }

@@ -1,10 +1,12 @@
 package com.tool;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.gradle.tooling.BuildLauncher;
+import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.TestLauncher;
 import org.gradle.tooling.events.OperationType;
@@ -25,7 +27,7 @@ import org.gradle.tooling.events.test.internal.DefaultTestFailureResult;
 public class GradleWorker {
     private ProjectConnection projectConnection;
 
-    GradleWorker(ProjectConnection projectConnection) {
+    public GradleWorker(ProjectConnection projectConnection) {
         this.projectConnection = projectConnection;
     }
 
@@ -33,13 +35,13 @@ public class GradleWorker {
         this.projectConnection.close();
     }
 
-    TestResult runSingleTest(TestIndentifier testIndentifier) {
+    public TestResult runSingleTest(TestIndentifier testIndentifier) {
         ArrayListWriter<TestResult> arrayListWriter = new ArrayListWriter<>();
         runTests(List.of(testIndentifier), arrayListWriter);
         return arrayListWriter.getList().get(0);
     }
 
-    void runTests(List<TestIndentifier> testIndentifiers, ItemWriter<TestResult> resultsWriter) {
+    public void runTests(List<TestIndentifier> testIndentifiers, ItemWriter<TestResult> resultsWriter) {
 
         TestLauncher testLauncher = projectConnection.newTestLauncher();
         testLauncher.setColorOutput(true);
@@ -60,7 +62,7 @@ public class GradleWorker {
         }
     }
 
-    void runAlltests(ItemWriter<TestResult> resultsWriter) {
+    public void runAlltests(ItemWriter<TestResult> resultsWriter) {
         BuildLauncher buildLauncher = projectConnection.newBuild();
 
         buildLauncher.forTasks("test");
@@ -123,5 +125,12 @@ public class GradleWorker {
             }
         }
         return failingTests;
+    }
+
+    public static GradleWorker mountGradleWorker(String gradleVersion, File directory) {
+        GradleConnector connector = GradleConnector.newConnector().useGradleVersion(gradleVersion);
+        connector.forProjectDirectory(directory);
+        GradleWorker gradleWorker = new GradleWorker(connector.connect());
+        return gradleWorker;
     }
 }
