@@ -11,12 +11,12 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.tooling.GradleConnector;
 
-import com.tool.templates.GitCommit;
-import com.tool.templates.RegressionBlame;
-import com.tool.templates.TestIndentifier;
-import com.tool.templates.TestResult;
+import com.tool.items.GitCommit;
+import com.tool.items.RegressionBlame;
+import com.tool.items.TestIndentifier;
+import com.tool.items.TestResult;
 import com.tool.writers.ArrayListWriter;
-import com.tool.writers.ItemWriter;
+import com.tool.writers.interfaces.ItemWriter;
 
 public class TargetProject {
 

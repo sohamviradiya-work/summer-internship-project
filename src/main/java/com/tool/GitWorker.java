@@ -11,7 +11,8 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 
-import com.tool.templates.GitCommit;
+import com.tool.items.GitCommit;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

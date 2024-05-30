@@ -1,4 +1,4 @@
-package com.tool.writers;
+package com.tool.writers.interfaces;
 
 import java.io.IOException;
 

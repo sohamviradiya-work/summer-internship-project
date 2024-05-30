@@ -1,4 +1,4 @@
-package com.tool.templates;
+package com.tool.items;
 
 public final class TestIndentifier {
     String testClass;

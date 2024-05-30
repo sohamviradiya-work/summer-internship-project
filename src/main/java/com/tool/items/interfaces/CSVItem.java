@@ -1,4 +1,4 @@
-package com.tool.templates;
+package com.tool.items.interfaces;
 
 public interface CSVItem {
     public String toCSVString();

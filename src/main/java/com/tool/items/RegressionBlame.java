@@ -1,4 +1,6 @@
-package com.tool.templates;
+package com.tool.items;
+
+import com.tool.items.interfaces.CSVItem;
 
 public class RegressionBlame implements CSVItem{
     private String author;

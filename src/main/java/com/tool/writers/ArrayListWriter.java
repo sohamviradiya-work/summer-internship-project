@@ -3,6 +3,8 @@ package com.tool.writers;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.tool.writers.interfaces.ItemWriter;
+
 public class ArrayListWriter<T> implements ItemWriter<T> {
     private ArrayList<T> list;
 

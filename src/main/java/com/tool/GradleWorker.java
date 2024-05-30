@@ -13,10 +13,10 @@ import org.gradle.tooling.events.ProgressListener;
 import org.gradle.tooling.events.test.TestOperationResult;
 import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
 
-import com.tool.templates.TestIndentifier;
-import com.tool.templates.TestResult;
+import com.tool.items.TestIndentifier;
+import com.tool.items.TestResult;
 import com.tool.writers.ArrayListWriter;
-import com.tool.writers.ItemWriter;
+import com.tool.writers.interfaces.ItemWriter;
 
 import org.gradle.tooling.events.test.internal.DefaultJvmTestOperationDescriptor;
 import org.gradle.tooling.events.test.internal.DefaultTestFailureResult;
