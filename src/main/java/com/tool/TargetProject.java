@@ -39,6 +39,11 @@ public class TargetProject {
         return this.gitWorker;
     }
 
+    public void close(){
+        this.gitWorker.close();
+        this.gradleWorker.close();
+    }
+
     public void runFailedTestsBranchWise(ItemWriter<RegressionBlame> regressionBlameWriter)
             throws IOException, NoHeadException, GitAPIException {
 
@@ -88,7 +93,6 @@ public class TargetProject {
         }
 
         gitWorker.checkoutToCommit(branchCommits.get(0).getCommitId());
-        gitWorker.close();
     }
 
     public static TargetProject mountLocalProject(String path, String gradleVersion) throws IOException {

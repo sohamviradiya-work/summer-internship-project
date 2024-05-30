@@ -29,6 +29,10 @@ public class GradleWorker {
         this.projectConnection = projectConnection;
     }
 
+    public void close(){
+        this.projectConnection.close();
+    }
+
     TestResult runSingleTest(TestIndentifier testIndentifier) {
         ArrayListWriter<TestResult> arrayListWriter = new ArrayListWriter<>();
         runTests(List.of(testIndentifier), arrayListWriter);

@@ -40,21 +40,21 @@ public class GitWorker {
     }
 
     public void close() {
-        revWalk.close();
+        this.git.close();
     }
 
     public void checkoutToCommit(String commitTag) throws GitAPIException, IllegalArgumentException, IOException {
-        Repository repository = git.getRepository();
+        Repository repository = getRepository();
+        
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
         git.checkout().setName(commit.getName()).call();
         System.out.println("Checked out to commit: " + commit.getName());
-    
     }
 
     public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch()
             throws IOException, NoHeadException, GitAPIException {
         List<Ref> branches = git.branchList().call();
-        Repository repository = git.getRepository();
+        Repository repository = getRepository();
 
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = new HashMap<>();
         HashSet<String> assignedCommits = new HashSet<String>();
@@ -62,10 +62,12 @@ public class GitWorker {
         for (Ref branch : branches) {
             String branchName = branch.getName();
             ObjectId branchObjectId = repository.resolve(branchName);
-            if (branchObjectId == null) {
+            
+            if (branchObjectId == null)
                 continue;
-            }
+            
             Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
+
             for (RevCommit commit : commits) {
                 GitCommit gitCommit = GitCommit.getGitCommitFromRevCommit(branchName, commit);
 
