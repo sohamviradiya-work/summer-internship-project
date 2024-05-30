@@ -22,24 +22,21 @@ import java.util.List;
 
 public class GitWorker {
 
-    private Repository repository;
     private RevWalk revWalk;
     private Git git;
 
     public GitWorker(Repository repository) {
-        this.repository = repository;
         this.revWalk = new RevWalk(repository);
         this.git = new Git(repository);
     }
 
     public GitWorker(Git git) {
         this.git = git;
-        this.repository = git.getRepository();
-        this.revWalk = new RevWalk(repository);
+        this.revWalk = new RevWalk(git.getRepository());
     }
 
     public Repository getRepository() {
-        return this.repository;
+        return this.git.getRepository();
     }
 
     public void close() {
@@ -47,14 +44,17 @@ public class GitWorker {
     }
 
     public void checkoutToCommit(String commitTag) throws GitAPIException, IllegalArgumentException, IOException {
+        Repository repository = git.getRepository();
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
         git.checkout().setName(commit.getName()).call();
         System.out.println("Checked out to commit: " + commit.getName());
+    
     }
 
     public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch()
             throws IOException, NoHeadException, GitAPIException {
         List<Ref> branches = git.branchList().call();
+        Repository repository = git.getRepository();
 
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = new HashMap<>();
         HashSet<String> assignedCommits = new HashSet<String>();
