@@ -1,11 +1,13 @@
-regression-finder/.gradle
-regression-finder/build/
 
-/out/
 .idea/
 .DS_Store
-
 .vscode/
-regression-finder/test-area/
 
-regression-finder/results/
+
+gradle/
+.gradle/
+wrapper/
+build/
+
+test-area/
+results/
