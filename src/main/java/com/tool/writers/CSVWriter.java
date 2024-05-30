@@ -10,7 +10,7 @@ import com.tool.writers.interfaces.ItemWriter;
 public class CSVWriter<T extends CSVItem> implements ItemWriter<T> {
     private BufferedWriter writer;
 
-    private CSVWriter(BufferedWriter writer) {
+    public CSVWriter(BufferedWriter writer) {
         this.writer = writer;
     }
 
