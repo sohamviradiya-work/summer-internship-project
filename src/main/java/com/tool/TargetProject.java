@@ -2,6 +2,7 @@ package com.tool;
 
 import java.io.File;
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,6 +10,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+
 import org.gradle.tooling.GradleConnector;
 
 import com.tool.items.GitCommit;
@@ -64,15 +66,20 @@ public class TargetProject {
             ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<>();
             gradleWorker.runTests(failingTests, testResultsWriter);
 
+            final ArrayList<TestIndentifier> nextBatchTests = new ArrayList<>();
+
             for (TestResult testResult : testResultsWriter.getList()) {
+                TestIndentifier testIdentifier = testResult.getIdentifier();
                 if (testResult.getResult() != TestResult.Result.FAILED) {
-
-                    RegressionBlame regressionBlame = new RegressionBlame(testResult.getIdentifier(), commitAfter);
+                    RegressionBlame regressionBlame = new RegressionBlame(testIdentifier, commitAfter);
                     regressionBlameWriter.write(regressionBlame);
-
-                    failingTests.removeIf(testIdentifier -> testIdentifier.getTestClass().equals(testResult.getIdentifier().getTestClass()) && testIdentifier.getTestMethod().equals(testResult.getIdentifier().getTestMethod()));
                 }
+                else    
+                    nextBatchTests.add(testIdentifier);
+            
             }
+
+            failingTests = nextBatchTests;
 
             if (failingTests.isEmpty())
                 break;
@@ -81,6 +88,7 @@ public class TargetProject {
         }
 
         gitWorker.checkoutToCommit(branchCommits.get(0).getCommitId());
+        gitWorker.close();
     }
 
     public static TargetProject mountLocalProject(String path, String gradleVersion) throws IOException {
