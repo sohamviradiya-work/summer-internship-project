@@ -12,6 +12,7 @@ import org.gradle.tooling.events.ProgressEvent;
 import org.gradle.tooling.events.ProgressListener;
 import org.gradle.tooling.events.test.TestOperationResult;
 import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
+import org.gradle.tooling.events.test.internal.DefaultTestSkippedResult;
 
 import com.tool.items.TestIndentifier;
 import com.tool.items.TestResult;
@@ -87,6 +88,8 @@ public class GradleWorker {
 
             if (result instanceof DefaultTestFailureResult)
                 resultString = "FAILED";
+            else if(result instanceof DefaultTestSkippedResult)
+                resultString = "SKIPPED";
             else
                 resultString = "PASSED";
                 

@@ -3,7 +3,8 @@ package com.tool.items;
 public class TestResult {
     public enum Result {
         PASSED,
-        FAILED
+        FAILED,
+        SKIPPED
     }
 
     private Result result;
@@ -17,6 +18,8 @@ public class TestResult {
     private static Result parseResult(String result) {
         if (result.equalsIgnoreCase("PASSED")) {
             return Result.PASSED;
+        }else if (result.equalsIgnoreCase("SKIPPED")) {
+            return Result.SKIPPED;
         } else if (result.equalsIgnoreCase("FAILED")) {
             return Result.FAILED;
         } else {
