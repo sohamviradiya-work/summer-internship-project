@@ -58,7 +58,7 @@ public class GradleWorker {
         try {
             testLauncher.run();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            
         }
     }
 
@@ -78,7 +78,7 @@ public class GradleWorker {
         try {
             buildLauncher.run();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            
         }
     }
 
@@ -125,6 +125,17 @@ public class GradleWorker {
             }
         }
         return failingTests;
+    }
+
+    static ArrayList<TestIndentifier> evaulateTestResults(ArrayList<TestResult> testResults) throws IOException {
+        ArrayList<TestIndentifier> passingTestIndentifiers = new ArrayList<>();
+    
+        for (TestResult testResult : testResults) {
+            TestIndentifier testIdentifier = testResult.getIdentifier();
+            if (testResult.getResult() != TestResult.Result.FAILED)
+                passingTestIndentifiers.add(testIdentifier);
+        }
+        return passingTestIndentifiers;
     }
 
     public static GradleWorker mountGradleWorker(String gradleVersion, File directory) {
