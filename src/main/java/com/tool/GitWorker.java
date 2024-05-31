@@ -49,7 +49,6 @@ public class GitWorker {
         
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
         git.checkout().setName(commit.getName()).call();
-        System.out.println("Checked out to commit: " + commit.getName());
     }
 
     public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch()
