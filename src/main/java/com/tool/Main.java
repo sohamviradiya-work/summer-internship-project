@@ -21,7 +21,7 @@ public class Main {
     public static String path = "./test-area/repository";
 
     public static void main(String[] args) {
-        String repositoryLink = "https://github.com/sohamviradiya-work/test-repo";
+        String repositoryLink = "https://github.com/sohamviradiya-work/test-repo/";
         clean(path);
         clean("./results");
 
@@ -30,7 +30,6 @@ public class Main {
             run();
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            e.printStackTrace();
         }
     }
 

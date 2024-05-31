@@ -104,7 +104,7 @@ public class GradleWorker {
                 try {
                     resultsWriter.write(testResult);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
         }
