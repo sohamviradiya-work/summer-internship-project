@@ -51,8 +51,7 @@ public class GitWorker {
         git.checkout().setName(commit.getName()).call();
     }
 
-    public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch()
-            throws IOException, NoHeadException, GitAPIException {
+    public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch() throws IOException, NoHeadException, GitAPIException {
         List<Ref> branches = git.branchList().call();
         Repository repository = getRepository();
 

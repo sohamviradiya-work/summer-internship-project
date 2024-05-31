@@ -27,7 +27,6 @@ public class CSVWriter<T extends CSVItem> implements ItemWriter<T> {
 
     public void close() throws IOException {
         if (writer != null) {
-            writer.flush();
             writer.close();
         }
     }

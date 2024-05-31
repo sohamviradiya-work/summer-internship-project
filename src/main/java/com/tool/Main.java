@@ -56,7 +56,6 @@ public class Main {
 
         targetProject.runFailedTestsBranchWise(blameCSVWriter);
         blameCSVWriter.close();
-
         targetProject.close();
 
     }

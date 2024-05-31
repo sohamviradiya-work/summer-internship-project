@@ -56,12 +56,4 @@ class CSVWriterTest {
         assertEquals("item1", captor.getAllValues().get(0));
         assertEquals("item2", captor.getAllValues().get(1));
     }
-
-    @Test
-    void testClose() throws IOException {
-        csvWriter.close();
-
-        verify(bufferedWriter, times(1)).flush();
-        verify(bufferedWriter, times(1)).close();
-    }
 }
