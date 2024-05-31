@@ -22,7 +22,7 @@ public class TargetProject {
     private GradleWorker gradleWorker;
     private GitWorker gitWorker;
 
-    private TargetProject(String path, GradleWorker gradleWorker, GitWorker gitWorker) {
+    public TargetProject(GradleWorker gradleWorker, GitWorker gitWorker) {
         this.gradleWorker = gradleWorker;
         this.gitWorker = gitWorker;
     }
@@ -100,6 +100,6 @@ public class TargetProject {
 
         GradleWorker gradleWorker = GradleWorker.mountGradleWorker(gradleVersion, directory);
         GitWorker gitWorker = GitWorker.mountGitWorker(directory);
-        return new TargetProject(path, gradleWorker, gitWorker);
+        return new TargetProject(gradleWorker, gitWorker);
     }
 }
