@@ -54,12 +54,14 @@ public class TargetProject {
     private void runFailedTestsForCommits(ArrayList<GitCommit> branchCommits,ItemWriter<RegressionBlame> regressionBlameWriter)
             throws IOException, IllegalArgumentException, GitAPIException {
 
-        gitWorker.checkoutToCommit(branchCommits.get(0).getCommitId());
+        GitCommit headCommit = branchCommits.get(0);
+        gitWorker.checkoutToCommit(headCommit.getCommitId());
 
         ArrayList<TestIndentifier> failingTests = gradleWorker.getFailingTests();
 
-        GitCommit commitAfter = GitCommit.createNullCommit();
+        GitCommit commitAfter = headCommit;
 
+        branchCommits.remove(0);
         for (GitCommit gitCommit : branchCommits) {
 
             gitWorker.checkoutToCommit(gitCommit.getCommitId());
@@ -77,7 +79,6 @@ public class TargetProject {
                 }
                 else    
                     nextBatchTests.add(testIdentifier);
-            
             }
 
             failingTests = nextBatchTests;
@@ -88,7 +89,7 @@ public class TargetProject {
             commitAfter = gitCommit;
         }
 
-        gitWorker.checkoutToCommit(branchCommits.get(0).getCommitId());
+        gitWorker.checkoutToCommit(headCommit.getCommitId());
     }
 
     public static TargetProject mountLocalProject(String path, String gradleVersion) throws IOException {
