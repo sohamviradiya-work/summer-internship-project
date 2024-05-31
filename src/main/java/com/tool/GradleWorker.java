@@ -89,7 +89,10 @@ public class GradleWorker {
             TestOperationResult result = ((DefaultTestFinishEvent) event).getResult();
             String resultString;
 
-            if (descriptor.getClassName() == null || descriptor.getMethodName() == null)
+            String testClassName = descriptor.getClassName();
+            String testMethodName = descriptor.getMethodName();
+
+            if (testClassName == null || testMethodName == null)
                 return;
 
             if (result instanceof DefaultTestFailureResult)
@@ -99,7 +102,9 @@ public class GradleWorker {
             else
                 resultString = "PASSED";
                 
-            TestResult testResult = new TestResult(descriptor.getClassName(), descriptor.getMethodName(), resultString);
+            testMethodName = testMethodName.replace("(", "").replace(")", "");
+
+            TestResult testResult = new TestResult(testClassName, testMethodName, resultString);
             if (testResult != null) {
                 try {
                     resultsWriter.write(testResult);
