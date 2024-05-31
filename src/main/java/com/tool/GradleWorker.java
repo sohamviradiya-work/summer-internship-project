@@ -44,7 +44,6 @@ public class GradleWorker {
     public void runTests(List<TestIndentifier> testIndentifiers, ItemWriter<TestResult> resultsWriter) {
 
         TestLauncher testLauncher = projectConnection.newTestLauncher();
-        testLauncher.setColorOutput(true);
         
         for(TestIndentifier testIndentifier:testIndentifiers){
             testLauncher.withTaskAndTestMethods("test", testIndentifier.getTestClass(), List.of(testIndentifier.getTestMethod()));
@@ -63,6 +62,7 @@ public class GradleWorker {
     }
 
     public void runAlltests(ItemWriter<TestResult> resultsWriter) {
+
         BuildLauncher buildLauncher = projectConnection.newBuild();
 
         buildLauncher.forTasks("test");
@@ -88,7 +88,7 @@ public class GradleWorker {
             
             TestOperationResult result = ((DefaultTestFinishEvent) event).getResult();
             String resultString;
-
+            
             String testClassName = descriptor.getClassName();
             String testMethodName = descriptor.getMethodName();
 
@@ -132,7 +132,7 @@ public class GradleWorker {
         return failingTests;
     }
 
-    static ArrayList<TestIndentifier> evaulateTestResults(ArrayList<TestResult> testResults) throws IOException {
+    public static ArrayList<TestIndentifier> evaulateTestResults(ArrayList<TestResult> testResults) throws IOException {
         ArrayList<TestIndentifier> passingTestIndentifiers = new ArrayList<>();
     
         for (TestResult testResult : testResults) {
