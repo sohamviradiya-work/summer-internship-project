@@ -15,13 +15,14 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 import com.tool.items.GitCommit;
 import com.tool.items.RegressionBlame;
 import com.tool.items.TestIndentifier;
+import com.tool.items.TestResult;
 import com.tool.writers.CSVWriter;
 
 public class Main {
     public static String path = "./test-area/repository";
 
     public static void main(String[] args) {
-        String repositoryLink = "https://github.com/sohamviradiya-work/test-repo/";
+        String repositoryLink = "https://github.com/sohamviradiya-work/large-test-repo/";
         clean(path);
         clean("./results");
 
@@ -34,7 +35,10 @@ public class Main {
     }
 
     private static void run() throws IOException, NoHeadException, GitAPIException {
+        
         TargetProject targetProject = TargetProject.mountLocalProject(path, "7.6.4");
+        
+        // writeTestResults(targetProject);
 
         CSVWriter<GitCommit> csvWriter = CSVWriter.create("./results/commits-list.csv");
 
@@ -55,6 +59,11 @@ public class Main {
 
         targetProject.close();
 
+    }
+
+    private static void writeTestResults(TargetProject targetProject) throws IOException {
+        CSVWriter<TestResult> testResultCSVWriter = CSVWriter.create("./results/test-results.csv");
+        targetProject.getRunner().runAlltests(testResultCSVWriter);
     }
 
     private static String getRepositoryLink() {

@@ -46,7 +46,7 @@ public class GitWorker {
 
     public void checkoutToCommit(String commitTag) throws GitAPIException, IllegalArgumentException, IOException {
         Repository repository = getRepository();
-        
+        System.out.println("Checked out to commit: " + commitTag);
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
         git.checkout().setName(commit.getName()).call();
     }

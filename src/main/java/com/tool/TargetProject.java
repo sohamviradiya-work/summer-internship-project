@@ -40,19 +40,18 @@ public class TargetProject {
         this.gradleWorker.close();
     }
 
-    public void runFailedTestsBranchWise(ItemWriter<RegressionBlame> regressionBlameWriter)
-            throws IOException, NoHeadException, GitAPIException {
+    public void runFailedTestsBranchWise(ItemWriter<RegressionBlame> regressionBlameWriter) throws IOException, NoHeadException, GitAPIException {
 
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = gitWorker.listCommitsByBranch();
         
         for (String branch : branchCommitMap.keySet()) {
+            System.out.println("Running for branch:" + branch);
             ArrayList<GitCommit> branchCommits = branchCommitMap.get(branch);
             runFailedTestsForCommits(branchCommits,regressionBlameWriter);
         }
     }
 
-    private void runFailedTestsForCommits(ArrayList<GitCommit> branchCommits,ItemWriter<RegressionBlame> regressionBlameWriter)
-            throws IOException, IllegalArgumentException, GitAPIException {
+    private void runFailedTestsForCommits(ArrayList<GitCommit> branchCommits,ItemWriter<RegressionBlame> regressionBlameWriter) throws IOException, IllegalArgumentException, GitAPIException {
 
         GitCommit headCommit = branchCommits.get(0);
         gitWorker.checkoutToCommit(headCommit.getCommitId());
