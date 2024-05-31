@@ -1,6 +1,8 @@
 package com.tool.items;
 
-public class TestResult {
+import com.tool.items.interfaces.CSVItem;
+
+public class TestResult implements CSVItem{
     public enum Result {
         PASSED,
         FAILED,
