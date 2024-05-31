@@ -16,4 +16,8 @@ public final class TestIndentifier {
     public String getTestMethod(){
         return testMethod;
     }
+
+    public static boolean compare(TestIndentifier testIdentifier1, TestIndentifier testIdentifier2) {
+        return testIdentifier1.getTestClass()==testIdentifier2.getTestClass() && testIdentifier1.getTestMethod()==testIdentifier1.getTestMethod();
+    }
 }
