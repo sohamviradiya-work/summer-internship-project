@@ -35,23 +35,26 @@ public class TargetProject {
         return this.gitWorker;
     }
 
-    public void close(){
+    public void close() {
         this.gitWorker.close();
         this.gradleWorker.close();
     }
 
-    public void runFailedTestsBranchWise(ItemWriter<RegressionBlame> regressionBlameWriter) throws IOException, NoHeadException, GitAPIException {
+    public void runFailedTestsBranchWise(ItemWriter<RegressionBlame> regressionBlameWriter)
+            throws IOException, NoHeadException, GitAPIException {
 
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = gitWorker.listCommitsByBranch();
-        
+
         for (String branch : branchCommitMap.keySet()) {
             System.out.println("Running for branch:" + branch);
             ArrayList<GitCommit> branchCommits = branchCommitMap.get(branch);
-            runFailedTestsForCommits(branchCommits,regressionBlameWriter);
+            runFailedTestsForCommits(branchCommits, regressionBlameWriter);
         }
     }
 
-    private void runFailedTestsForCommits(ArrayList<GitCommit> branchCommits,ItemWriter<RegressionBlame> regressionBlameWriter) throws IOException, IllegalArgumentException, GitAPIException {
+    private void runFailedTestsForCommits(ArrayList<GitCommit> branchCommits,
+            ItemWriter<RegressionBlame> regressionBlameWriter)
+            throws IOException, IllegalArgumentException, GitAPIException {
 
         GitCommit headCommit = branchCommits.get(0);
         gitWorker.checkoutToCommit(headCommit.getCommitId());
@@ -62,8 +65,8 @@ public class TargetProject {
 
         branchCommits.remove(0);
         for (GitCommit gitCommit : branchCommits) {
-            
-            if(isSyncRequired(gitCommit.getCommitId(), commitAfter.getCommitId())) 
+
+            if (isSyncRequired(gitCommit.getCommitId(), commitAfter.getCommitId()))
                 gradleWorker.syncDependencies();
 
             gitWorker.checkoutToCommit(gitCommit.getCommitId());
@@ -71,19 +74,7 @@ public class TargetProject {
             ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<>();
             gradleWorker.runTests(failingTests, testResultsWriter);
 
-            final ArrayList<TestIdentifier> nextBatchTests = new ArrayList<>();
-
-            for (TestResult testResult : testResultsWriter.getList()) {
-                TestIdentifier testIdentifier = testResult.getIdentifier();
-                if (testResult.getResult() != TestResult.Result.FAILED) {
-                    RegressionBlame regressionBlame = new RegressionBlame(testIdentifier, commitAfter);
-                    regressionBlameWriter.write(regressionBlame);
-                }
-                else    
-                    nextBatchTests.add(testIdentifier);
-            }
-
-            failingTests = nextBatchTests;
+            failingTests = evaulateResults(regressionBlameWriter, commitAfter, testResultsWriter);
 
             if (failingTests.isEmpty())
                 break;
@@ -94,10 +85,26 @@ public class TargetProject {
         gitWorker.checkoutToCommit(headCommit.getCommitId());
     }
 
+    private ArrayList<TestIdentifier> evaulateResults(ItemWriter<RegressionBlame> regressionBlameWriter,
+            GitCommit commitAfter, ArrayListWriter<TestResult> testResultsWriter) throws IOException {
+        final ArrayList<TestIdentifier> nextBatchTests = new ArrayList<>();
+
+        for (TestResult testResult : testResultsWriter.getList()) {
+            TestIdentifier testIdentifier = testResult.getIdentifier();
+            if (testResult.getResult() != TestResult.Result.FAILED) {
+                RegressionBlame regressionBlame = new RegressionBlame(testIdentifier, commitAfter);
+                regressionBlameWriter.write(regressionBlame);
+            } else
+                nextBatchTests.add(testIdentifier);
+        }
+        return nextBatchTests;
+    }
+
     private boolean isSyncRequired(String commitId, String commitId2) {
         ArrayList<String> changedFilePaths = gitWorker.getChangedFiles(commitId, commitId2);
-        for(String path: changedFilePaths){
-            if(path.endsWith(".gradle")) return true;
+        for (String path : changedFilePaths) {
+            if (path.endsWith(".gradle"))
+                return true;
         }
         return false;
     }
