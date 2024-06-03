@@ -1,4 +1,4 @@
-package com.tool;
+package com.tool.git;
 
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
@@ -15,8 +15,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
-
-import com.tool.items.GitCommit;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

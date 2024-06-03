@@ -1,11 +1,12 @@
 package com.tool.writers;
 
-import com.tool.items.interfaces.CSVItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import com.tool.interfaces.CSVItem;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

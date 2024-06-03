@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import com.tool.items.interfaces.CSVItem;
+import com.tool.interfaces.CSVItem;
 import com.tool.writers.interfaces.ItemWriter;
 
 public class CSVWriter<T extends CSVItem> implements ItemWriter<T> {

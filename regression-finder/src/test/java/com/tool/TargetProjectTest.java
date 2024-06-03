@@ -1,7 +1,9 @@
 package com.tool;
 
-import com.tool.items.GitCommit;
-import com.tool.items.RegressionBlame;
+import com.tool.git.GitCommit;
+import com.tool.git.GitWorker;
+import com.tool.git.RegressionBlame;
+import com.tool.runner.GradleWorker;
 import com.tool.writers.interfaces.ItemWriter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;

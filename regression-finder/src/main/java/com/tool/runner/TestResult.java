@@ -1,6 +1,6 @@
-package com.tool.items;
+package com.tool.runner;
 
-import com.tool.items.interfaces.CSVItem;
+import com.tool.interfaces.CSVItem;
 
 public class TestResult implements CSVItem{
     public enum Result {

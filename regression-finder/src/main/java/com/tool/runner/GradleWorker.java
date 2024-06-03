@@ -1,4 +1,4 @@
-package com.tool;
+package com.tool.runner;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,8 +16,6 @@ import org.gradle.tooling.events.test.TestOperationResult;
 import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
 import org.gradle.tooling.events.test.internal.DefaultTestSkippedResult;
 
-import com.tool.items.TestIdentifier;
-import com.tool.items.TestResult;
 import com.tool.writers.ArrayListWriter;
 import com.tool.writers.interfaces.ItemWriter;
 
