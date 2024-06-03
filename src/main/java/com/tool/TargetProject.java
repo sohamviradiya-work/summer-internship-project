@@ -11,7 +11,7 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 
 import com.tool.items.GitCommit;
 import com.tool.items.RegressionBlame;
-import com.tool.items.TestIndentifier;
+import com.tool.items.TestIdentifier;
 import com.tool.items.TestResult;
 import com.tool.writers.ArrayListWriter;
 import com.tool.writers.interfaces.ItemWriter;
@@ -56,7 +56,7 @@ public class TargetProject {
         GitCommit headCommit = branchCommits.get(0);
         gitWorker.checkoutToCommit(headCommit.getCommitId());
 
-        ArrayList<TestIndentifier> failingTests = gradleWorker.getFailingTests();
+        ArrayList<TestIdentifier> failingTests = gradleWorker.getFailingTests();
 
         GitCommit commitAfter = headCommit;
 
@@ -68,10 +68,10 @@ public class TargetProject {
             ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<>();
             gradleWorker.runTests(failingTests, testResultsWriter);
 
-            final ArrayList<TestIndentifier> nextBatchTests = new ArrayList<>();
+            final ArrayList<TestIdentifier> nextBatchTests = new ArrayList<>();
 
             for (TestResult testResult : testResultsWriter.getList()) {
-                TestIndentifier testIdentifier = testResult.getIdentifier();
+                TestIdentifier testIdentifier = testResult.getIdentifier();
                 if (testResult.getResult() != TestResult.Result.FAILED) {
                     RegressionBlame regressionBlame = new RegressionBlame(testIdentifier, commitAfter);
                     regressionBlameWriter.write(regressionBlame);

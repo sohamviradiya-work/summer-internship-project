@@ -14,7 +14,7 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 
 import com.tool.items.GitCommit;
 import com.tool.items.RegressionBlame;
-import com.tool.items.TestIndentifier;
+import com.tool.items.TestIdentifier;
 import com.tool.items.TestResult;
 import com.tool.writers.CSVWriter;
 
@@ -22,7 +22,7 @@ public class Main {
     public static String path = "./test-area/repository";
 
     public static void main(String[] args) {
-        String repositoryLink = "https://github.com/sohamviradiya-work/large-test-repo/";
+        String repositoryLink = "https://github.com/sohamviradiya-work/test-repo/";
         clean(path);
         clean("./results");
 
@@ -52,7 +52,7 @@ public class Main {
         csvWriter.close();
 
         CSVWriter<RegressionBlame> blameCSVWriter = CSVWriter.create("./results/blame-tests.csv");
-        blameCSVWriter.write(new RegressionBlame(new TestIndentifier("testClass", "testMethod"),new GitCommit("author", "commit", "parent", "branch",Date.from(Instant.now()), "message")));
+        blameCSVWriter.write(new RegressionBlame(new TestIdentifier("testClass", "testMethod"),new GitCommit("author", "commit", "parent", "branch",Date.from(Instant.now()), "message")));
 
         targetProject.runFailedTestsBranchWise(blameCSVWriter);
         blameCSVWriter.close();

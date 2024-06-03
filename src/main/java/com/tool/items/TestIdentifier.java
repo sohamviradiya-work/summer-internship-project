@@ -1,10 +1,10 @@
 package com.tool.items;
 
-public final class TestIndentifier {
+public final class TestIdentifier {
     String testClass;
     String testMethod;
 
-    public TestIndentifier(String testClass, String testMethod) {
+    public TestIdentifier(String testClass, String testMethod) {
         this.testClass = testClass;
         this.testMethod = testMethod;
     }
@@ -17,7 +17,7 @@ public final class TestIndentifier {
         return testMethod;
     }
 
-    public static boolean compare(TestIndentifier testIdentifier1, TestIndentifier testIdentifier2) {
+    public static boolean compare(TestIdentifier testIdentifier1, TestIdentifier testIdentifier2) {
         return testIdentifier1.getTestClass()==testIdentifier2.getTestClass() && testIdentifier1.getTestMethod()==testIdentifier1.getTestMethod();
     }
 }

@@ -10,10 +10,10 @@ public class TestResult implements CSVItem{
     }
 
     private Result result;
-    private TestIndentifier testIndentifier;
+    private TestIdentifier testIdentifier;
 
     public TestResult(String testClass, String testMethod, String result) {
-        this.testIndentifier = new TestIndentifier(testClass,testMethod);
+        this.testIdentifier = new TestIdentifier(testClass,testMethod);
         this.result = parseResult(result);
     }
 
@@ -30,14 +30,14 @@ public class TestResult implements CSVItem{
     }
 
     public String toCSVString() {
-        return testIndentifier.testClass + "," + testIndentifier.testMethod + "," + result.name();
+        return testIdentifier.testClass + "," + testIdentifier.testMethod + "," + result.name();
     }
 
     public Result getResult(){
         return result;
     }
 
-    public TestIndentifier getIdentifier(){
-        return testIndentifier;
+    public TestIdentifier getIdentifier(){
+        return testIdentifier;
     }
 }

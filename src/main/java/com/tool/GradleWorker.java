@@ -16,7 +16,7 @@ import org.gradle.tooling.events.test.TestOperationResult;
 import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
 import org.gradle.tooling.events.test.internal.DefaultTestSkippedResult;
 
-import com.tool.items.TestIndentifier;
+import com.tool.items.TestIdentifier;
 import com.tool.items.TestResult;
 import com.tool.writers.ArrayListWriter;
 import com.tool.writers.interfaces.ItemWriter;
@@ -35,18 +35,18 @@ public class GradleWorker {
         this.projectConnection.close();
     }
 
-    public TestResult runSingleTest(TestIndentifier testIndentifier) {
+    public TestResult runSingleTest(TestIdentifier testIdentifier) {
         ArrayListWriter<TestResult> arrayListWriter = new ArrayListWriter<>();
-        runTests(List.of(testIndentifier), arrayListWriter);
+        runTests(List.of(testIdentifier), arrayListWriter);
         return arrayListWriter.getList().get(0);
     }
 
-    public void runTests(List<TestIndentifier> testIndentifiers, ItemWriter<TestResult> resultsWriter) {
+    public void runTests(List<TestIdentifier> testIdentifiers, ItemWriter<TestResult> resultsWriter) {
 
         TestLauncher testLauncher = projectConnection.newTestLauncher();
         
-        for(TestIndentifier testIndentifier:testIndentifiers){
-            testLauncher.withTaskAndTestMethods("test", testIndentifier.getTestClass(), List.of(testIndentifier.getTestMethod()));
+        for(TestIdentifier testIdentifier:testIdentifiers){
+            testLauncher.withTaskAndTestMethods("test", testIdentifier.getTestClass(), List.of(testIdentifier.getTestMethod()));
         }
         testLauncher.addProgressListener(new ProgressListener() {
             @Override
@@ -115,8 +115,8 @@ public class GradleWorker {
         }
     }
 
-    public ArrayList<TestIndentifier> getFailingTests() {
-        ArrayList<TestIndentifier> failingTests = new ArrayList<TestIndentifier>();
+    public ArrayList<TestIdentifier> getFailingTests() {
+        ArrayList<TestIdentifier> failingTests = new ArrayList<TestIdentifier>();
     
         ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<TestResult>();
     
@@ -132,15 +132,15 @@ public class GradleWorker {
         return failingTests;
     }
 
-    public static ArrayList<TestIndentifier> evaulateTestResults(ArrayList<TestResult> testResults) throws IOException {
-        ArrayList<TestIndentifier> passingTestIndentifiers = new ArrayList<>();
+    public static ArrayList<TestIdentifier> evaulateTestResults(ArrayList<TestResult> testResults) throws IOException {
+        ArrayList<TestIdentifier> passingTestIdentifiers = new ArrayList<>();
     
         for (TestResult testResult : testResults) {
-            TestIndentifier testIdentifier = testResult.getIdentifier();
+            TestIdentifier testIdentifier = testResult.getIdentifier();
             if (testResult.getResult() != TestResult.Result.FAILED)
-                passingTestIndentifiers.add(testIdentifier);
+                passingTestIdentifiers.add(testIdentifier);
         }
-        return passingTestIndentifiers;
+        return passingTestIdentifiers;
     }
 
     public static GradleWorker mountGradleWorker(String gradleVersion, File directory) {
