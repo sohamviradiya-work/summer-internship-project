@@ -23,7 +23,7 @@ public class Main {
     public static String resultsPath = "../results/";
 
     public static void main(String[] args) {
-        String repositoryLink = "https://github.com/sohamviradiya-work/test-repo/";
+        String repositoryLink = "https://github.com/sohamviradiya-work/small-test-repo/";
         clean(repositoryPath);
         clean(resultsPath);
 
@@ -39,9 +39,9 @@ public class Main {
         
         TargetProject targetProject = TargetProject.mountLocalProject(repositoryPath, "7.6.4");
         
-        // writeTestResults(targetProject);
+        writeTestResults(targetProject);
         
-        // writecommits(targetProject);
+        writecommits(targetProject);
 
         CSVWriter<RegressionBlame> blameCSVWriter = CSVWriter.create(resultsPath + "blame-tests.csv");
         blameCSVWriter.write(new RegressionBlame(new TestIdentifier("testClass", "testMethod"),new GitCommit("author", "commit", "parent", "branch",Date.from(Instant.now()), "message")));
@@ -52,8 +52,7 @@ public class Main {
 
     }
 
-    private static void writecommits(TargetProject targetProject)
-            throws IOException, NoHeadException, GitAPIException {
+    private static void writecommits(TargetProject targetProject) throws IOException, NoHeadException, GitAPIException {
         CSVWriter<GitCommit> csvWriter = CSVWriter.create(resultsPath + "commits-list.csv");
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = targetProject.getGitWorker().listCommitsByBranch();
         for(Entry<String, ArrayList<GitCommit>> entry:branchCommitMap.entrySet()){
@@ -65,7 +64,7 @@ public class Main {
     }
 
     private static void writeTestResults(TargetProject targetProject) throws IOException {
-        CSVWriter<TestResult> testResultCSVWriter = CSVWriter.create("./results/test-results.csv");
+        CSVWriter<TestResult> testResultCSVWriter = CSVWriter.create(resultsPath + "test-results.csv");
         targetProject.getRunner().runAlltests(testResultCSVWriter);
     }
 
