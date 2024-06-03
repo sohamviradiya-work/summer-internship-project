@@ -1,6 +1,5 @@
 package com.git;
 
-import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
@@ -38,5 +37,19 @@ public class GitWorker {
         Git git = new Git(repository);
         GitWorker gitWorker = new GitWorker(git, username,email, token);
         return gitWorker;
+    }
+
+    public void pushCommit() throws InvalidRemoteException, GitAPIException {
+        git.push().setCredentialsProvider(credentialsProvider).setPushAll().call();
+    }
+
+    public void postCommit(String commitMessage)
+            throws GitAPIException, IOException {
+
+        git.add().addFilepattern(".").call();
+
+        RevCommit revCommit = git.commit().setCommitter(new PersonIdent(username, email)).setMessage(commitMessage).call();
+
+        System.out.println("Committed: " + revCommit.getName() + "," + revCommit.getShortMessage());
     }
 }
