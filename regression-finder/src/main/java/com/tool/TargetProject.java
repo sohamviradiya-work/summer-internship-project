@@ -61,6 +61,7 @@ public class TargetProject {
         GitCommit commitAfter = headCommit;
 
         branchCommits.remove(0);
+        gradleWorker.syncDependencies();
         for (GitCommit gitCommit : branchCommits) {
 
             gitWorker.checkoutToCommit(gitCommit.getCommitId());

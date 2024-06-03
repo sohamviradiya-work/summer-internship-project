@@ -143,6 +143,18 @@ public class GradleWorker {
         return passingTestIdentifiers;
     }
 
+    public void syncDependencies() {
+        BuildLauncher buildLauncher = projectConnection.newBuild();
+        buildLauncher.forTasks("dependencies");
+        buildLauncher.withArguments("--refresh-dependencies");
+        
+        try {
+            buildLauncher.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static GradleWorker mountGradleWorker(String gradleVersion, File directory) {
         GradleConnector connector = GradleConnector.newConnector().useGradleVersion(gradleVersion);
         connector.forProjectDirectory(directory);
