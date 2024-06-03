@@ -5,15 +5,23 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
 
 import com.tool.items.GitCommit;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,7 +59,47 @@ public class GitWorker {
         git.checkout().setName(commit.getName()).call();
     }
 
-    public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch() throws IOException, NoHeadException, GitAPIException {
+    public boolean isFileChanged(String commitTagA, String commitTagB, String filePath) {
+        Repository repository = getRepository();
+        try {
+            ObjectId commitIdA = repository.resolve(commitTagA);
+            ObjectId commitIdB = repository.resolve(commitTagB);
+
+            if (commitIdA == null || commitIdB == null) {
+                throw new IllegalArgumentException("Invalid commit ID or tag.");
+            }
+
+            CanonicalTreeParser treeParserA = new CanonicalTreeParser();
+            try (ObjectReader reader = repository.newObjectReader()) {
+                treeParserA.reset(reader, revWalk.parseCommit(commitIdA).getTree());
+            }
+
+            CanonicalTreeParser treeParserB = new CanonicalTreeParser();
+            try (ObjectReader reader = repository.newObjectReader()) {
+                treeParserB.reset(reader, revWalk.parseCommit(commitIdB).getTree());
+            }
+
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    DiffFormatter diffFormatter = new DiffFormatter(out)) {
+                diffFormatter.setRepository(repository);
+                List<DiffEntry> diffs = diffFormatter.scan(treeParserA, treeParserB);
+
+                for (DiffEntry diff : diffs) {
+                    if (diff.getNewPath().equals(filePath) || diff.getOldPath().equals(filePath)) {
+                        return true; 
+                    }
+                }
+            }
+            return false;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch()
+            throws IOException, NoHeadException, GitAPIException {
         List<Ref> branches = git.branchList().call();
         Repository repository = getRepository();
 
@@ -61,10 +109,10 @@ public class GitWorker {
         for (Ref branch : branches) {
             String branchName = branch.getName();
             ObjectId branchObjectId = repository.resolve(branchName);
-            
+
             if (branchObjectId == null)
                 continue;
-            
+
             Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
 
             for (RevCommit commit : commits) {
@@ -86,7 +134,7 @@ public class GitWorker {
 
     public static GitWorker mountGitWorker(File directory) throws IOException {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-    
+
         Repository repository = builder.findGitDir(directory).build();
         GitWorker gitWorker = new GitWorker(repository);
         return gitWorker;
@@ -100,9 +148,9 @@ public class GitWorker {
                 .setDirectory(dir)
                 .setCloneAllBranches(false)
                 .call();
-        
+
         git.fetch().call();
-        
+
         List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
         for (Ref ref : remoteBranches) {
             cloneBranchToLocal(git, ref);
