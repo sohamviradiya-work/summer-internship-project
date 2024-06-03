@@ -19,15 +19,16 @@ import com.tool.items.TestResult;
 import com.tool.writers.CSVWriter;
 
 public class Main {
-    public static String path = "./test-area/repository";
+    public static String repositoryPath = "../test-area/repository";
+    public static String resultsPath = "../results/";
 
     public static void main(String[] args) {
         String repositoryLink = "https://github.com/sohamviradiya-work/test-repo/";
-        clean(path);
-        clean("./results");
+        clean(repositoryPath);
+        clean(resultsPath);
 
         try {
-            GitWorker.getRemoteRepository(path, repositoryLink);
+            GitWorker.getRemoteRepository(repositoryPath, repositoryLink);
             run();
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -36,11 +37,11 @@ public class Main {
 
     private static void run() throws IOException, NoHeadException, GitAPIException {
         
-        TargetProject targetProject = TargetProject.mountLocalProject(path, "7.6.4");
+        TargetProject targetProject = TargetProject.mountLocalProject(repositoryPath, "7.6.4");
         
         // writeTestResults(targetProject);
 
-        CSVWriter<GitCommit> csvWriter = CSVWriter.create("./results/commits-list.csv");
+        CSVWriter<GitCommit> csvWriter = CSVWriter.create(resultsPath + "commits-list.csv");
 
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = targetProject.getGitWorker().listCommitsByBranch();
 
@@ -51,7 +52,7 @@ public class Main {
         }
         csvWriter.close();
 
-        CSVWriter<RegressionBlame> blameCSVWriter = CSVWriter.create("./results/blame-tests.csv");
+        CSVWriter<RegressionBlame> blameCSVWriter = CSVWriter.create(resultsPath + "blame-tests.csv");
         blameCSVWriter.write(new RegressionBlame(new TestIdentifier("testClass", "testMethod"),new GitCommit("author", "commit", "parent", "branch",Date.from(Instant.now()), "message")));
 
         targetProject.runFailedTestsBranchWise(blameCSVWriter);
