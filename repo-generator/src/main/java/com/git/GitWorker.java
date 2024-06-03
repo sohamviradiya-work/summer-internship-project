@@ -35,7 +35,7 @@ public class GitWorker {
                 .readEnvironment()
                 .build();
         Git git = new Git(repository);
-        GitWorker gitWorker = new GitWorker(git, username,email, token);
+        GitWorker gitWorker = new GitWorker(git, username, email, token);
         return gitWorker;
     }
 
