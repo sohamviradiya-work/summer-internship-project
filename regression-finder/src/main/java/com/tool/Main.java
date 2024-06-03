@@ -39,7 +39,7 @@ public class Main {
         
         TargetProject targetProject = TargetProject.mountLocalProject(repositoryPath, "7.6.4");
         
-        // writeTestResults(targetProject);
+        writeTestResults(targetProject);
         
         writecommits(targetProject);
 
@@ -49,7 +49,6 @@ public class Main {
         targetProject.runFailedTestsBranchWise(blameCSVWriter);
         blameCSVWriter.close();
         targetProject.close();
-
     }
 
     private static void writecommits(TargetProject targetProject) throws IOException, NoHeadException, GitAPIException {
@@ -66,6 +65,7 @@ public class Main {
     private static void writeTestResults(TargetProject targetProject) throws IOException {
         CSVWriter<TestResult> testResultCSVWriter = CSVWriter.create(resultsPath + "test-results.csv");
         targetProject.getRunner().runAlltests(testResultCSVWriter);
+        testResultCSVWriter.close();
     }
 
     private static String getRepositoryLink() {
