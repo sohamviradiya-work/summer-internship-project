@@ -39,7 +39,7 @@ public class Main {
         
         TargetProject targetProject = TargetProject.mountLocalProject(repositoryPath, "7.6.4");
         
-        writeTestResults(targetProject);
+        // writeTestResults(targetProject);
         
         writecommits(targetProject);
 
