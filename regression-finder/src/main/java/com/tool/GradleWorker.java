@@ -149,6 +149,7 @@ public class GradleWorker {
         buildLauncher.withArguments("--refresh-dependencies");
         
         try {
+            System.out.println("Syncing Dependencies");
             buildLauncher.run();
         } catch (Exception e) {
             e.printStackTrace();
