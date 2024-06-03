@@ -12,12 +12,9 @@ import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
-import org.eclipse.jgit.treewalk.TreeWalk;
-import org.eclipse.jgit.treewalk.filter.PathFilter;
 
 import com.tool.items.GitCommit;
 
@@ -59,43 +56,44 @@ public class GitWorker {
         git.checkout().setName(commit.getName()).call();
     }
 
-    public boolean isFileChanged(String commitTagA, String commitTagB, String filePath) {
+    public ArrayList<String> getChangedFiles(String commitTagA, String commitTagB) {
         Repository repository = getRepository();
-        try {
+        ArrayList<String> changedFiles = new ArrayList<>();
+    
+        try (RevWalk revWalk = new RevWalk(repository)) {
             ObjectId commitIdA = repository.resolve(commitTagA);
             ObjectId commitIdB = repository.resolve(commitTagB);
-
+    
             if (commitIdA == null || commitIdB == null) {
                 throw new IllegalArgumentException("Invalid commit ID or tag.");
             }
-
+    
+            RevCommit commitA = revWalk.parseCommit(commitIdA);
+            RevCommit commitB = revWalk.parseCommit(commitIdB);
+    
             CanonicalTreeParser treeParserA = new CanonicalTreeParser();
-            try (ObjectReader reader = repository.newObjectReader()) {
-                treeParserA.reset(reader, revWalk.parseCommit(commitIdA).getTree());
-            }
-
             CanonicalTreeParser treeParserB = new CanonicalTreeParser();
+    
             try (ObjectReader reader = repository.newObjectReader()) {
-                treeParserB.reset(reader, revWalk.parseCommit(commitIdB).getTree());
+                treeParserA.reset(reader, commitA.getTree());
+                treeParserB.reset(reader, commitB.getTree());
             }
-
+    
             try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    DiffFormatter diffFormatter = new DiffFormatter(out)) {
+                 DiffFormatter diffFormatter = new DiffFormatter(out)) {
                 diffFormatter.setRepository(repository);
                 List<DiffEntry> diffs = diffFormatter.scan(treeParserA, treeParserB);
-
+    
                 for (DiffEntry diff : diffs) {
-                    if (diff.getNewPath().equals(filePath) || diff.getOldPath().equals(filePath)) {
-                        return true; 
-                    }
+                    changedFiles.add(diff.getNewPath());
                 }
             }
-            return false;
-
+    
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
         }
+    
+        return changedFiles;
     }
 
     public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch()
