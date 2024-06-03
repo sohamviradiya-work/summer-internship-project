@@ -40,17 +40,8 @@ public class Main {
         TargetProject targetProject = TargetProject.mountLocalProject(repositoryPath, "7.6.4");
         
         // writeTestResults(targetProject);
-
-        CSVWriter<GitCommit> csvWriter = CSVWriter.create(resultsPath + "commits-list.csv");
-
-        HashMap<String, ArrayList<GitCommit>> branchCommitMap = targetProject.getGitWorker().listCommitsByBranch();
-
-        for(Entry<String, ArrayList<GitCommit>> entry:branchCommitMap.entrySet()){
-            for(GitCommit gitCommit:entry.getValue()){
-                csvWriter.write(gitCommit);
-            }
-        }
-        csvWriter.close();
+        
+        // writecommits(targetProject);
 
         CSVWriter<RegressionBlame> blameCSVWriter = CSVWriter.create(resultsPath + "blame-tests.csv");
         blameCSVWriter.write(new RegressionBlame(new TestIdentifier("testClass", "testMethod"),new GitCommit("author", "commit", "parent", "branch",Date.from(Instant.now()), "message")));
@@ -59,6 +50,18 @@ public class Main {
         blameCSVWriter.close();
         targetProject.close();
 
+    }
+
+    private static void writecommits(TargetProject targetProject)
+            throws IOException, NoHeadException, GitAPIException {
+        CSVWriter<GitCommit> csvWriter = CSVWriter.create(resultsPath + "commits-list.csv");
+        HashMap<String, ArrayList<GitCommit>> branchCommitMap = targetProject.getGitWorker().listCommitsByBranch();
+        for(Entry<String, ArrayList<GitCommit>> entry:branchCommitMap.entrySet()){
+            for(GitCommit gitCommit:entry.getValue()){
+                csvWriter.write(gitCommit);
+            }
+        }
+        csvWriter.close();
     }
 
     private static void writeTestResults(TargetProject targetProject) throws IOException {
