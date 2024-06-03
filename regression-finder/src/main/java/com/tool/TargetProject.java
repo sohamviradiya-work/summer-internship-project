@@ -61,8 +61,12 @@ public class TargetProject {
         GitCommit commitAfter = headCommit;
 
         branchCommits.remove(0);
-        gradleWorker.syncDependencies();
         for (GitCommit gitCommit : branchCommits) {
+
+            // TODO: Make compatible for other versions 
+            
+            if(isFileChanged(gitCommit.getCommitId(), commitAfter.getCommitId(), "app/build.gradle")) 
+                gradleWorker.syncDependencies();
 
             gitWorker.checkoutToCommit(gitCommit.getCommitId());
 
@@ -90,6 +94,11 @@ public class TargetProject {
         }
 
         gitWorker.checkoutToCommit(headCommit.getCommitId());
+    }
+
+    private boolean isFileChanged(String commitId, String commitId2, String path) {
+        ArrayList<String> changedFilePaths = gitWorker.getChangedFiles(commitId, commitId2);
+        return changedFilePaths.contains(path);
     }
 
     public static TargetProject mountLocalProject(String path, String gradleVersion) throws IOException {
