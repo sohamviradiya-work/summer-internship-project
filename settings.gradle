@@ -1,1 +1,1 @@
-include('regression-finder')
+include('regression-finder','repo-generator')
