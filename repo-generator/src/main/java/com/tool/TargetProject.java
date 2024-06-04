@@ -31,18 +31,17 @@ public class TargetProject {
 
         GradleWriter gradleWriter = GradleWriter.initialize(rootPath, projectName);
         
-        gitWorker.postCommit("init project");
-
         return new TargetProject(gitWorker, gradleWriter,rootPath);
     }
 
-    public void populate(int numOfSubProjects,int numOfModules,int numOfClasses,int numOfMethods,int randomCeiling) throws IOException {
+    public void populate(int numOfSubProjects,int numOfModules,int numOfClasses,int numOfMethods,int randomCeiling) throws IOException, GitAPIException {
         gradleWriter.populate();
         subProjects = new SubProject[numOfSubProjects];
         for(int i=0;i<numOfSubProjects;i++){
             subProjects[i] = SubProject.createSubProject(rootPath, i, numOfModules, numOfClasses, numOfMethods, randomCeiling);
             subProjects[i].writeSubProject(gradleWriter);
         }
+        gitWorker.postCommit("init project");
     }
     
     public void modifyProject(int subProjectNum,int moduleNum,int classNum,int methodNum,int x, int y) throws IOException, GitAPIException {
