@@ -27,8 +27,10 @@ public class Main {
         String token = dotenv.get("GITHUB_ACCESS_TOKEN");
 
         try {
-            TargetProject targetProject = TargetProject.initializeProject(rootPath,projectName,username,email,token,SUB_PROJECTS,MODULES_PER_SUB_PROJECT,CLASSES_PER_MODULE,TESTS_PER_CLASS,RANDOM_INT_LIMIT);
-
+            TargetProject targetProject = TargetProject.initializeProject(rootPath,projectName,username,email,token);
+            
+            targetProject.populate(SUB_PROJECTS,MODULES_PER_SUB_PROJECT,CLASSES_PER_MODULE, TESTS_PER_CLASS, RANDOM_INT_LIMIT);
+            
             for(int i=0;i<ITERATIONS;i++){
                 int randomSubProject = Helper.getRandom(SUB_PROJECTS);
                 int randomModuleNumber = Helper.getRandom(MODULES_PER_SUB_PROJECT);
@@ -38,7 +40,9 @@ public class Main {
                 int y = Helper.getRandom(RANDOM_INT_LIMIT);
                 targetProject.modifyProject(randomSubProject, randomModuleNumber, randomClassNumber, randomMethodNumber, x, y);
             }
+      
             targetProject.pushChanges();
+
         } catch (IOException | GitAPIException e) {
             e.printStackTrace();
         }

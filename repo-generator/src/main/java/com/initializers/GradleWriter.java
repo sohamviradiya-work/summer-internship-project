@@ -8,18 +8,23 @@ import java.util.List;
 public class GradleWriter {
 
     private Path rootPath;
+    private String projectName;
 
-    private GradleWriter(Path rootPath) {
+    private GradleWriter(Path rootPath,String projectName) {
         this.rootPath = rootPath;
+        this.projectName = projectName;
     }
 
 
     public static GradleWriter initialize(String rootPath,String projectName) throws IOException{
-        GradleWriter gradleWriter = new GradleWriter(Path.of(rootPath));
-        Files.createDirectories(Path.of(rootPath));
-        gradleWriter.createRootBuildGradle();
-        gradleWriter.createSettingsGradle(projectName);
+        GradleWriter gradleWriter = new GradleWriter(Path.of(rootPath),projectName);
         return gradleWriter; 
+    }
+
+    public void populate() throws IOException{
+        Files.createDirectories(rootPath);
+        createRootBuildGradle();
+        createSettingsGradle(projectName);
     }
 
     public void initSubProjectGradle(String subProjectName) throws IOException {
