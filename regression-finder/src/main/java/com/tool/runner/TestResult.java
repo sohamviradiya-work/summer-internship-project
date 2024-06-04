@@ -12,8 +12,8 @@ public class TestResult implements CSVItem{
     private Result result;
     private TestIdentifier testIdentifier;
 
-    public TestResult(String testClass, String testMethod, String result) {
-        this.testIdentifier = new TestIdentifier(testClass,testMethod);
+    public TestResult(String testClass, String testMethod,String testProject ,String result) {
+        this.testIdentifier = new TestIdentifier(testClass,testMethod,testProject);
         this.result = parseResult(result);
     }
 
@@ -30,7 +30,7 @@ public class TestResult implements CSVItem{
     }
 
     public String toCSVString() {
-        return testIdentifier.testClass + "," + testIdentifier.testMethod + "," + result.name();
+        return testIdentifier.getTestProject() + "," + testIdentifier.getTestClass() + "," + testIdentifier.getTestMethod() + "," + result.name();
     }
 
     public Result getResult(){
