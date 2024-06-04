@@ -11,3 +11,4 @@ build/
 
 test-area/
 results/
+.env
