@@ -10,18 +10,17 @@ public class GradleWriter {
     private Path rootPath;
     private String projectName;
 
-    private GradleWriter(Path rootPath,String projectName) {
+    private GradleWriter(Path rootPath, String projectName) {
         this.rootPath = rootPath;
         this.projectName = projectName;
     }
 
-
-    public static GradleWriter initialize(String rootPath,String projectName) throws IOException{
-        GradleWriter gradleWriter = new GradleWriter(Path.of(rootPath),projectName);
-        return gradleWriter; 
+    public static GradleWriter initialize(String rootPath, String projectName) throws IOException {
+        GradleWriter gradleWriter = new GradleWriter(Path.of(rootPath), projectName);
+        return gradleWriter;
     }
 
-    public void populate() throws IOException{
+    public void populate() throws IOException {
         Files.createDirectories(rootPath);
         createRootBuildGradle();
         createSettingsGradle(projectName);
@@ -41,13 +40,12 @@ public class GradleWriter {
                 "subprojects {",
                 "    apply plugin: 'java'",
                 "}",
-                ""
-        );
+                "");
         Files.write(rootPath.resolve("build.gradle"), lines, StandardOpenOption.CREATE);
     }
 
     private void createSettingsGradle(String projectName) throws IOException {
-        String settingsContent = "rootProject.name = " + projectName + ";\n";
+        String settingsContent = "rootProject.name = '" + projectName + "';\n";
         Files.write(rootPath.resolve("settings.gradle"), settingsContent.getBytes(), StandardOpenOption.CREATE);
     }
 
@@ -64,16 +62,19 @@ public class GradleWriter {
                 "    id 'java'",
                 "}",
                 "",
+                "repositories {",
+                "mavenCentral()",
+                "}",
+                "",
                 "dependencies {",
-                "    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'",
-                "    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.1'",
+                "    testImplementation platform('org.junit:junit-bom:5.10.0')",
+                "    testImplementation 'org.junit.jupiter:junit-jupiter'",
                 "}",
                 "",
                 "test {",
                 "    useJUnitPlatform()",
                 "}",
-                ""
-        );
+                "");
         Files.write(subProjectPath.resolve("build.gradle"), lines, StandardOpenOption.CREATE);
     }
 }
