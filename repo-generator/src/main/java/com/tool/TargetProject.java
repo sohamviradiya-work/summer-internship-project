@@ -33,13 +33,13 @@ public class TargetProject {
             subProjects[i] = SubProject.createSubProject(rootPath, i, numOfModules, numOfClasses, numOfMethods, randomCeiling);
             subProjects[i].writeSubProject(gradleWriter);
         }
-
+        gitWorker.postCommit("init project");
         return new TargetProject(gitWorker, gradleWriter,subProjects);
     }
     
     public void modifyProject(int subProjectNum,int moduleNum,int classNum,int methodNum,int x, int y) throws IOException, GitAPIException {
         subProjects[subProjectNum].modifySubProject(moduleNum, classNum, methodNum, x, y);
-        String commitMessage = "Modified " + Helper.getSubProjectName(subProjectNum) + "." + Helper.getModuleName(moduleNum) + "." + Helper.getTestClassName(classNum) + "." + Helper.getTestMethodName(methodNum)+ "to x: " + x + ", y: " + y;
+        String commitMessage = "Modified " + Helper.getSubProjectName(subProjectNum) + "." + Helper.getModuleName(moduleNum) + "." + Helper.getTestClassName(classNum) + "." + Helper.getTestMethodName(methodNum)+ " to x: " + x + ", y: " + y;
         gitWorker.postCommit(commitMessage);
     }
 
