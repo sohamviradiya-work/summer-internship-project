@@ -68,6 +68,9 @@ public class TargetProject {
         branchCommits.remove(0);
         for (GitCommit gitCommit : branchCommits) {
 
+            if (failingTests.isEmpty())
+                break;
+
             if (isSyncRequired(gitCommit.getCommitId(), commitAfter.getCommitId()))
                 gradleWorker.syncDependencies();
 
@@ -77,9 +80,6 @@ public class TargetProject {
             gradleWorker.runTests(failingTests, testResultsWriter);
 
             failingTests = evaulateResults(regressionBlameWriter, commitAfter, testResultsWriter);
-
-            if (failingTests.isEmpty())
-                break;
 
             commitAfter = gitCommit;
         }

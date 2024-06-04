@@ -52,8 +52,8 @@ class TargetProjectTest {
 
         verify(gitWorker, times(1)).listCommitsByBranch();
         verify(gitWorker, times(2)).checkoutToCommit("commit1"); // once at the beginning, one at the end
-        verify(gitWorker, times(1)).checkoutToCommit("commit2");
+        verify(gitWorker, times(0)).checkoutToCommit("commit2"); // not invoked for no fail
         verify(gradleWorker, times(1)).getFailingTests();
-        verify(gradleWorker, times(1)).runTests(anyList(), any());
+        verify(gradleWorker, times(0)).runTests(anyList(), any());
     }
 }
