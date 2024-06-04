@@ -16,6 +16,7 @@ public class GradleWriter {
 
     public static GradleWriter initialize(String rootPath,String projectName) throws IOException{
         GradleWriter gradleWriter = new GradleWriter(Path.of(rootPath));
+        Files.createDirectories(Path.of(rootPath));
         gradleWriter.createRootBuildGradle();
         gradleWriter.createSettingsGradle(projectName);
         return gradleWriter; 
@@ -41,7 +42,7 @@ public class GradleWriter {
     }
 
     private void createSettingsGradle(String projectName) throws IOException {
-        String settingsContent = "rootProject.name = " + projectName + ";";
+        String settingsContent = "rootProject.name = " + projectName + ";\n";
         Files.write(rootPath.resolve("settings.gradle"), settingsContent.getBytes(), StandardOpenOption.CREATE);
     }
 

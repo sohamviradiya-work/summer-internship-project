@@ -1,6 +1,8 @@
 package com.initializers;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import com.utils.Helper;
 
@@ -34,6 +36,7 @@ public class TestModuleWriter {
     }
 
     public void writeTestModule() throws IOException {
+        Files.createDirectories(Path.of(modulePath));
         for(TestClassWriter testClassWriter:testClassWriters){
             testClassWriter.writeToFile(modulePath, packageName);
         }

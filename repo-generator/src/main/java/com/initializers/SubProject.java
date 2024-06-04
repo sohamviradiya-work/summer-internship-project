@@ -1,6 +1,8 @@
 package com.initializers;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import com.utils.Helper;
 
@@ -29,6 +31,7 @@ public class SubProject {
     }
 
     public void writeSubProject(GradleWriter gradleWriter) throws IOException {
+        Files.createDirectories(Path.of(subProjectPath));
         gradleWriter.initSubProjectGradle(subProjectName);
         for(TestModuleWriter testModuleWriter:testModuleWriters){
             testModuleWriter.writeTestModule();
