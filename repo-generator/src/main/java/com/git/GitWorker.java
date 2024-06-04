@@ -50,6 +50,6 @@ public class GitWorker {
 
         RevCommit revCommit = git.commit().setCommitter(new PersonIdent(username, email)).setMessage(commitMessage).call();
 
-        System.out.println("Committed: " + revCommit.getName() + "," + revCommit.getShortMessage());
+        System.out.println("Committed: " + revCommit.getName() + " ," + revCommit.getShortMessage());
     }
 }
