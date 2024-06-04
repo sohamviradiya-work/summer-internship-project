@@ -23,7 +23,7 @@ public class TestMethodWriter {
         method.setName(methodName);
         method.setType(new VoidType());
         
-        method.addAnnotation("Test");
+        method.addMarkerAnnotation("Test");
         
         MethodCallExpr assertEqualsCall = new MethodCallExpr("assertEquals");
         assertEqualsCall.addArgument(String.valueOf(x));
