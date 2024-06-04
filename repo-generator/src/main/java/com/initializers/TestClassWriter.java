@@ -12,9 +12,10 @@ public class TestClassWriter {
         this.testMethodWriters = testMethodWriters;
     }
 
-    public static TestClassWriter writeTestClass(String testClassName, int numOfMethods, int randomCeiling) {
+    public static TestClassWriter writeTestClass(int classNum, int numOfMethods, int randomCeiling) {
 
         ClassOrInterfaceDeclaration classDeclaration = new ClassOrInterfaceDeclaration();
+        classDeclaration.setName(Helper.getTestClassName(classNum));
 
         TestMethodWriter[] testMethodWriters = new TestMethodWriter[numOfMethods];
 
