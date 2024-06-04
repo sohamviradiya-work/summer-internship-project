@@ -30,8 +30,9 @@ public class TestClassWriter {
         return new TestClassWriter(classDeclaration, testMethodWriters);
     }
 
-    public void modifyTestClass(int methodNum, int x, int y) {
+    public TestClassWriter modifyTestClass(int methodNum, int x, int y) {
         testMethodWriters[methodNum].modifyTestMethod(x, y);
+        return this;
     }
 
     public void writeToFile(String modulePath, String packageName) throws IOException {
