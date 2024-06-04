@@ -16,7 +16,7 @@ public class TestClassWriter {
         this.testMethodWriters = testMethodWriters;
     }
 
-    public static TestClassWriter writeTestClass(int classNum, int numOfMethods, int randomCeiling) {
+    public static TestClassWriter createTestClass(int classNum, int numOfMethods, int randomCeiling) {
 
         ClassOrInterfaceDeclaration classDeclaration = new ClassOrInterfaceDeclaration();
         classDeclaration.setName(Helper.getTestClassName(classNum));
@@ -24,7 +24,7 @@ public class TestClassWriter {
         TestMethodWriter[] testMethodWriters = new TestMethodWriter[numOfMethods];
 
         for (int i = 0; i < numOfMethods; i++) {
-            testMethodWriters[i] = TestMethodWriter.writeTestMethod(i, randomCeiling);
+            testMethodWriters[i] = TestMethodWriter.createTestMethod(i, randomCeiling);
             classDeclaration.addMember(testMethodWriters[i].methodDeclaration);
         }
         return new TestClassWriter(classDeclaration, testMethodWriters);

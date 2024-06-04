@@ -15,7 +15,7 @@ public class TestMethodWriter {
         this.methodDeclaration = methodDeclaration;
     }
 
-    public static TestMethodWriter writeTestMethod(int methodNum, int randomCeiling) {
+    public static TestMethodWriter createTestMethod(int methodNum, int randomCeiling) {
         MethodDeclaration method = new MethodDeclaration();
         String methodName = Helper.getTestMethodName(methodNum);
         int x = Helper.getRandom(randomCeiling);
