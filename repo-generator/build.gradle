@@ -12,15 +12,15 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'org.mockito:mockito-core:3.12.4'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.12.4'
+
+    implementation 'io.github.cdimascio:dotenv-java:2.2.0'
+    
+    implementation 'com.github.javaparser:javaparser-core:3.25.10'
     
     implementation 'org.gradle:gradle-tooling-api:7.3-20210825160000+0000' 
 
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r'
-
     implementation 'org.eclipse.jgit:org.eclipse.jgit.ssh.apache:6.4.0.202211300538-r'
-
     implementation 'org.eclipse.jgit:org.eclipse.jgit.gpg.bc:6.4.0.202211300538-r'
 }
 
