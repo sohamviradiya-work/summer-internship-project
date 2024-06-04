@@ -22,7 +22,7 @@ public class GitWorker {
 
     private GitWorker(Git git, String username,String email,String token) {
         
-        this.credentialsProvider = new UsernamePasswordCredentialsProvider(username, token);
+        this.credentialsProvider = new UsernamePasswordCredentialsProvider(email, token);
         this.git = git;
         this.username = username;
         this.email = email;
