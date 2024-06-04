@@ -43,7 +43,7 @@ public class TestClassWriter {
         compilationUnit.addType(classDeclaration);
 
         compilationUnit.addImport("org.junit.jupiter.api.Test");
-        compilationUnit.addImport("org.junit.jupiter.api.Assertions.assertEquals");
+        compilationUnit.addImport("org.junit.jupiter.api.Assertions.assertEquals", true, false);
 
         String outputFilePath = modulePath + "/" + classDeclaration.getNameAsString() + ".java";
         FileOutputStream output = new FileOutputStream(outputFilePath);
