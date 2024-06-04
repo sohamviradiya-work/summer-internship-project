@@ -6,6 +6,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.VoidType;
+import com.utils.Helper;
 
 public class TestMethodWriter {
     MethodDeclaration methodDeclaration;
@@ -14,9 +15,11 @@ public class TestMethodWriter {
         this.methodDeclaration = methodDeclaration;
     }
 
-    public static TestMethodWriter writeTestMethod(String methodName, int x, int y) {
+    public static TestMethodWriter writeTestMethod(int methodNum, int randomCeiling) {
         MethodDeclaration method = new MethodDeclaration();
-        
+        String methodName = Helper.getTestMethodName(methodNum);
+        int x = Helper.getRandom(randomCeiling);
+        int y = Helper.getRandom(randomCeiling);
         method.setName(methodName);
         method.setType(new VoidType());
         
