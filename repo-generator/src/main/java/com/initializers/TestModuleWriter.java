@@ -28,8 +28,9 @@ public class TestModuleWriter {
         return new TestModuleWriter(testClassWriters, modulePath,packageName);
     }
 
-    public void modifyTestModule(int classNum,int methodNum,int x, int y) throws IOException {
+    public TestModuleWriter modifyTestModule(int classNum,int methodNum,int x, int y) throws IOException {
         this.testClassWriters[classNum].modifyTestClass(methodNum, x, y).writeToFile(modulePath, packageName);
+        return this;
     }
 
     public void writeTestModule() throws IOException {
