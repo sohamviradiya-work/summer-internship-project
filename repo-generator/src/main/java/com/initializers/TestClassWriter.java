@@ -50,5 +50,4 @@ public class TestClassWriter {
         output.write(compilationUnit.toString().getBytes());
         output.close();
     }
-
 }

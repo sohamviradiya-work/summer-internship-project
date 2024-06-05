@@ -1,7 +1,6 @@
 package com.tool;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;

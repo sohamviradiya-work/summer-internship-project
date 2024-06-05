@@ -2,7 +2,6 @@ package com.tool.runner;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -141,17 +140,6 @@ public class GradleWorker {
             }
         }
         return failingTests;
-    }
-
-    public static ArrayList<TestIdentifier> evaulateTestResults(ArrayList<TestResult> testResults) throws IOException {
-        ArrayList<TestIdentifier> passingTestIdentifiers = new ArrayList<>();
-
-        for (TestResult testResult : testResults) {
-            TestIdentifier testIdentifier = testResult.getIdentifier();
-            if (testResult.getResult() != TestResult.Result.FAILED)
-                passingTestIdentifiers.add(testIdentifier);
-        }
-        return passingTestIdentifiers;
     }
 
     public void syncDependencies() {
