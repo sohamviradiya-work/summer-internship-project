@@ -1,7 +1,6 @@
-package com.tool.git;
+package com.items;
 
-import com.tool.interfaces.CSVItem;
-import com.tool.runner.TestIdentifier;
+import com.items.interfaces.CSVItem;
 
 public class RegressionBlame implements CSVItem{
 

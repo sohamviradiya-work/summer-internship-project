@@ -16,6 +16,8 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
+import com.items.GitCommit;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -39,23 +41,19 @@ public class GitWorker {
         this.revWalk = new RevWalk(git.getRepository());
     }
 
-    public Repository getRepository() {
-        return this.git.getRepository();
-    }
-
     public void close() {
         this.git.close();
     }
 
     public void checkoutToCommit(String commitTag) throws GitAPIException, IllegalArgumentException, IOException {
-        Repository repository = getRepository();
+        Repository repository = git.getRepository();
         System.out.println("Checked out to commit: " + commitTag);
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
         git.checkout().setName(commit.getName()).call();
     }
 
     public ArrayList<String> getChangedFiles(String commitTagA, String commitTagB) {
-        Repository repository = getRepository();
+        Repository repository = git.getRepository();
         ArrayList<String> changedFiles = new ArrayList<>();
     
         try (RevWalk revWalk = new RevWalk(repository)) {
@@ -97,7 +95,7 @@ public class GitWorker {
     public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch()
             throws IOException, NoHeadException, GitAPIException {
         List<Ref> branches = git.branchList().call();
-        Repository repository = getRepository();
+        Repository repository = git.getRepository();
 
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = new HashMap<>();
         HashSet<String> assignedCommits = new HashSet<String>();

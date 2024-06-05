@@ -12,11 +12,11 @@ import java.util.Map.Entry;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 
-import com.tool.git.GitCommit;
+import com.items.GitCommit;
+import com.items.RegressionBlame;
+import com.items.TestIdentifier;
+import com.items.TestResult;
 import com.tool.git.GitWorker;
-import com.tool.git.RegressionBlame;
-import com.tool.runner.TestIdentifier;
-import com.tool.runner.TestResult;
 import com.tool.writers.CSVWriter;
 
 public class Main {

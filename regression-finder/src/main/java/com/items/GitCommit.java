@@ -1,4 +1,4 @@
-package com.tool.git;
+package com.items;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -6,7 +6,7 @@ import java.util.TimeZone;
 
 import org.eclipse.jgit.revwalk.RevCommit;
 
-import com.tool.interfaces.CSVItem;
+import com.items.interfaces.CSVItem;
 
 public class GitCommit implements CSVItem {
     private String authorMail;
