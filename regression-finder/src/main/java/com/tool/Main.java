@@ -24,7 +24,7 @@ public class Main {
     public static String resultsPath = "../results/";
 
     public static void main(String[] args) {
-        String repositoryLink = "https://github.com/sohamviradiya-work/large-repo/";
+        String repositoryLink = "https://github.com/sohamviradiya-work/small-test-repo/";
         clean(repositoryPath);
         clean(resultsPath);
 
@@ -40,12 +40,13 @@ public class Main {
         
         TargetProject targetProject = TargetProject.mountLocalProject(repositoryPath, "7.6.4");
         
-        writeTestResults(targetProject);
+        // writeTestResults(targetProject);
         
-        writecommits(targetProject);
+     writecommits(targetProject);
 
         CSVWriter<RegressionBlame> blameCSVWriter = CSVWriter.create(resultsPath + "blame-tests.csv");
-        blameCSVWriter.write(new RegressionBlame(new TestIdentifier("testClass", "testMethod"),new GitCommit("author", "commit", "parent", "branch",Date.from(Instant.now()), "message")));
+       
+        blameCSVWriter.write(new RegressionBlame(new TestIdentifier("testClass", "testMethod","testProject"),new GitCommit("author", "commit", "parent", "branch",Date.from(Instant.now()), "message")));
 
         targetProject.runFailedTestsBranchWise(blameCSVWriter);
         blameCSVWriter.close();
