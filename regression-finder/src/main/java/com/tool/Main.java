@@ -24,7 +24,7 @@ public class Main {
     public static String resultsPath = "../results/";
 
     public static void main(String[] args) {
-        String repositoryLink = "https://github.com/sohamviradiya-work/small-test-repo/";
+        String repositoryLink = "https://github.com/sohamviradiya-work/large-repo/";
         clean(repositoryPath);
         clean(resultsPath);
 
