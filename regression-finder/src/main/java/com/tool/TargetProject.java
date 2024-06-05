@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
@@ -79,12 +80,14 @@ public class TargetProject {
             ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<>();
             gradleWorker.runTests(failingTests, testResultsWriter);
 
-            failingTests = evaulateResults(regressionBlameWriter, commitAfter, testResultsWriter);
+            ArrayList<TestResult> testResults = testResultsWriter.getList();
+
+            failingTests = evaluateResults(regressionBlameWriter, failingTests, commitAfter, testResults);
 
             commitAfter = gitCommit;
         }
-        
-        for(TestIdentifier testIdentifier:failingTests){
+
+        for (TestIdentifier testIdentifier : failingTests) {
             RegressionBlame regressionBlame = new RegressionBlame(testIdentifier, commitAfter);
             regressionBlameWriter.write(regressionBlame);
         }
@@ -92,19 +95,28 @@ public class TargetProject {
         gitWorker.checkoutToCommit(headCommit.getCommitId());
     }
 
-    private ArrayList<TestIdentifier> evaulateResults(ItemWriter<RegressionBlame> regressionBlameWriter,
-            GitCommit commitAfter, ArrayListWriter<TestResult> testResultsWriter) throws IOException {
-        final ArrayList<TestIdentifier> nextBatchTests = new ArrayList<>();
+    private ArrayList<TestIdentifier> evaluateResults(ItemWriter<RegressionBlame> regressionBlameWriter,
+            ArrayList<TestIdentifier> failingTests, GitCommit commitAfter, ArrayList<TestResult> testResults)
+            throws IOException {
+        HashSet<TestIdentifier> failingTestSet = new HashSet<>();
 
-        for (TestResult testResult : testResultsWriter.getList()) {
-            TestIdentifier testIdentifier = testResult.getIdentifier();
-            if (testResult.getResult() != TestResult.Result.FAILED) {
-                RegressionBlame regressionBlame = new RegressionBlame(testIdentifier, commitAfter);
-                regressionBlameWriter.write(regressionBlame);
-            } else
-                nextBatchTests.add(testIdentifier);
+        for (TestResult testResult : testResults) {
+            if (testResult.getResult() == TestResult.Result.FAILED)
+                failingTestSet.add(testResult.getIdentifier());
         }
-        return nextBatchTests;
+
+        ArrayList<TestIdentifier> newFailingTests = new ArrayList<>();
+
+        for (TestIdentifier testIdentifier : failingTests) {
+            if (!failingTestSet.contains(testIdentifier)) {
+                regressionBlameWriter.write(new RegressionBlame(testIdentifier, commitAfter));
+            }
+        }
+
+        for (TestIdentifier testIdentifier : failingTestSet) {
+            newFailingTests.add(testIdentifier);
+        }
+        return newFailingTests;
     }
 
     private boolean isSyncRequired(String commitId, String commitId2) {
