@@ -83,6 +83,11 @@ public class TargetProject {
 
             commitAfter = gitCommit;
         }
+        
+        for(TestIdentifier testIdentifier:failingTests){
+            RegressionBlame regressionBlame = new RegressionBlame(testIdentifier, commitAfter);
+            regressionBlameWriter.write(regressionBlame);
+        }
 
         gitWorker.checkoutToCommit(headCommit.getCommitId());
     }
