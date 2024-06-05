@@ -1,5 +1,6 @@
 package com.tool.runner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,15 +35,10 @@ public final class TestIdentifier {
         HashMap<String,HashMap<String,List<String>>> projectWiseTestGroups = new HashMap<>();
 
         for(TestIdentifier testIdentifier:testIdentifiers){
-            if(!projectWiseTestGroups.containsKey(testIdentifier.getTestProject())){
-                HashMap<String,List<String>> testGroup = new HashMap<>();
-                projectWiseTestGroups.put(testIdentifier.getTestProject(),testGroup);
-            }
-            HashMap<String,List<String>> classWiseTestGroup = projectWiseTestGroups.get(testIdentifier.getTestProject());
-            if(!classWiseTestGroup.containsKey(testIdentifier.getTestClass())){
-                classWiseTestGroup.put(testIdentifier.getTestClass(), List.of());
-            }
-            classWiseTestGroup.get(testIdentifier.getTestClass()).add(testIdentifier.getTestMethod());
+            
+            projectWiseTestGroups.computeIfAbsent(testIdentifier.getTestProject(), k -> new HashMap<>())
+                .computeIfAbsent(testIdentifier.getTestClass(), k -> new ArrayList<>())
+                .add(testIdentifier.getTestMethod());
         }
 
         return projectWiseTestGroups;
