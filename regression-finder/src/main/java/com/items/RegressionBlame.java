@@ -14,6 +14,6 @@ public class RegressionBlame implements CSVItem{
     
     @Override
     public String toCSVString() {
-        return testIdentifier.getTestProject() + ","+ testIdentifier.getTestClass() +  "," + testIdentifier.getTestMethod() + "," + gitCommit.getBranch() + "," + gitCommit.getCommitId() + "," + gitCommit.getAuthor(); 
+        return testIdentifier.getTestProject().substring(1) + ","+ testIdentifier.getTestClass() +  "," + testIdentifier.getTestMethod() + "," + gitCommit.getBranch() + "," + gitCommit.getCommitId() + "," + gitCommit.getAuthor(); 
     }
 }
