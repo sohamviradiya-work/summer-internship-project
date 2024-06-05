@@ -10,10 +10,10 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class Main {
     static int ITERATIONS =1000;
-    static int SUB_PROJECTS = 10;
-    static int MODULES_PER_SUB_PROJECT = 5;
-    static int CLASSES_PER_MODULE = 4;
-    static int TESTS_PER_CLASS = 5;
+    static int SUB_PROJECTS = 2;
+    static int MODULES_PER_SUB_PROJECT = 3;
+    static int CLASSES_PER_MODULE = 3;
+    static int TESTS_PER_CLASS = 4;
     static int RANDOM_INT_LIMIT = 2;
     static String rootPath = "../test-area/large-repo";
     static String projectName = "large-repo";
