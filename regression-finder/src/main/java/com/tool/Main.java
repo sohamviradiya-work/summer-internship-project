@@ -55,22 +55,25 @@ public class Main {
     }
 
     private static void writecommits(TargetProject targetProject) throws IOException, NoHeadException, GitAPIException {
-        CSVWriter<GitCommit> csvWriter = CSVWriter.create(resultsPath + "commits-list.csv");
+        CSVWriter<GitCommit> commitsCSVWriter = CSVWriter.create(resultsPath + "commits-list.csv");
+        commitsCSVWriter.write(new GitCommit("author", "commit", "parent", "branch", Date.from(Instant.now()), "message"));
         HashMap<String, ArrayList<GitCommit>> branchCommitMap = targetProject.getGitWorker().listCommitsByBranch();
         for (Entry<String, ArrayList<GitCommit>> entry : branchCommitMap.entrySet()) {
             for (GitCommit gitCommit : entry.getValue()) {
-                csvWriter.write(gitCommit);
+                commitsCSVWriter.write(gitCommit);
             }
         }
-        csvWriter.close();
+        commitsCSVWriter.close();
     }
 
     private static void writeTestResults(TargetProject targetProject) throws IOException {
         CSVWriter<TestResult> testResultCSVWriter = CSVWriter.create(resultsPath + "test-results.csv");
+        testResultCSVWriter.write(new TestResult("class","method", "project", "PASSED"));
         targetProject.getRunner().runAlltests(testResultCSVWriter);
         testResultCSVWriter.close();
     }
 
+    @SuppressWarnings("unused")
     private static String getRepositoryLink() {
         System.out.println("Enter Repository Link");
         Scanner scanner = new Scanner(System.in);
