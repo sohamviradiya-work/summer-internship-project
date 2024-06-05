@@ -54,6 +54,7 @@ public class GradleWorker {
         for (String testClass : testMethods.keySet()) {
             testLauncher.withTaskAndTestMethods(testProject + ":test", testClass, testMethods.get(testClass));
         }
+        testLauncher.addArguments("--parallel");
         testLauncher.addProgressListener(new ProgressListener() {
             @Override
             public void statusChanged(ProgressEvent event) {
@@ -78,7 +79,7 @@ public class GradleWorker {
         BuildLauncher buildLauncher = projectConnection.newBuild();
 
         buildLauncher.forTasks(testProjectName + ":test");
-        buildLauncher.withArguments("--continue", "--quiet");
+        buildLauncher.addArguments("--continue", "--quiet","--parallel");
         buildLauncher.addProgressListener(new ProgressListener() {
 
             @Override
