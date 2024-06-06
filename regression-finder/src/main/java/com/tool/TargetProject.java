@@ -67,6 +67,7 @@ public class TargetProject {
         GitCommit commitAfter = headCommit;
 
         branchCommits.remove(0);
+
         for (GitCommit gitCommit : branchCommits) {
 
             if (failingTests.isEmpty())
@@ -95,8 +96,7 @@ public class TargetProject {
         gitWorker.checkoutToCommit(headCommit.getCommitId());
     }
 
-    private ArrayList<TestIdentifier> evaluateResults(ItemWriter<RegressionBlame> regressionBlameWriter,
-            ArrayList<TestIdentifier> failingTests, GitCommit commitAfter, ArrayList<TestResult> testResults)
+    private ArrayList<TestIdentifier> evaluateResults(ItemWriter<RegressionBlame> regressionBlameWriter, ArrayList<TestIdentifier> failingTests, GitCommit commitAfter, ArrayList<TestResult> testResults)
             throws IOException {
         HashSet<TestIdentifier> failingTestSet = new HashSet<>();
 
@@ -108,19 +108,17 @@ public class TargetProject {
         ArrayList<TestIdentifier> newFailingTests = new ArrayList<>();
 
         for (TestIdentifier testIdentifier : failingTests) {
-            if (!failingTestSet.contains(testIdentifier)) {
+            if (failingTestSet.contains(testIdentifier))
+                newFailingTests.add(testIdentifier);
+            else
                 regressionBlameWriter.write(new RegressionBlame(testIdentifier, commitAfter));
-            }
         }
 
-        for (TestIdentifier testIdentifier : failingTestSet) {
-            newFailingTests.add(testIdentifier);
-        }
         return newFailingTests;
     }
 
-    private boolean isSyncRequired(String commitId, String commitId2) {
-        ArrayList<String> changedFilePaths = gitWorker.getChangedFiles(commitId, commitId2);
+    private boolean isSyncRequired(String commitIdA, String commitIdB) {
+        ArrayList<String> changedFilePaths = gitWorker.getChangedFiles(commitIdA, commitIdB);
         for (String path : changedFilePaths) {
             if (path.endsWith(".gradle"))
                 return true;
