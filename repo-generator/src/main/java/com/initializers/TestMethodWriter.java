@@ -19,7 +19,7 @@ public class TestMethodWriter {
         MethodDeclaration method = new MethodDeclaration();
         String methodName = Helper.getTestMethodName(methodNum);
         int x = Helper.getRandom(randomCeiling);
-        int y = Helper.getRandom(randomCeiling);
+        int y = x;
         method.setName(methodName);
         method.setType(new VoidType());
         
