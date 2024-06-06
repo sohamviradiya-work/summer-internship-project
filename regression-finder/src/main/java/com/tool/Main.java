@@ -45,7 +45,7 @@ public class Main {
 
         CSVWriter<RegressionBlame> blameCSVWriter = CSVWriter.create(resultsPath + "blame-tests.csv");
 
-        blameCSVWriter.write(new RegressionBlame(new TestIdentifier("testProject","testClass", "testMethod"),
+        blameCSVWriter.write(new RegressionBlame(new TestIdentifier(":testProject","testClass", "testMethod"),
                 new GitCommit("author", "commit", "parent", "branch", Date.from(Instant.now()), "message")));
 
         targetProject.runFailedTestsBranchWise(blameCSVWriter);
