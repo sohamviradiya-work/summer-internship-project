@@ -15,7 +15,6 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 import com.items.GitCommit;
 import com.items.RegressionBlame;
 import com.items.TestIdentifier;
-import com.items.TestResult;
 import com.tool.git.GitWorker;
 import com.tool.writers.CSVWriter;
 
@@ -24,7 +23,7 @@ public class Main {
     public static String resultsPath = "../results/";
 
     public static void main(String[] args) {
-        String repositoryLink = "https://github.com/sohamviradiya-work/large-repo/";
+        String repositoryLink = "https://github.com/sohamviradiya-work/small-test-repo/";
         clean(repositoryPath);
         clean(resultsPath);
 
@@ -67,10 +66,13 @@ public class Main {
     }
 
     private static void writeTestResults(TargetProject targetProject) throws IOException {
-        CSVWriter<TestResult> testResultCSVWriter = CSVWriter.create(resultsPath + "test-results.csv");
-        testResultCSVWriter.write(new TestResult("class","method", "project", "PASSED"));
-        targetProject.getRunner().runAlltests(testResultCSVWriter);
-        testResultCSVWriter.close();
+        ArrayList<TestIdentifier> failedTests = targetProject.getRunner().getFailingTests();
+        CSVWriter<TestIdentifier> failedTestsCSVWriter = CSVWriter.create(resultsPath + "failed-tests.csv");
+
+        for(TestIdentifier testIdentifier:failedTests){
+            failedTestsCSVWriter.write(testIdentifier);
+        }
+        failedTestsCSVWriter.close();
     }
 
     @SuppressWarnings("unused")
