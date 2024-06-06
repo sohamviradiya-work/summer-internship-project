@@ -9,7 +9,7 @@ import com.utils.Helper;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class Main {
-    static int ITERATIONS =250;
+    static int ITERATIONS = 500;
     static int SUB_PROJECTS = 2;
     static int MODULES_PER_SUB_PROJECT = 3;
     static int CLASSES_PER_MODULE = 5;
@@ -18,7 +18,6 @@ public class Main {
     static String rootPath = "../test-area/large-repo";
     static String projectName = "large-repo";
     public static void main(String[] args) {
-        System.out.println("Hello World!");
 
         Dotenv dotenv = Dotenv.configure().directory("../").load();
 

@@ -41,7 +41,7 @@ public class TestClassWriter {
 
         compilationUnit.setPackageDeclaration(packageName);
         compilationUnit.addType(classDeclaration);
-
+        
         compilationUnit.addImport("org.junit.jupiter.api.Test");
         compilationUnit.addImport("org.junit.jupiter.api.Assertions.assertEquals", true, false);
 
