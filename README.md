@@ -42,3 +42,38 @@ The Regression Finder Tool is designed to identify the specific commit that caus
 
 4. **Output**:  
    The results will be generated and stored in a CSV file located at `./results/blame-tests.csv`.
+
+## Algorithm
+
+1. **Run All Tests for HEAD Commit:**
+    - Execute the full test suite on the latest commit (`HEAD`) in the repository.
+
+2. **Store Failed Tests:**
+    - Identify and store any failed tests in a list called `failedTests`.
+    - Initialize an empty list called `blameList` to keep track of the commits responsible for test failures.
+    - Initialize a variable `previousCommit` and set it to `HEAD`.
+
+3. **Check for Test Failures:**
+    - If `failedTests` is empty, the process ends here as there are no test failures to analyze further.
+
+4. **Revert to Previous Commit:**
+    - Revert the repository to the previous commit.
+    - Initialize a new empty list called `newFailedTests`.
+
+5. **Run Specific Tests:**
+    - Run only the tests that are listed in `failedTests` on the reverted commit.
+
+6. **Store New Failed Tests:**
+    - Identify and store any failed tests in `newFailedTests`.
+
+7. **Analyze Test Results:**
+    - Compare `failedTests` and `newFailedTests`:
+        - If a test is present in `failedTests` but not in `newFailedTests`, it indicates that this test passed in the previous commit and only failed after the reverted commit.
+        - Write this test to `blameList` along with `previousCommit`
+
+8. **Update For Next Iteration:**
+    - Set `failedTests` to `newFailedTests`.
+    - Set `previousCommit` to the current commit.
+
+9. **Repeat the Process:**
+    - Go back to Step 3.
