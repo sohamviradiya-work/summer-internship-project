@@ -1,4 +1,4 @@
-package com.tool.runners;
+package com.tool.runner;
 
 import java.util.ArrayList;
 import java.util.HashMap;

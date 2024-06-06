@@ -15,7 +15,7 @@ import com.items.RegressionBlame;
 import com.items.TestIdentifier;
 import com.items.TestResult;
 import com.tool.git.GitWorker;
-import com.tool.runners.GradleWorker;
+import com.tool.runner.GradleWorker;
 import com.tool.writers.ArrayListWriter;
 import com.tool.writers.interfaces.ItemWriter;
 
