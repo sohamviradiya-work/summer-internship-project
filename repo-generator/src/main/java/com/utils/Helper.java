@@ -5,6 +5,13 @@ public class Helper {
     public static int getRandom(int n) {
         return (int)(Math.random()*n);
     }
+
+    public static int getRandom(int n,int exclude) {
+        int random = exclude;
+        while(random == exclude)
+             random = (int)(Math.random()*n);
+        return random;
+    }
     
     public static String getTestMethodName(int num){
         return "testMethod" + num;
