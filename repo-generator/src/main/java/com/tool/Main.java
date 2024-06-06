@@ -14,9 +14,10 @@ public class Main {
     static int MODULES_PER_SUB_PROJECT = 3;
     static int CLASSES_PER_MODULE = 5;
     static int TESTS_PER_CLASS = 5;
-    static int RANDOM_INT_LIMIT = 2;
+    static int RANDOM_INT_LIMIT = 5;
     static String rootPath = "../test-area/large-repo";
     static String projectName = "large-repo";
+     
     public static void main(String[] args) {
 
         Dotenv dotenv = Dotenv.configure().directory("../").load();
@@ -24,6 +25,8 @@ public class Main {
         String email = dotenv.get("GITHUB_EMAIL");
         String username = dotenv.get("GITHUB_USERNAME");
         String token = dotenv.get("GITHUB_ACCESS_TOKEN");
+
+        boolean pass_after_fail = dotenv.get("PASS_AFTER_FAIL")=="TRUE";    
 
         try {
             TargetProject targetProject = TargetProject.initializeProject(rootPath,projectName,username,email,token);
@@ -35,8 +38,10 @@ public class Main {
                 int randomModuleNumber = Helper.getRandom(MODULES_PER_SUB_PROJECT);
                 int randomClassNumber = Helper.getRandom(CLASSES_PER_MODULE);
                 int randomMethodNumber = Helper.getRandom(MODULES_PER_SUB_PROJECT);
+
                 int x = Helper.getRandom(RANDOM_INT_LIMIT);
-                int y = Helper.getRandom(RANDOM_INT_LIMIT);
+                int y = pass_after_fail ? Helper.getRandom(RANDOM_INT_LIMIT) : Helper.getRandom(RANDOM_INT_LIMIT,x);
+
                 targetProject.modifyProject(randomSubProject, randomModuleNumber, randomClassNumber, randomMethodNumber, x, y);
             }
       
