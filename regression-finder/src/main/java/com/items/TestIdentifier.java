@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public final class TestIdentifier implements Comparable<TestIdentifier> {
+import com.items.interfaces.CSVItem;
+
+public final class TestIdentifier implements Comparable<TestIdentifier>, CSVItem {
     private String testClass;
     private String testMethod;
     private String testProject;
@@ -69,5 +71,10 @@ public final class TestIdentifier implements Comparable<TestIdentifier> {
         }
 
         return projectWiseTestGroups;
+    }
+
+    @Override
+    public String toCSVString() {
+        return testProject + "," + testClass + "," + testMethod;
     }
 }
