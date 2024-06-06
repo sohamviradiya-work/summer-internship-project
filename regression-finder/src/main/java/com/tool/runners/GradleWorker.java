@@ -14,18 +14,12 @@ import org.gradle.tooling.TestLauncher;
 import org.gradle.tooling.events.OperationType;
 import org.gradle.tooling.events.ProgressEvent;
 import org.gradle.tooling.events.ProgressListener;
-import org.gradle.tooling.events.test.TestOperationResult;
-import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
-import org.gradle.tooling.events.test.internal.DefaultTestSkippedResult;
 import org.gradle.tooling.model.GradleProject;
 
 import com.items.TestIdentifier;
 import com.items.TestResult;
 import com.tool.writers.ArrayListWriter;
 import com.tool.writers.interfaces.ItemWriter;
-
-import org.gradle.tooling.events.test.internal.DefaultJvmTestOperationDescriptor;
-import org.gradle.tooling.events.test.internal.DefaultTestFailureResult;
 
 public class GradleWorker {
     private ProjectConnection projectConnection;
@@ -47,18 +41,18 @@ public class GradleWorker {
         }
     }
 
-    private void runTestsForProject(String testProject, HashMap<String, List<String>> testMethods,
+    private void runTestsForProject(String testProjectName, HashMap<String, List<String>> testMethods,
             ItemWriter<TestResult> resultsWriter) {
         TestLauncher testLauncher = projectConnection.newTestLauncher();
 
         for (String testClass : testMethods.keySet()) {
-            testLauncher.withTaskAndTestMethods(testProject + ":test", testClass, testMethods.get(testClass));
+            testLauncher.withTaskAndTestMethods(testProjectName + ":test", testClass, testMethods.get(testClass));
         }
         testLauncher.addArguments("--parallel");
         testLauncher.addProgressListener(new ProgressListener() {
             @Override
             public void statusChanged(ProgressEvent event) {
-                logTest(event, testProject, resultsWriter);
+                logTest(event, testProjectName, resultsWriter);
             }
         }, OperationType.TEST);
         try {
@@ -77,9 +71,8 @@ public class GradleWorker {
 
     private void runAlltestsForProject(ItemWriter<TestResult> resultsWriter, String testProjectName) {
         BuildLauncher buildLauncher = projectConnection.newBuild();
-
         buildLauncher.forTasks(testProjectName + ":test");
-        buildLauncher.addArguments("--continue", "--quiet","--parallel");
+        buildLauncher.addArguments("--continue", "--quiet", "--parallel");
         buildLauncher.addProgressListener(new ProgressListener() {
 
             @Override
@@ -91,41 +84,7 @@ public class GradleWorker {
         try {
             buildLauncher.run();
         } catch (Exception e) {
-            
-        }
-    }
 
-    private void logTest(ProgressEvent event, String testProjectName, ItemWriter<TestResult> resultsWriter) {
-        if (event instanceof DefaultTestFinishEvent) {
-            DefaultJvmTestOperationDescriptor descriptor = (DefaultJvmTestOperationDescriptor) event.getDescriptor();
-
-            TestOperationResult result = ((DefaultTestFinishEvent) event).getResult();
-            String resultString;
-
-            String testClassName = descriptor.getClassName();
-            String testMethodName = descriptor.getMethodName();
-
-            if (testClassName == null || testMethodName == null)
-                return;
-
-            if (result instanceof DefaultTestFailureResult)
-                resultString = "FAILED";
-            else if (result instanceof DefaultTestSkippedResult)
-                resultString = "SKIPPED";
-            else
-                resultString = "PASSED";
-
-            testMethodName = testMethodName.replace("(", "").replace(")", "");
-
-            TestResult testResult = new TestResult(testClassName, testMethodName, testProjectName, resultString);
-
-            if (testResult != null) {
-                try {
-                    resultsWriter.write(testResult);
-                } catch (IOException e) {
-                    
-                }
-            }
         }
     }
 
@@ -148,7 +107,7 @@ public class GradleWorker {
     public void syncDependencies() {
         BuildLauncher buildLauncher = projectConnection.newBuild();
         buildLauncher.forTasks("dependencies");
-        buildLauncher.withArguments("--refresh-dependencies");
+        buildLauncher.addArguments("--refresh-dependencies");
 
         try {
             System.out.println("Syncing Dependencies");
@@ -158,16 +117,10 @@ public class GradleWorker {
         }
     }
 
-    public static GradleWorker mountGradleWorker(String gradleVersion, File directory) {
-        GradleConnector connector = GradleConnector.newConnector().useGradleVersion(gradleVersion);
-        connector.forProjectDirectory(directory);
-        GradleWorker gradleWorker = new GradleWorker(connector.connect());
-        return gradleWorker;
-    }
 
     public List<String> getSubProjects() {
 
-       List<String> subProjects = new ArrayList<>();
+        List<String> subProjects = new ArrayList<>();
         ModelBuilder<GradleProject> modelBuilder = projectConnection.model(GradleProject.class);
         try {
             GradleProject rootProject = modelBuilder.get();
@@ -178,5 +131,24 @@ public class GradleWorker {
             e.printStackTrace();
         }
         return subProjects;
+    }
+
+    public static GradleWorker mountGradleWorker(String gradleVersion, File directory) {
+        GradleConnector connector = GradleConnector.newConnector().useGradleVersion(gradleVersion);
+        connector.forProjectDirectory(directory);
+        GradleWorker gradleWorker = new GradleWorker(connector.connect());
+        return gradleWorker;
+    }
+
+
+    private static void logTest(ProgressEvent event, String testProjectName, ItemWriter<TestResult> resultsWriter) {
+        TestResult testResult = TestResult.extractResult(event, testProjectName, resultsWriter);
+        if (testResult != null) {
+            try {
+                resultsWriter.write(testResult);
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 }

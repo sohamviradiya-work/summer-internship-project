@@ -1,6 +1,14 @@
 package com.items;
 
+import org.gradle.tooling.events.ProgressEvent;
+import org.gradle.tooling.events.test.TestOperationResult;
+import org.gradle.tooling.events.test.internal.DefaultJvmTestOperationDescriptor;
+import org.gradle.tooling.events.test.internal.DefaultTestFailureResult;
+import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
+import org.gradle.tooling.events.test.internal.DefaultTestSkippedResult;
+
 import com.items.interfaces.CSVItem;
+import com.tool.writers.interfaces.ItemWriter;
 
 public class TestResult implements CSVItem{
     public enum Result {
@@ -39,5 +47,33 @@ public class TestResult implements CSVItem{
 
     public TestIdentifier getIdentifier(){
         return testIdentifier;
+    }
+
+    public static TestResult extractResult(ProgressEvent event, String testProjectName, ItemWriter<TestResult> resultsWriter) {
+        if (event instanceof DefaultTestFinishEvent) {
+            DefaultJvmTestOperationDescriptor descriptor = (DefaultJvmTestOperationDescriptor) event.getDescriptor();
+    
+            TestOperationResult result = ((DefaultTestFinishEvent) event).getResult();
+            String resultString;
+    
+            String testClassName = descriptor.getClassName();
+            String testMethodName = descriptor.getMethodName();
+    
+            if (testClassName == null || testMethodName == null)
+                return null;
+    
+            if (result instanceof DefaultTestFailureResult)
+                resultString = "FAILED";
+            else if (result instanceof DefaultTestSkippedResult)
+                resultString = "SKIPPED";
+            else
+                resultString = "PASSED";
+    
+            testMethodName = testMethodName.replace("(", "").replace(")", "");
+    
+            return new TestResult(testClassName, testMethodName, testProjectName, resultString);
+    
+        }
+        return null;
     }
 }
