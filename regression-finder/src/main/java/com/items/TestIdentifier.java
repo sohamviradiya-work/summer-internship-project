@@ -12,10 +12,10 @@ public final class TestIdentifier implements Comparable<TestIdentifier>, CSVItem
     private String testMethod;
     private String testProject;
 
-    public TestIdentifier(String testClass, String testMethod, String testProject) {
+    public TestIdentifier(String testProject, String testClass, String testMethod) {
+        this.testProject = testProject;
         this.testClass = testClass;
         this.testMethod = testMethod;
-        this.testProject = testProject;
     }
 
     public String getTestClass() {

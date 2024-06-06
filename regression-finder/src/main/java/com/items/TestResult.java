@@ -21,7 +21,7 @@ public class TestResult implements CSVItem{
     private TestIdentifier testIdentifier;
 
     public TestResult(String testClass, String testMethod,String testProject ,String result) {
-        this.testIdentifier = new TestIdentifier(testClass,testMethod,testProject);
+        this.testIdentifier = new TestIdentifier(testProject,testClass,testMethod);
         this.result = parseResult(result);
     }
 
