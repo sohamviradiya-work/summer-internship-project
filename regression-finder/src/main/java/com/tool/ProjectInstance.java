@@ -29,17 +29,24 @@ public class ProjectInstance {
         this.gradleWorker.close();
     }
 
-    public ArrayList<TestResult> runTestsForCommit(ArrayList<TestIdentifier> testIdentifiers,ProjectCommit projectCommit) throws GitAPIException, IOException {
-        gitWorker.checkoutToCommit(projectCommit.getCommitId());
+    public ArrayList<TestResult> runTestsForCommit(ArrayList<TestIdentifier> testIdentifiers,
+            ProjectCommit projectCommit, ProjectCommit previousCommit) throws GitAPIException, IOException {
+        gitWorker.checkoutToCommit(projectCommit);
+        syncIfRequired(projectCommit, previousCommit);
         return gradleWorker.runTests(testIdentifiers);
     }
 
     public ArrayList<TestResult> runAllTestsForCommit(ProjectCommit projectCommit) throws GitAPIException, IOException {
-        gitWorker.checkoutToCommit(projectCommit.getCommitId());
+        gitWorker.checkoutToCommit(projectCommit);
         return gradleWorker.runAllTests();
     }
 
-    public boolean isSyncRequired(ProjectCommit commitA, ProjectCommit commitB) {
+    public void syncIfRequired(ProjectCommit commitA, ProjectCommit commitB) {
+        if (isSyncRequired(commitA, commitB))
+            gradleWorker.syncDependencies();
+    }
+
+    private boolean isSyncRequired(ProjectCommit commitA, ProjectCommit commitB) {
         String commitIdA = commitA.getCommitId();
         String commitIdB = commitB.getCommitId();
 
@@ -50,7 +57,6 @@ public class ProjectInstance {
         }
         return false;
     }
-
 
     public static ProjectInstance mountLocalProject(String path) throws IOException {
         return mountLocalProject(path, "");
