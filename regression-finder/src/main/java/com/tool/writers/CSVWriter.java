@@ -3,6 +3,7 @@ package com.tool.writers;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 
 import com.items.interfaces.CSVItem;
 import com.tool.writers.interfaces.ItemWriter;
@@ -25,9 +26,18 @@ public class CSVWriter<T extends CSVItem> implements ItemWriter<T> {
         return new CSVWriter<T>(writer);
     }
 
+    @Override
     public void close() throws IOException {
         if (writer != null) {
             writer.close();
         }
+    }
+
+    @Override
+    public void writeAll(Collection<T> items) throws IOException {
+        for(T item:items){
+            this.write(item);
+        }
+        this.writer.flush();
     }
 }

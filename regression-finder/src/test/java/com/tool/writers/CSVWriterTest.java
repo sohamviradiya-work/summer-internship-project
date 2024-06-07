@@ -10,6 +10,7 @@ import com.items.interfaces.CSVItem;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -57,4 +58,24 @@ class CSVWriterTest {
         assertEquals("item1", captor.getAllValues().get(0));
         assertEquals("item2", captor.getAllValues().get(1));
     }
+
+    @Test
+    void testWriteAll() throws IOException {
+        CSVItem csvItem2 = mock(CSVItem.class);
+        CSVItem csvItem3 = mock(CSVItem.class);
+        when(csvItem2.toCSVString()).thenReturn("item2");
+        when(csvItem3.toCSVString()).thenReturn("item3");
+
+        csvWriter.writeAll(List.of(csvItem,csvItem2,csvItem3));
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(bufferedWriter, times(3)).write(captor.capture());
+        verify(bufferedWriter, times(3)).newLine();
+
+        assertEquals("item1", captor.getAllValues().get(0));
+        assertEquals("item2", captor.getAllValues().get(1));
+        assertEquals("item3", captor.getAllValues().get(2));
+    }
+
 }
+
