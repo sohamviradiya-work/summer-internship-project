@@ -18,13 +18,13 @@ import com.tool.git.GitWorker;
 import com.tool.runner.GradleWorker;
 import com.tool.writers.interfaces.ItemWriter;
 
-public class TargetProject {
+public class ProjectInstance {
 
     private static String DEFAULT_GRADLE_VERSION = "7.6.4";
     private GradleWorker gradleWorker;
     private GitWorker gitWorker;
 
-    public TargetProject(GradleWorker gradleWorker, GitWorker gitWorker) {
+    public ProjectInstance(GradleWorker gradleWorker, GitWorker gitWorker) {
         this.gradleWorker = gradleWorker;
         this.gitWorker = gitWorker;
     }
@@ -123,7 +123,7 @@ public class TargetProject {
         return false;
     }
 
-    public static TargetProject mountLocalProject(String path, String gradleVersion) throws IOException {
+    public static ProjectInstance mountLocalProject(String path, String gradleVersion) throws IOException {
 
         if (gradleVersion.length() == 0)
             gradleVersion = DEFAULT_GRADLE_VERSION;
@@ -132,6 +132,6 @@ public class TargetProject {
 
         GradleWorker gradleWorker = GradleWorker.mountGradleWorker(gradleVersion, directory);
         GitWorker gitWorker = GitWorker.mountGitWorker(directory);
-        return new TargetProject(gradleWorker, gitWorker);
+        return new ProjectInstance(gradleWorker, gitWorker);
     }
 }
