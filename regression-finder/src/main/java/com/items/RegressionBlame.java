@@ -4,16 +4,16 @@ import com.items.interfaces.CSVItem;
 
 public class RegressionBlame implements CSVItem{
 
-    private GitCommit gitCommit;
+    private ProjectCommit projectCommit;
     private TestIdentifier testIdentifier;
 
-    public RegressionBlame(TestIdentifier testIdentifier, GitCommit gitCommit) {
+    public RegressionBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit) {
         this.testIdentifier = testIdentifier;
-        this.gitCommit = gitCommit;
+        this.projectCommit = projectCommit;
     }
     
     @Override
     public String toCSVString() {
-        return testIdentifier.getTestProject().substring(1) + ","+ testIdentifier.getTestClass() +  "," + testIdentifier.getTestMethod() + "," + gitCommit.getBranch() + "," + gitCommit.getCommitId() + "," + gitCommit.getAuthor(); 
+        return testIdentifier.getTestProject().substring(1) + ","+ testIdentifier.getTestClass() +  "," + testIdentifier.getTestMethod() + "," + projectCommit.getBranch() + "," + projectCommit.getCommitId() + "," + projectCommit.getAuthor(); 
     }
 }

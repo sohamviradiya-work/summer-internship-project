@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-import com.items.GitCommit;
+import com.items.ProjectCommit;
 import com.items.TestIdentifier;
 import com.items.TestResult;
 import com.tool.git.GitWorker;
@@ -29,17 +29,17 @@ public class ProjectInstance {
         this.gradleWorker.close();
     }
 
-    public ArrayList<TestResult> runTestsForCommit(ArrayList<TestIdentifier> testIdentifiers, GitCommit gitCommit) throws GitAPIException, IOException {
-        gitWorker.checkoutToCommit(gitCommit.getCommitId());
+    public ArrayList<TestResult> runTestsForCommit(ArrayList<TestIdentifier> testIdentifiers,ProjectCommit projectCommit) throws GitAPIException, IOException {
+        gitWorker.checkoutToCommit(projectCommit.getCommitId());
         return gradleWorker.runTests(testIdentifiers);
     }
 
-    public ArrayList<TestResult> runAllTestsForCommit(GitCommit gitCommit) throws GitAPIException, IOException {
-        gitWorker.checkoutToCommit(gitCommit.getCommitId());
+    public ArrayList<TestResult> runAllTestsForCommit(ProjectCommit projectCommit) throws GitAPIException, IOException {
+        gitWorker.checkoutToCommit(projectCommit.getCommitId());
         return gradleWorker.runAllTests();
     }
 
-    public boolean isSyncRequired(GitCommit commitA, GitCommit commitB) {
+    public boolean isSyncRequired(ProjectCommit commitA, ProjectCommit commitB) {
         String commitIdA = commitA.getCommitId();
         String commitIdB = commitB.getCommitId();
 
@@ -49,6 +49,11 @@ public class ProjectInstance {
                 return true;
         }
         return false;
+    }
+
+
+    public static ProjectInstance mountLocalProject(String path) throws IOException {
+        return mountLocalProject(path, "");
     }
 
     public static ProjectInstance mountLocalProject(String path, String gradleVersion) throws IOException {

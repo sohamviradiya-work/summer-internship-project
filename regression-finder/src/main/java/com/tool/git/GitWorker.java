@@ -16,7 +16,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
-import com.items.GitCommit;
+import com.items.ProjectCommit;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -92,12 +92,12 @@ public class GitWorker {
         return changedFiles;
     }
 
-    public HashMap<String, ArrayList<GitCommit>> listCommitsByBranch()
+    public HashMap<String, ArrayList<ProjectCommit>> listCommitsByBranch()
             throws IOException, NoHeadException, GitAPIException {
         List<Ref> branches = git.branchList().call();
         Repository repository = git.getRepository();
 
-        HashMap<String, ArrayList<GitCommit>> branchCommitMap = new HashMap<>();
+        HashMap<String, ArrayList<ProjectCommit>> branchCommitMap = new HashMap<>();
         HashSet<String> assignedCommits = new HashSet<String>();
 
         for (Ref branch : branches) {
@@ -110,16 +110,16 @@ public class GitWorker {
             Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
 
             for (RevCommit commit : commits) {
-                GitCommit gitCommit = GitCommit.getGitCommitFromRevCommit(branchName, commit);
+                ProjectCommit projectCommit = ProjectCommit.getprojectCommitFromRevCommit(branchName, commit);
 
-                if (assignedCommits.contains(gitCommit.getCommitId()))
+                if (assignedCommits.contains(projectCommit.getCommitId()))
                     continue;
 
-                if (!branchCommitMap.containsKey(gitCommit.getBranch()))
-                    branchCommitMap.put(gitCommit.getBranch(), new ArrayList<>());
+                if (!branchCommitMap.containsKey(projectCommit.getBranch()))
+                    branchCommitMap.put(projectCommit.getBranch(), new ArrayList<>());
 
-                branchCommitMap.get(gitCommit.getBranch()).add(gitCommit);
-                assignedCommits.add(gitCommit.getCommitId());
+                branchCommitMap.get(projectCommit.getBranch()).add(projectCommit);
+                assignedCommits.add(projectCommit.getCommitId());
 
             }
         }

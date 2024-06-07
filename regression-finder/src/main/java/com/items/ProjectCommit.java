@@ -8,7 +8,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.items.interfaces.CSVItem;
 
-public class GitCommit implements CSVItem {
+public class ProjectCommit implements CSVItem {
     private String authorMail;
     private String commitId;
     private String parentCommitId;
@@ -16,7 +16,7 @@ public class GitCommit implements CSVItem {
     private Date time;
     private String message;
 
-    public GitCommit(String authorMail, String commitId, String parentCommitId, String branch, Date time,
+    public ProjectCommit(String authorMail, String commitId, String parentCommitId, String branch, Date time,
                      String message) {
         this.authorMail = authorMail;
         this.commitId = commitId;
@@ -26,8 +26,8 @@ public class GitCommit implements CSVItem {
         this.message = message;
     }
 
-    public static GitCommit createNullCommit(){
-        return new GitCommit(null, null, null, null, null, null);
+    public static ProjectCommit createNullCommit(){
+        return new ProjectCommit(null, null, null, null, null, null);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class GitCommit implements CSVItem {
         return branch;
     }
 
-    public static GitCommit getGitCommitFromRevCommit(String branchName, RevCommit commit) {
+    public static ProjectCommit getprojectCommitFromRevCommit(String branchName, RevCommit commit) {
         String parentId;
         if (commit.getParentCount() > 0) {
             RevCommit parent = commit.getParent(0);
@@ -59,7 +59,7 @@ public class GitCommit implements CSVItem {
             parentId = "HEAD";
         }
 
-        return new GitCommit(
+        return new ProjectCommit(
                 commit.getAuthorIdent().getEmailAddress(),
                 commit.getName(),
                 parentId,
