@@ -51,7 +51,7 @@ public class GradleWorker {
         return extractResults(testProjectName, events);
     }
 
-    public ArrayList<TestIdentifier> getFailingTests() throws IOException {
+    public ArrayList<TestResult> runAllTests() throws IOException {
 
         List<String> subProjects = projectManager.getSubProjects();
         ArrayListWriter<TestResult> testResultsWriter = ArrayListWriter.create();
@@ -60,14 +60,8 @@ public class GradleWorker {
         }
 
         ArrayList<TestResult> testResults = testResultsWriter.getList();
-        ArrayList<TestIdentifier> failingTests = new ArrayList<TestIdentifier>();
-
-        for (TestResult testResult : testResults) {
-            if (testResult.getResult() == TestResult.Result.FAILED) {
-                failingTests.add(testResult.getIdentifier());
-            }
-        }
-        return failingTests;
+        
+        return testResults;
     }
 
     public void syncDependencies() {

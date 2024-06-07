@@ -15,6 +15,7 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 import com.items.GitCommit;
 import com.items.RegressionBlame;
 import com.items.TestIdentifier;
+import com.items.TestResult;
 import com.tool.git.GitWorker;
 import com.tool.writers.CSVWriter;
 
@@ -66,13 +67,13 @@ public class Main {
     }
 
     private static void writeTestResults(TargetProject targetProject) throws IOException {
-        ArrayList<TestIdentifier> failedTests = targetProject.getRunner().getFailingTests();
-        CSVWriter<TestIdentifier> failedTestsCSVWriter = CSVWriter.create(resultsPath + "failed-tests.csv");
+        ArrayList<TestResult> testResults = targetProject.getRunner().runAllTests();
+        CSVWriter<TestResult> testResultsCSVWriter = CSVWriter.create(resultsPath + "failed-tests.csv");
 
-        for(TestIdentifier testIdentifier:failedTests){
-            failedTestsCSVWriter.write(testIdentifier);
+        for(TestResult testResult:testResults){
+            testResultsCSVWriter.write(testResult);
         }
-        failedTestsCSVWriter.close();
+        testResultsCSVWriter.close();
     }
 
     @SuppressWarnings("unused")

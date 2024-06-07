@@ -61,7 +61,8 @@ public class TargetProject {
         GitCommit headCommit = branchCommits.get(0);
         gitWorker.checkoutToCommit(headCommit.getCommitId());
 
-        ArrayList<TestIdentifier> failingTests = gradleWorker.getFailingTests();
+        ArrayList<TestResult> testResults = gradleWorker.runAllTests();
+        ArrayList<TestIdentifier> failingTests = TestResult.extractFailingTests(testResults);
 
         GitCommit commitAfter = headCommit;
 
@@ -77,7 +78,7 @@ public class TargetProject {
 
             gitWorker.checkoutToCommit(gitCommit.getCommitId());
 
-            ArrayList<TestResult> testResults = gradleWorker.runTests(failingTests);
+            testResults = gradleWorker.runTests(failingTests);
 
             failingTests = evaluateResults(regressionBlameWriter, failingTests, commitAfter, testResults);
 
