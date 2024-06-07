@@ -1,6 +1,7 @@
 package com.items;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import com.items.interfaces.CSVItem;
 
@@ -43,8 +44,8 @@ public class TestResult implements CSVItem{
         return testIdentifier;
     }
 
-    public static ArrayList<TestIdentifier> extractFailingTests(ArrayList<TestResult> testResults) {
-        ArrayList<TestIdentifier> failingTests = new ArrayList<>();
+    public static HashSet<TestIdentifier> extractFailingTests(ArrayList<TestResult> testResults) {
+        HashSet<TestIdentifier> failingTests = new HashSet<>();
         for(TestResult testResult:testResults){
             if(testResult.getResult()==TestResult.Result.FAILED)
                 failingTests.add(testResult.getIdentifier());
@@ -53,8 +54,8 @@ public class TestResult implements CSVItem{
     }
 
 
-    public static ArrayList<TestIdentifier> extractNotFailingTests(ArrayList<TestResult> testResults) {
-        ArrayList<TestIdentifier> failingTests = new ArrayList<>();
+    public static HashSet<TestIdentifier> extractNotFailingTests(ArrayList<TestResult> testResults) {
+        HashSet<TestIdentifier> failingTests = new HashSet<>();
         for(TestResult testResult:testResults){
             if(testResult.getResult()!=TestResult.Result.FAILED)
                 failingTests.add(testResult.getIdentifier());
