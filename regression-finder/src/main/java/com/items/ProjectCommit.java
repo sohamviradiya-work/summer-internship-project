@@ -17,7 +17,7 @@ public class ProjectCommit implements CSVItem {
     private String message;
 
     public ProjectCommit(String authorMail, String commitId, String parentCommitId, String branch, Date time,
-                     String message) {
+            String message) {
         this.authorMail = authorMail;
         this.commitId = commitId;
         this.parentCommitId = parentCommitId;
@@ -26,27 +26,24 @@ public class ProjectCommit implements CSVItem {
         this.message = message;
     }
 
-    public static ProjectCommit createNullCommit(){
-        return new ProjectCommit(null, null, null, null, null, null);
-    }
-
     @Override
     public String toCSVString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                dateFormat.setTimeZone(TimeZone.getDefault()); 
-                
-        return authorMail + "," + commitId + "," + parentCommitId + "," + branch + "," + dateFormat.format(time) + "," + message;
+        dateFormat.setTimeZone(TimeZone.getDefault());
+
+        return authorMail + "," + commitId + "," + parentCommitId + "," + branch + "," + dateFormat.format(time) + ","
+                + message;
     }
-    
-    public String getCommitId(){
+
+    public String getCommitId() {
         return commitId;
     }
 
-    public String getAuthor(){
+    public String getAuthor() {
         return authorMail;
     }
 
-    public String getBranch(){
+    public String getBranch() {
         return branch;
     }
 
