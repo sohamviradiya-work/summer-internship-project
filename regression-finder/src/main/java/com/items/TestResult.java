@@ -51,4 +51,14 @@ public class TestResult implements CSVItem{
         }
         return failingTests;
     }
+
+
+    public static ArrayList<TestIdentifier> extractNotFailingTests(ArrayList<TestResult> testResults) {
+        ArrayList<TestIdentifier> failingTests = new ArrayList<>();
+        for(TestResult testResult:testResults){
+            if(testResult.getResult()!=TestResult.Result.FAILED)
+                failingTests.add(testResult.getIdentifier());
+        }
+        return failingTests;
+    }
 }
