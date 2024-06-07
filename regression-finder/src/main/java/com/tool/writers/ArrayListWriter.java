@@ -24,8 +24,7 @@ public class ArrayListWriter<T> implements ItemWriter<T> {
 
     @Override
     public void writeAll(Collection<T> items) throws IOException {
-        for(T item: items)
-            this.write(item);
+        this.list.addAll(items);
     }
 
     public ArrayList<T> getList() {

@@ -16,7 +16,6 @@ import com.items.TestIdentifier;
 import com.items.TestResult;
 import com.tool.git.GitWorker;
 import com.tool.runner.GradleWorker;
-import com.tool.writers.ArrayListWriter;
 import com.tool.writers.interfaces.ItemWriter;
 
 public class TargetProject {
@@ -78,10 +77,7 @@ public class TargetProject {
 
             gitWorker.checkoutToCommit(gitCommit.getCommitId());
 
-            ArrayListWriter<TestResult> testResultsWriter = new ArrayListWriter<>();
-            gradleWorker.runTests(failingTests, testResultsWriter);
-
-            ArrayList<TestResult> testResults = testResultsWriter.getList();
+            ArrayList<TestResult> testResults = gradleWorker.runTests(failingTests);
 
             failingTests = evaluateResults(regressionBlameWriter, failingTests, commitAfter, testResults);
 
