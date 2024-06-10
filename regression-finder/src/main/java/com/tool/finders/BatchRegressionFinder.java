@@ -31,7 +31,8 @@ public class BatchRegressionFinder extends LinearRegressionFinder {
         int i = endIndex;
 
         for (; i >= startIndex; i -= batchSize) {
-            if (failedTests.size() == 0)
+
+            if(failedTests.isEmpty())
                 break;
 
             int lastIndex = Math.min(i + batchSize, endIndex);
@@ -53,8 +54,6 @@ public class BatchRegressionFinder extends LinearRegressionFinder {
             super.runForCommitsAndTests(projectCommits, i + 1, Math.min(i + batchSize - 1, endIndex), batchTests);
             
             failedTests = newFailedTests;
-            if(failedTests.isEmpty())
-                break;
         }
 
         super.runForCommitsAndTests(projectCommits, startIndex, Math.min(i + batchSize - 1, endIndex), failedTests);

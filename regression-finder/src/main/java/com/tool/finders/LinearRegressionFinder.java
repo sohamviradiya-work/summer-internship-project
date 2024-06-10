@@ -32,6 +32,8 @@ public class LinearRegressionFinder implements Finder {
         ArrayList<TestIdentifier> failedTests = testIdentifiers;
 
         for (int i = endIndex; i >= startIndex; i--) {
+            if(failedTests.isEmpty())
+                break;
 
             ProjectCommit currentCommit = projectCommits.get(i);
             ProjectCommit previousCommit = projectCommits.get(i+1);
@@ -51,8 +53,6 @@ public class LinearRegressionFinder implements Finder {
                     this.blameWriter.write(new RegressionBlame(testIdentifier, previousCommit));
             }
             failedTests = newFailedTests;
-            if(failedTests.isEmpty())
-                break;
         }
 
         for(TestIdentifier testIdentifier:failedTests)
