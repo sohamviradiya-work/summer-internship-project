@@ -1,6 +1,5 @@
 package com.tool;
 
-import java.io.File;
 import java.util.Scanner;
 import com.tool.git.GitWorker;
 
@@ -10,10 +9,14 @@ public class Main {
 
     public static void main(String[] args) {
         //String repositoryLink = "https://github.com/sohamviradiya-work/large-repo/";
-        String repositoryLink = getRepositoryLink();
-        String method = getMethod();
-        clean(repositoryPath);
-        clean(resultsPath);
+        
+        Scanner scanner = new Scanner(System.in);
+        String repositoryLink = Helper.getRepositoryLink(scanner);
+        String method = Helper.getMethod(scanner);
+        scanner.close();
+
+        Helper.clean(repositoryPath);
+        Helper.clean(resultsPath);
 
         try {
             GitWorker.getRemoteRepository(repositoryPath, repositoryLink);
@@ -22,42 +25,4 @@ public class Main {
             System.out.println(e.getMessage());
         }
     }
-
-    private static String getRepositoryLink() {
-        System.out.println("Enter Repository Link");
-        Scanner scanner = new Scanner(System.in);
-        String repositoryLink = scanner.nextLine();
-        return repositoryLink;
-    }
-
-    private static String getMethod() {
-        System.out.println("Enter Method (Linear, Bisect or Batch XX): ");
-        Scanner scanner = new Scanner(System.in);
-        String methodName = scanner.nextLine();
-        scanner.close();
-        return methodName;
-    }
-
-    
-
-    public static void clean(String path) {
-        cleanDirectory(new File(path));
-    }
-
-    private static void cleanDirectory(File directory) {
-        if (!directory.exists() || !directory.isDirectory()) {
-            return;
-        }
-
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    cleanDirectory(file);
-                }
-                file.delete();
-            }
-        }
-    }
-
 }
