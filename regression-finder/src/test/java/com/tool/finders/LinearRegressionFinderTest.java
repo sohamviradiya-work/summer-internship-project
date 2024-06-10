@@ -1,5 +1,6 @@
 package com.tool.finders;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -35,21 +36,26 @@ class LinearRegressionFinderTest {
     @Test
     void testRunForCommitsAndTests() throws GitAPIException, IOException {
 
-        List<ProjectCommit> projectCommits = TestHelper.createMockCommits(4);
+        List<ProjectCommit> projectCommits = TestHelper.createMockCommits(6);
         List<TestIdentifier> testIdentifiers = TestHelper.createMockTestIdentifiers(5);
         ArrayList<TestResult> mockTestResults = TestHelper.createMockTestResults(5);
 
         when(mockProjectInstance.runTestsForCommit(any(), any(), any())).thenReturn(mockTestResults);
 
-        finder.runForCommitsAndTests(new ArrayList<>(projectCommits), 0, 2, new ArrayList<>(testIdentifiers));
+        finder.runForCommitsAndTests(new ArrayList<>(projectCommits), 0, 4, new ArrayList<>(testIdentifiers));
 
         ArgumentCaptor<RegressionBlame> blameCaptor = ArgumentCaptor.forClass(RegressionBlame.class);
         verify(mockBlameWriter, atLeastOnce()).write(blameCaptor.capture());
-
-        List<RegressionBlame> capturedBlames = blameCaptor.getAllValues();
-        TestHelper.assertCapturedBlames(capturedBlames, projectCommits, 0,5);
-
-        verify(mockProjectInstance, times(3)).runTestsForCommit(any(), any(), any()); // 2, 1, 0
-        verify(mockBlameWriter, atLeastOnce()).write(any(RegressionBlame.class));
+        TestHelper.assertCapturedBlames(blameCaptor.getAllValues(), projectCommits, 0,5);
+        
+        ArgumentCaptor<ProjectCommit> commitCaptor = ArgumentCaptor.forClass(ProjectCommit.class);
+        verify(mockProjectInstance, times(5)).runTestsForCommit(any(),commitCaptor.capture(), any());
+        List<ProjectCommit> capturedProjectCommits = commitCaptor.getAllValues();
+        
+        int i = 5;
+        for(ProjectCommit projectCommit:capturedProjectCommits){
+            i--;
+            assertEquals(projectCommit.toCSVString(), projectCommits.get(i).toCSVString());
+        } 
     }
 }

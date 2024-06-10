@@ -1,5 +1,6 @@
 package com.tool.finders;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -43,18 +44,17 @@ public class BisectRegressionFinderTest {
 
         ArgumentCaptor<RegressionBlame> blameCaptor = ArgumentCaptor.forClass(RegressionBlame.class);
         verify(mockBlameWriter, atLeastOnce()).write(blameCaptor.capture());
+        TestHelper.assertCapturedBlames(blameCaptor.getAllValues(), projectCommits, 0, 4);
 
-        List<RegressionBlame> capturedBlames = blameCaptor.getAllValues();
-        TestHelper.assertCapturedBlames(capturedBlames, projectCommits, 0, 4);
+        ArgumentCaptor<ProjectCommit> commitCaptor = ArgumentCaptor.forClass(ProjectCommit.class);
+        verify(mockProjectInstance, times(7)).runTestsForCommit(any(),commitCaptor.capture(), any());
+        List<ProjectCommit> capturedProjectCommits = commitCaptor.getAllValues();
 
-        // 0 99
-        // 0 49
-        // 0 24
-        // 0 12
-        // 0 6
-        // 0 3
-        // 0 1
-        verify(mockProjectInstance, times(7)).runTestsForCommit(any(), any(), any());
-        verify(mockBlameWriter, atLeastOnce()).write(any(RegressionBlame.class));
+        int i = 99;
+        
+        for(ProjectCommit projectCommit:capturedProjectCommits){
+            i/=2;
+            assertEquals(projectCommit.toCSVString(), projectCommits.get(i).toCSVString());
+        } 
     }
 }
