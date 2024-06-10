@@ -23,6 +23,12 @@ public class ProjectInstance {
         this.gradleWorker = gradleWorker;
         this.gitWorker = gitWorker;
     }
+    
+
+    public GitWorker getGitWorker() {
+        return gitWorker;
+    }
+
 
     public void close() {
         this.gitWorker.close();
