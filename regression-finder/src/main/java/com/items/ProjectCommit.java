@@ -11,16 +11,14 @@ import com.items.interfaces.CSVItem;
 public class ProjectCommit implements CSVItem {
     private String authorMail;
     private String commitId;
-    private String parentCommitId;
     private String branch;
     private Date time;
     private String message;
 
-    public ProjectCommit(String authorMail, String commitId, String parentCommitId, String branch, Date time,
+    public ProjectCommit(String authorMail, String commitId, String branch, Date time,
             String message) {
         this.authorMail = authorMail;
         this.commitId = commitId;
-        this.parentCommitId = parentCommitId;
         this.branch = branch;
         this.time = time;
         this.message = message;
@@ -31,7 +29,7 @@ public class ProjectCommit implements CSVItem {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getDefault());
 
-        return authorMail + "," + commitId + "," + parentCommitId + "," + branch + "," + dateFormat.format(time) + ","
+        return authorMail + "," + commitId + "," + branch + "," + dateFormat.format(time) + ","
                 + message;
     }
 
@@ -48,18 +46,9 @@ public class ProjectCommit implements CSVItem {
     }
 
     public static ProjectCommit getprojectCommitFromRevCommit(String branchName, RevCommit commit) {
-        String parentId;
-        if (commit.getParentCount() > 0) {
-            RevCommit parent = commit.getParent(0);
-            parentId = parent.getName();
-        } else {
-            parentId = "HEAD";
-        }
-
         return new ProjectCommit(
                 commit.getAuthorIdent().getEmailAddress(),
                 commit.getName(),
-                parentId,
                 branchName,
                 commit.getAuthorIdent().getWhen(),
                 commit.getShortMessage());
