@@ -52,7 +52,7 @@ public class ProjectInstance {
             gradleWorker.syncDependencies();
     }
 
-    private boolean isRunRequired(ProjectCommit commitA, ProjectCommit commitB) {
+    public boolean isRunRequired(ProjectCommit commitA, ProjectCommit commitB) {
         String commitIdA = commitA.getCommitId();
         String commitIdB = commitB.getCommitId();
 

@@ -34,12 +34,9 @@ public class LinearRegressionFinder implements Finder {
         for (int i = endIndex; i >= startIndex; i--) {
             if(failedTests.isEmpty())
                 break;
-
+            
             ProjectCommit currentCommit = projectCommits.get(i);
             ProjectCommit previousCommit = projectCommits.get(i+1);
-
-            if (failedTests.size() == 0)
-                break;
 
             ArrayList<TestIdentifier> newFailedTests = new ArrayList<>();
 
