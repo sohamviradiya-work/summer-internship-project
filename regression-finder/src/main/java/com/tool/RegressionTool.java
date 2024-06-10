@@ -21,25 +21,25 @@ import com.tool.writers.CSVWriter;
 
 public class RegressionTool {
 
-    public static long run(String path, String gradleVersion, String method, String resultPath)
+    public static long run(String path, String gradleVersion, String method, String resultPath, boolean logCommits)
             throws IOException, NoHeadException, GitAPIException {
 
         CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/" + method + ".csv");
-        CSVWriter<ProjectCommit> commitsWriter = CSVWriter.create(resultPath + "/" + "commits.csv");
 
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(path, gradleVersion);
 
         Finder finder = createFinder(method, blameWriter, projectInstance);
 
         GitWorker gitWorker = projectInstance.getGitWorker();
+
         HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch();
 
-        
+        if (logCommits)
+            log(resultPath, branchWiseCommitList);
+
         long start = System.currentTimeMillis();
         for (String branch : branchWiseCommitList.keySet()) {
-
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
-            commitsWriter.writeAll(projectCommits);
 
             ArrayList<TestResult> testResults = projectInstance.runAllTestsForCommit(projectCommits.get(0));
             ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
@@ -49,8 +49,16 @@ public class RegressionTool {
         long end = System.currentTimeMillis();
         projectInstance.close();
         finder.close();
-        commitsWriter.close();
         return end - start;
+    }
+
+    private static void log(String resultPath, HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList)
+            throws IOException {
+        CSVWriter<ProjectCommit> commitsWriter = CSVWriter.create(resultPath + "/" + "commits.csv");
+        for (String branch : branchWiseCommitList.keySet()) {
+            ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
+            commitsWriter.writeAll(projectCommits);
+        }
     }
 
     private static Finder createFinder(String method, CSVWriter<RegressionBlame> blameWriter,
