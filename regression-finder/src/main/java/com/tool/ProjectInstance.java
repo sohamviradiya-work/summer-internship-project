@@ -30,7 +30,8 @@ public class ProjectInstance {
     }
 
 
-    public void close() {
+    public void close() throws IOException, GitAPIException {
+        this.gitWorker.restoreRepository();
         this.gitWorker.close();
         this.gradleWorker.close();
     }
@@ -89,6 +90,7 @@ public class ProjectInstance {
 
         GradleWorker gradleWorker = GradleWorker.mountGradleWorker(gradleVersion, directory);
         GitWorker gitWorker = GitWorker.mountGitWorker(directory);
+        
         return new ProjectInstance(gradleWorker, gitWorker);
     }
 }

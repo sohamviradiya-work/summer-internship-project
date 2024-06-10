@@ -44,7 +44,9 @@ public class RegressionTool {
             ArrayList<TestResult> testResults = projectInstance.runAllTestsForCommit(projectCommits.get(0));
             ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
             Collections.reverse(projectCommits);
+            
             finder.runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 2, failingTests);
+            
         }
         long end = System.currentTimeMillis();
         projectInstance.close();

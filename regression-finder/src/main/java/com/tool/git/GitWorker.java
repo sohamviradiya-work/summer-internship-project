@@ -4,7 +4,9 @@ import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.lib.ObjectId;
@@ -45,7 +47,8 @@ public class GitWorker {
         this.git.close();
     }
 
-    public void checkoutToCommit(ProjectCommit projectCommit) throws GitAPIException, IllegalArgumentException, IOException {
+    public void checkoutToCommit(ProjectCommit projectCommit)
+            throws GitAPIException, IllegalArgumentException, IOException {
         String commitTag = projectCommit.getCommitId();
         Repository repository = git.getRepository();
         System.out.println("Checked out to commit: " + commitTag);
@@ -56,40 +59,40 @@ public class GitWorker {
     public ArrayList<String> getChangedFiles(String commitTagA, String commitTagB) {
         Repository repository = git.getRepository();
         ArrayList<String> changedFiles = new ArrayList<>();
-    
+
         try (RevWalk revWalk = new RevWalk(repository)) {
             ObjectId commitIdA = repository.resolve(commitTagA);
             ObjectId commitIdB = repository.resolve(commitTagB);
-    
+
             if (commitIdA == null || commitIdB == null) {
                 throw new IllegalArgumentException("Invalid commit ID or tag.");
             }
-    
+
             RevCommit commitA = revWalk.parseCommit(commitIdA);
             RevCommit commitB = revWalk.parseCommit(commitIdB);
-    
+
             CanonicalTreeParser treeParserA = new CanonicalTreeParser();
             CanonicalTreeParser treeParserB = new CanonicalTreeParser();
-    
+
             try (ObjectReader reader = repository.newObjectReader()) {
                 treeParserA.reset(reader, commitA.getTree());
                 treeParserB.reset(reader, commitB.getTree());
             }
-    
+
             try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-                 DiffFormatter diffFormatter = new DiffFormatter(out)) {
+                    DiffFormatter diffFormatter = new DiffFormatter(out)) {
                 diffFormatter.setRepository(repository);
                 List<DiffEntry> diffs = diffFormatter.scan(treeParserA, treeParserB);
-    
+
                 for (DiffEntry diff : diffs) {
                     changedFiles.add(diff.getNewPath());
                 }
             }
-    
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-    
+
         return changedFiles;
     }
 
@@ -125,6 +128,32 @@ public class GitWorker {
             }
         }
         return branchCommitMap;
+    }
+
+    public void restoreRepository() throws InvalidRemoteException, TransportException, GitAPIException, IOException {
+        git.fetch().call();
+
+        List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
+
+        for (Ref ref : remoteBranches) {
+            String remoteBranchName = ref.getName();
+            String localBranchName = remoteBranchName.replace("refs/remotes/origin/", "");
+
+            Ref localBranch = git.getRepository().findRef(localBranchName);
+            if (localBranch != null) {
+                git.checkout().setName(localBranchName).call();
+
+                git.reset().setMode(org.eclipse.jgit.api.ResetCommand.ResetType.HARD)
+                        .setRef(remoteBranchName).call();
+            } else {
+                git.checkout().setCreateBranch(true)
+                        .setName(localBranchName)
+                        .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                        .setStartPoint(remoteBranchName)
+                        .call();
+            }
+            System.out.println("Reseted branch " + localBranchName);
+        }
     }
 
     public static GitWorker mountGitWorker(File directory) throws IOException {
