@@ -5,6 +5,7 @@
 
 
 gradle/
+gradle.properties
 .gradle/
 wrapper/
 build/

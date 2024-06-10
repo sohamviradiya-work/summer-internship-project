@@ -52,6 +52,18 @@ public class ProjectInstance {
             gradleWorker.syncDependencies();
     }
 
+    private boolean isRunRequired(ProjectCommit commitA, ProjectCommit commitB) {
+        String commitIdA = commitA.getCommitId();
+        String commitIdB = commitB.getCommitId();
+
+        ArrayList<String> changedFilePaths = gitWorker.getChangedFiles(commitIdA, commitIdB);
+        for (String path : changedFilePaths) {
+            if (path.endsWith(".java"))
+                return true;
+        }
+        return false;
+    }
+
     private boolean isSyncRequired(ProjectCommit commitA, ProjectCommit commitB) {
         String commitIdA = commitA.getCommitId();
         String commitIdB = commitB.getCommitId();
