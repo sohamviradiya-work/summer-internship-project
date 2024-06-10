@@ -19,37 +19,42 @@ import com.items.TestResult;
 import com.tool.ProjectInstance;
 import com.tool.writers.interfaces.ItemWriter;
 
-class BatchRegressionFinderTest {
-
+public class BisectRegressionFinderTest {
     private ProjectInstance mockProjectInstance;
     private ItemWriter<RegressionBlame> mockBlameWriter;
-    private BatchRegressionFinder finder;
+    private BisectRegressionFinder finder;
 
     @BeforeEach
     void setUp() {
         mockProjectInstance = mock(ProjectInstance.class);
         mockBlameWriter = mock(ItemWriter.class);
-        finder = new BatchRegressionFinder(mockProjectInstance, mockBlameWriter, 3); 
+        finder = new BisectRegressionFinder(mockProjectInstance, mockBlameWriter);
     }
 
     @Test
     void testRunForCommitsAndTests() throws GitAPIException, IOException {
-        List<ProjectCommit> projectCommits = TestHelper.createMockCommits(12);
+        List<ProjectCommit> projectCommits = TestHelper.createMockCommits(100);
         List<TestIdentifier> testIdentifiers = TestHelper.createMockTestIdentifiers(4);
         ArrayList<TestResult> mockTestResults = TestHelper.createMockTestResults(4);
 
         when(mockProjectInstance.runTestsForCommit(any(), any(), any())).thenReturn(mockTestResults);
 
-        finder.runForCommitsAndTests(new ArrayList<>(projectCommits), 0, 11, new ArrayList<>(testIdentifiers));
+        finder.runForCommitsAndTests(new ArrayList<>(projectCommits), 0, 99, new ArrayList<>(testIdentifiers));
 
         ArgumentCaptor<RegressionBlame> blameCaptor = ArgumentCaptor.forClass(RegressionBlame.class);
         verify(mockBlameWriter, atLeastOnce()).write(blameCaptor.capture());
 
         List<RegressionBlame> capturedBlames = blameCaptor.getAllValues();
-        TestHelper.assertCapturedBlames(capturedBlames, projectCommits,3,4);
+        TestHelper.assertCapturedBlames(capturedBlames, projectCommits, 3, 4);
 
-        verify(mockProjectInstance, times(6)).runTestsForCommit(any(), any(), any()); // 11, 8, 5, 2, 1, 0
+        // 0 99
+        // 0 49
+        // 0 24
+        // 0 12
+        // 0 6
+        // 0 3
+        // 0 1
+        verify(mockProjectInstance, times(7)).runTestsForCommit(any(), any(), any());
         verify(mockBlameWriter, atLeastOnce()).write(any(RegressionBlame.class));
     }
-
 }

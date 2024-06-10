@@ -1,10 +1,12 @@
 package com.tool.finders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import com.items.ProjectCommit;
@@ -53,20 +55,19 @@ public class TestHelper {
 
     static void assertCapturedBlames(List<RegressionBlame> capturedBlames, List<ProjectCommit> projectCommits,
             int regressionCommitIndex,int num) {
-        List<RegressionBlame> expectedBlames = new ArrayList<>();
+        HashSet<String> expectedBlames = new HashSet<>();
         for (int i = 0; i < num; i++) {
             expectedBlames.add(
-                    new RegressionBlame(createMockIdentifier(i), projectCommits.get(regressionCommitIndex)));
+                    (new RegressionBlame(createMockIdentifier(i), projectCommits.get(regressionCommitIndex))).toCSVString());
         }
     
         assertEquals(expectedBlames.size(), capturedBlames.size(),
                 "The number of captured blames should match the expected count.");
-    
+        
         for (int i = 0; i < expectedBlames.size(); i++) {
-            RegressionBlame expectedBlame = expectedBlames.get(i);
-            RegressionBlame capturedBlame = capturedBlames.get(i);
-    
-            assertEquals(expectedBlame.toCSVString(), capturedBlame.toCSVString(), "CSV string should match.");
+            String capturedBlame = capturedBlames.get(i).toCSVString();
+            
+            assertTrue(expectedBlames.contains(capturedBlame));
         }
     }
     
