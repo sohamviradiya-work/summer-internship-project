@@ -20,7 +20,10 @@ public class Main {
 
         try {
             GitWorker.getRemoteRepository(repositoryPath, repositoryLink);
+            long start = System.currentTimeMillis();
             RegressionTool.run(repositoryPath, "7.6.4", method,resultsPath);
+            long end = System.currentTimeMillis();
+            Helper.printRunTime(start, end);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
