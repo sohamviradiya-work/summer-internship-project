@@ -5,8 +5,6 @@ import java.util.Scanner;
 
 public class Helper {
 
-    private static final double MILLISECONDS_PER_SECOND = 1000.0;
-    private static final int MILLISECONDS_PER_MINUTE = 1000*60;
 
     static String getRepositoryLink(Scanner scanner) {
         System.out.println("Enter Repository Link");
@@ -39,15 +37,4 @@ public class Helper {
         String methodName = scanner.nextLine();
         return methodName;
     }
-
-    static void printRunTime(long start,long end) {
-        long milliSecs = end - start;
-        long minutes = milliSecs/MILLISECONDS_PER_MINUTE;
-        milliSecs %= MILLISECONDS_PER_MINUTE;
-
-        double seconds = milliSecs/MILLISECONDS_PER_SECOND;
-
-        System.out.println("Runtime: "+ minutes + " minutes, " + seconds + " seconds");
-    }
-    
 }

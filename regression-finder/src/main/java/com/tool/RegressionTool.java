@@ -21,8 +21,9 @@ import com.tool.writers.CSVWriter;
 
 public class RegressionTool {
 
-    public static void run(String path, String gradleVersion, String method, String resultPath)
+    public static long run(String path, String gradleVersion, String method, String resultPath)
             throws IOException, NoHeadException, GitAPIException {
+
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(path, gradleVersion);
 
         GitWorker gitWorker = projectInstance.getGitWorker();
@@ -42,8 +43,9 @@ public class RegressionTool {
             int batchSize = Integer.parseInt(method.substring(6));
             finder = new BatchRegressionFinder(projectInstance, blameWriter, batchSize);
         } else
-            throw new IllegalArgumentException("Method must be one of Linear, Bisect or Batch XX received: "+method);
+            throw new IllegalArgumentException("Method must be one of Linear, Bisect or Batch XX received: " + method);
 
+        long start = System.currentTimeMillis();
         for (String branch : branchWiseCommitList.keySet()) {
 
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
@@ -54,8 +56,10 @@ public class RegressionTool {
             Collections.reverse(projectCommits);
             finder.runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 2, failingTests);
         }
+        long end = System.currentTimeMillis();
         projectInstance.close();
         finder.close();
         commitsWriter.close();
+        return end - start;
     }
 }
