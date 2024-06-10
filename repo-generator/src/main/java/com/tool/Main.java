@@ -9,15 +9,14 @@ import com.utils.Helper;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class Main {
-    static int ITERATIONS = 500;
-    static int SUB_PROJECTS = 2;
+    static int ITERATIONS = 1000;
     static int MODULES_PER_SUB_PROJECT = 3;
-    static int CLASSES_PER_MODULE = 5;
-    static int TESTS_PER_CLASS = 5;
+    static int CLASSES_PER_MODULE = 3;
+    static int TESTS_PER_CLASS = 10;
     static int RANDOM_INT_LIMIT = 5;
     static String rootPath = "../test-area/large-repo";
     static String projectName = "large-repo";
-     
+    static double ADDITION_PROB = 0.01;
     public static void main(String[] args) {
 
         Dotenv dotenv = Dotenv.configure().directory("../").load();
@@ -31,10 +30,15 @@ public class Main {
         try {
             TargetProject targetProject = TargetProject.initializeProject(rootPath,projectName,username,email,token);
             
-            targetProject.populate(SUB_PROJECTS,MODULES_PER_SUB_PROJECT,CLASSES_PER_MODULE, TESTS_PER_CLASS, RANDOM_INT_LIMIT);
+            targetProject.populate();
             
             for(int i=0;i<ITERATIONS;i++){
-                int randomSubProject = Helper.getRandom(SUB_PROJECTS);
+                if(Math.random() < ADDITION_PROB || targetProject.getNumOfSubprojects()==0){                    
+                    targetProject.addSubProject(MODULES_PER_SUB_PROJECT, CLASSES_PER_MODULE, TESTS_PER_CLASS, RANDOM_INT_LIMIT);
+                    continue;
+                }
+                
+                int randomSubProject = Helper.getRandom(targetProject.getNumOfSubprojects());
                 int randomModuleNumber = Helper.getRandom(MODULES_PER_SUB_PROJECT);
                 int randomClassNumber = Helper.getRandom(CLASSES_PER_MODULE);
                 int randomMethodNumber = Helper.getRandom(MODULES_PER_SUB_PROJECT);
