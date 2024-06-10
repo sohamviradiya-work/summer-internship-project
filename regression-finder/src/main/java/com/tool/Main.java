@@ -6,28 +6,39 @@ import com.tool.git.GitWorker;
 
 public class Main {
     public static String repositoryPath = "../test-area/repository";
-    public static String resultsPath = "../results/";
+    public static String resultsPath = "../results";
 
     public static void main(String[] args) {
-        String repositoryLink = "https://github.com/sohamviradiya-work/small-test-repo/";
+        //String repositoryLink = "https://github.com/sohamviradiya-work/large-repo/";
+        String repositoryLink = getRepositoryLink();
+        String method = getMethod();
         clean(repositoryPath);
         clean(resultsPath);
 
         try {
             GitWorker.getRemoteRepository(repositoryPath, repositoryLink);
+            RegressionTool.run(repositoryPath, "7.6.4", method,resultsPath);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    @SuppressWarnings("unused")
     private static String getRepositoryLink() {
         System.out.println("Enter Repository Link");
         Scanner scanner = new Scanner(System.in);
         String repositoryLink = scanner.nextLine();
-        scanner.close();
         return repositoryLink;
     }
+
+    private static String getMethod() {
+        System.out.println("Enter Method (Linear, Bisect or Batch XX): ");
+        Scanner scanner = new Scanner(System.in);
+        String methodName = scanner.nextLine();
+        scanner.close();
+        return methodName;
+    }
+
+    
 
     public static void clean(String path) {
         cleanDirectory(new File(path));

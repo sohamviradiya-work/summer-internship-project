@@ -34,15 +34,15 @@ public class RegressionTool {
         CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/" + method + ".csv");
         CSVWriter<ProjectCommit> commitsWriter = CSVWriter.create(resultPath + "/" + "commits.csv");
 
-        if (method == "Linear")
+        if (method.startsWith("Linear"))
             finder = new LinearRegressionFinder(projectInstance, blameWriter);
-        else if (method == "Bisect")
+        else if (method.startsWith("Bisect"))
             finder = new BisectRegressionFinder(projectInstance, blameWriter);
         else if (method.startsWith("Batch")) {
             int batchSize = Integer.parseInt(method.substring(6));
             finder = new BatchRegressionFinder(projectInstance, blameWriter, batchSize);
         } else
-            throw new IllegalArgumentException("Method must be one of Linear, Bisect or Batch XX");
+            throw new IllegalArgumentException("Method must be one of Linear, Bisect or Batch XX received: "+method);
 
         for (String branch : branchWiseCommitList.keySet()) {
 
