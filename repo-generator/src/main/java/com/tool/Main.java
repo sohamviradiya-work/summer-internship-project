@@ -9,7 +9,7 @@ import com.utils.Helper;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class Main {
-    static int ITERATIONS = 1000;
+    static int ITERATIONS = 200;
     static int MODULES_PER_SUB_PROJECT = 3;
     static int CLASSES_PER_MODULE = 3;
     static int TESTS_PER_CLASS = 10;
