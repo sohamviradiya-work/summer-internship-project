@@ -46,7 +46,7 @@ class BatchRegressionFinderTest {
         verify(mockBlameWriter, atLeastOnce()).write(blameCaptor.capture());
 
         List<RegressionBlame> capturedBlames = blameCaptor.getAllValues();
-        TestHelper.assertCapturedBlames(capturedBlames, projectCommits,3,4);
+        TestHelper.assertCapturedBlames(capturedBlames, projectCommits,0,4);
 
         verify(mockProjectInstance, times(6)).runTestsForCommit(any(), any(), any()); // 11, 8, 5, 2, 1, 0
         verify(mockBlameWriter, atLeastOnce()).write(any(RegressionBlame.class));

@@ -45,7 +45,7 @@ public class BisectRegressionFinderTest {
         verify(mockBlameWriter, atLeastOnce()).write(blameCaptor.capture());
 
         List<RegressionBlame> capturedBlames = blameCaptor.getAllValues();
-        TestHelper.assertCapturedBlames(capturedBlames, projectCommits, 3, 4);
+        TestHelper.assertCapturedBlames(capturedBlames, projectCommits, 0, 4);
 
         // 0 99
         // 0 49

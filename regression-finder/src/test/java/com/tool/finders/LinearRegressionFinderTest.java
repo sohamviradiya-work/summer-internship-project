@@ -47,7 +47,7 @@ class LinearRegressionFinderTest {
         verify(mockBlameWriter, atLeastOnce()).write(blameCaptor.capture());
 
         List<RegressionBlame> capturedBlames = blameCaptor.getAllValues();
-        TestHelper.assertCapturedBlames(capturedBlames, projectCommits, 1,5);
+        TestHelper.assertCapturedBlames(capturedBlames, projectCommits, 0,5);
 
         verify(mockProjectInstance, times(3)).runTestsForCommit(any(), any(), any()); // 2, 1, 0
         verify(mockBlameWriter, atLeastOnce()).write(any(RegressionBlame.class));

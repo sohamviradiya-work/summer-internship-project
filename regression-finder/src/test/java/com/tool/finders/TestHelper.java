@@ -17,7 +17,7 @@ import com.items.TestResult;
 public class TestHelper {
 
     static ProjectCommit createMockCommit(int i) {
-        return new ProjectCommit("test@gmail.com", "abc", "main", Date.from(Instant.now()),"Commit message" + i);
+        return new ProjectCommit("test@gmail.com", "abc" + i, "main", Date.from(Instant.now()),"Commit message " + i);
     }
 
     static List<ProjectCommit> createMockCommits(int num) {
@@ -29,11 +29,11 @@ public class TestHelper {
     }
 
     static TestIdentifier createMockIdentifier(int i) {
-        return new TestIdentifier("project" + i,"TestClass" + i, "testMethod" + i);
+        return new TestIdentifier(":project" + i,"TestClass" + i, "testMethod" + i);
     }
 
-    static TestResult createMockTest(int i) {
-        return new TestResult("TestClass" + i, "testMethod" + i, "project" + i, "FAILED");
+    static TestResult createMockTestResult(int i) {
+        return new TestResult("TestClass" + i, "testMethod" + i, ":project" + i, "FAILED");
     }
 
     static List<TestIdentifier> createMockTestIdentifiers(int num) {
@@ -48,7 +48,7 @@ public class TestHelper {
         ArrayList<TestResult> testResults = new ArrayList<>();
         
         for (int i = 0; i < num; i++) {
-            testResults.add(createMockTest(i));
+            testResults.add(createMockTestResult(i));
         }
         return testResults;
     }
@@ -57,16 +57,14 @@ public class TestHelper {
             int regressionCommitIndex,int num) {
         HashSet<String> expectedBlames = new HashSet<>();
         for (int i = 0; i < num; i++) {
-            expectedBlames.add(
-                    (new RegressionBlame(createMockIdentifier(i), projectCommits.get(regressionCommitIndex))).toCSVString());
+            expectedBlames.add((new RegressionBlame(createMockIdentifier(i), projectCommits.get(regressionCommitIndex))).toCSVString());
         }
     
         assertEquals(expectedBlames.size(), capturedBlames.size(),
                 "The number of captured blames should match the expected count.");
         
-        for (int i = 0; i < expectedBlames.size(); i++) {
+        for (int i = 0; i < capturedBlames.size(); i++) {
             String capturedBlame = capturedBlames.get(i).toCSVString();
-            
             assertTrue(expectedBlames.contains(capturedBlame));
         }
     }
