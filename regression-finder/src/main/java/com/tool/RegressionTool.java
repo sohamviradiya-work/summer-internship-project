@@ -24,27 +24,17 @@ public class RegressionTool {
     public static long run(String path, String gradleVersion, String method, String resultPath)
             throws IOException, NoHeadException, GitAPIException {
 
-        ProjectInstance projectInstance = ProjectInstance.mountLocalProject(path, gradleVersion);
-
-        GitWorker gitWorker = projectInstance.getGitWorker();
-
-        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch();
-
-        Finder finder;
-
         CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/" + method + ".csv");
         CSVWriter<ProjectCommit> commitsWriter = CSVWriter.create(resultPath + "/" + "commits.csv");
 
-        if (method.startsWith("Linear"))
-            finder = new LinearRegressionFinder(projectInstance, blameWriter);
-        else if (method.startsWith("Bisect"))
-            finder = new BisectRegressionFinder(projectInstance, blameWriter);
-        else if (method.startsWith("Batch")) {
-            int batchSize = Integer.parseInt(method.substring(6));
-            finder = new BatchRegressionFinder(projectInstance, blameWriter, batchSize);
-        } else
-            throw new IllegalArgumentException("Method must be one of Linear, Bisect or Batch XX received: " + method);
+        ProjectInstance projectInstance = ProjectInstance.mountLocalProject(path, gradleVersion);
 
+        Finder finder = createFinder(method, blameWriter, projectInstance);
+
+        GitWorker gitWorker = projectInstance.getGitWorker();
+        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch();
+
+        
         long start = System.currentTimeMillis();
         for (String branch : branchWiseCommitList.keySet()) {
 
@@ -61,5 +51,18 @@ public class RegressionTool {
         finder.close();
         commitsWriter.close();
         return end - start;
+    }
+
+    private static Finder createFinder(String method, CSVWriter<RegressionBlame> blameWriter,
+            ProjectInstance projectInstance) {
+        if (method.startsWith("Linear"))
+            return new LinearRegressionFinder(projectInstance, blameWriter);
+        else if (method.startsWith("Bisect"))
+            return new BisectRegressionFinder(projectInstance, blameWriter);
+        else if (method.startsWith("Batch")) {
+            int batchSize = Integer.parseInt(method.substring(6));
+            return new BatchRegressionFinder(projectInstance, blameWriter, batchSize);
+        } else
+            throw new IllegalArgumentException("Method must be one of Linear, Bisect or Batch XX received: " + method);
     }
 }
