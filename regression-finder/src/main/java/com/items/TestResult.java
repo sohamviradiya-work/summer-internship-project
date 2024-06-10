@@ -54,12 +54,12 @@ public class TestResult implements CSVItem{
     }
 
 
-    public static HashSet<TestIdentifier> extractNotFailingTests(ArrayList<TestResult> testResults) {
-        HashSet<TestIdentifier> failingTests = new HashSet<>();
+    public static HashSet<TestIdentifier> extractNotFailingTests(ArrayList<TestResult> testResults,ArrayList<TestIdentifier> allTests) {
+        HashSet<TestIdentifier> passingTests = new HashSet<>(allTests);
         for(TestResult testResult:testResults){
-            if(testResult.getResult()!=TestResult.Result.FAILED)
-                failingTests.add(testResult.getIdentifier());
+            if(testResult.getResult()==TestResult.Result.FAILED)
+                passingTests.remove(testResult.getIdentifier());               
         }
-        return failingTests;
+        return passingTests;
     }
 }
