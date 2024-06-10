@@ -8,11 +8,10 @@ public class Main {
     public static String resultsPath = "../results";
 
     public static void main(String[] args) {
-        //String repositoryLink = "https://github.com/sohamviradiya-work/large-repo/";
         
         Scanner scanner = new Scanner(System.in);
         String repositoryLink = Helper.getRepositoryLink(scanner);
-        String method = Helper.getMethod(scanner);
+        // String method = Helper.getMethod(scanner);
         scanner.close();
 
         Helper.clean(repositoryPath);
@@ -20,7 +19,7 @@ public class Main {
 
         try {
             GitWorker.getRemoteRepository(repositoryPath, repositoryLink);
-            RegressionTool.run(repositoryPath, "7.6.4", method,resultsPath);
+            BenchMarker.benchmark(repositoryPath, resultsPath, "7.6.4");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
