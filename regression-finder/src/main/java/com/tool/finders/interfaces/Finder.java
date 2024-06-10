@@ -8,7 +8,9 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import com.items.ProjectCommit;
 import com.items.TestIdentifier;
 
-public interface RegressionFinder {
-    void runForCommitsAndTests(ArrayList<ProjectCommit> gitCommits, ArrayList<TestIdentifier> testIdentifiers,ProjectCommit lastCommit) throws GitAPIException, IOException;
+public interface Finder {
+    void runForCommitsAndTests(ArrayList<ProjectCommit> gitCommits, int startIndex, int endIndex,
+            ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException;
+
     void close() throws IOException;
 }
