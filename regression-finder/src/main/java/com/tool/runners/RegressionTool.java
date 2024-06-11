@@ -2,7 +2,6 @@ package com.tool.runners;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -34,7 +33,7 @@ public class RegressionTool {
 
         HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch();
 
-        if (logCommits)
+        if(logCommits)
             log(resultPath, branchWiseCommitList);
 
         long start = System.currentTimeMillis();

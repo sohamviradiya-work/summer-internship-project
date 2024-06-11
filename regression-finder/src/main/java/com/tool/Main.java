@@ -19,15 +19,9 @@ public class Main {
 
 
         try {
-
-        Helper.create(resultsPath);
-        Helper.create(repositoryPath);
-        Helper.clean(repositoryPath);
-
-            GitWorker.getRemoteRepository(repositoryPath, repositoryLink);
+            Helper.setup(repositoryPath, resultsPath);
+            GitWorker.getRemoteRepository(repositoryPath, repositoryLink); 
             RegressionTool.run(repositoryPath, "7.6.4", method, resultsPath, true);
-            // BenchMarker.benchmark(repositoryPath, resultsPath, "7.6.4");
-            
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

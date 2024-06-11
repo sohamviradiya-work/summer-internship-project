@@ -46,4 +46,11 @@ public class Helper {
         String methodName = scanner.nextLine();
         return methodName;
     }
+
+    static void setup(String repositoryPath, String resultsPath) throws IOException {
+        create(resultsPath);
+        create(repositoryPath);
+        clean(repositoryPath);
+        clean(resultsPath);
+    }
 }
