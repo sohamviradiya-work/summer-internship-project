@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -105,6 +106,7 @@ public class GitWorker {
         HashSet<String> assignedCommits = new HashSet<String>();
 
         for (Ref branch : branches) {
+
             String branchName = branch.getName();
             ObjectId branchObjectId = repository.resolve(branchName);
 
@@ -112,6 +114,7 @@ public class GitWorker {
                 continue;
 
             Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
+            
 
             for (RevCommit commit : commits) {
                 ProjectCommit projectCommit = ProjectCommit.getprojectCommitFromRevCommit(branchName, commit);
@@ -124,8 +127,8 @@ public class GitWorker {
 
                 branchCommitMap.get(projectCommit.getBranch()).add(projectCommit);
                 assignedCommits.add(projectCommit.getCommitId());
-
             }
+            Collections.reverse(branchCommitMap.get(branchName));
         }
         return branchCommitMap;
     }

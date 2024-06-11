@@ -41,12 +41,12 @@ public class RegressionTool {
         for (String branch : branchWiseCommitList.keySet()) {
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
 
-            ArrayList<TestResult> testResults = projectInstance.runAllTestsForCommit(projectCommits.get(0));
+            ArrayList<TestResult> testResults = projectInstance.runAllTestsForCommit(projectCommits.get(projectCommits.size()-1));
+
+
             ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
-            Collections.reverse(projectCommits);
             
             finder.runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 2, failingTests);
-            
         }
         long end = System.currentTimeMillis();
         projectInstance.close();
