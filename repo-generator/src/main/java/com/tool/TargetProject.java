@@ -32,7 +32,7 @@ public class TargetProject {
 
     public static TargetProject initializeProject(String rootPath,String projectName,String username,String email,String token) throws IOException, GitAPIException{
         GitWorker gitWorker = GitWorker.mountGitWorker(rootPath, username, email, token);
-
+        gitWorker.resetRepository();
         GradleWriter gradleWriter = GradleWriter.initialize(rootPath, projectName);
         
         return new TargetProject(gitWorker, gradleWriter,rootPath);

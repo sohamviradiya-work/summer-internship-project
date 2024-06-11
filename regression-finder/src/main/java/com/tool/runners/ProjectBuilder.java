@@ -1,4 +1,4 @@
-package com.tool.runner;
+package com.tool.runners;
 
 import java.util.ArrayList;
 

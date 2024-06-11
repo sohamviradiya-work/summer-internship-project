@@ -1,4 +1,4 @@
-package com.tool;
+package com.tool.runners;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import com.tool.finders.BatchRegressionFinder;
 import com.tool.finders.BisectRegressionFinder;
 import com.tool.finders.LinearRegressionFinder;
 import com.tool.finders.interfaces.Finder;
-import com.tool.git.GitWorker;
+import com.tool.runners.git.GitWorker;
 import com.tool.writers.CSVWriter;
 
 public class RegressionTool {

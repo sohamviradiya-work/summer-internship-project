@@ -10,8 +10,8 @@ import com.items.ProjectCommit;
 import com.items.RegressionBlame;
 import com.items.TestIdentifier;
 import com.items.TestResult;
-import com.tool.ProjectInstance;
 import com.tool.finders.interfaces.Finder;
+import com.tool.runners.ProjectInstance;
 import com.tool.writers.interfaces.ItemWriter;
 
 public class LinearRegressionFinder implements Finder {
@@ -19,6 +19,16 @@ public class LinearRegressionFinder implements Finder {
 
     protected ProjectInstance projectInstance;
     private ItemWriter<RegressionBlame> blameWriter;
+    private int totalTests;
+    private int remainingTests;
+
+    public void putBlame(RegressionBlame regressionBlame) throws IOException {
+        remainingTests--;
+        blameWriter.write(regressionBlame);
+        
+        double percentage = (100.0 * remainingTests / totalTests);
+        System.out.println("Remaining Work: " + String.format("%.2f", percentage) + "%");
+    }
 
     public LinearRegressionFinder(ProjectInstance projectInstance, ItemWriter<RegressionBlame> blameWriter) {
         this.projectInstance = projectInstance;
@@ -28,7 +38,8 @@ public class LinearRegressionFinder implements Finder {
     @Override
     public void runForCommitsAndTests(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex,
             ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
-
+        totalTests = testIdentifiers.size();
+        remainingTests = totalTests;
         ArrayList<TestIdentifier> failedTests = testIdentifiers;
 
         for (int i = endIndex; i >= startIndex; i--) {
@@ -47,13 +58,13 @@ public class LinearRegressionFinder implements Finder {
                 if (newFailedTestsSet.contains(testIdentifier))
                     newFailedTests.add(testIdentifier);
                 else
-                    this.blameWriter.write(new RegressionBlame(testIdentifier, previousCommit));
+                    putBlame(new RegressionBlame(testIdentifier, previousCommit));
             }
             failedTests = newFailedTests;
         }
 
         for(TestIdentifier testIdentifier:failedTests)
-            this.blameWriter.write(new RegressionBlame(testIdentifier, projectCommits.get(startIndex)));
+            putBlame(new RegressionBlame(testIdentifier, projectCommits.get(startIndex)));
     }
 
     @Override

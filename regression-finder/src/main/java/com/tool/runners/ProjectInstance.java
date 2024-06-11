@@ -1,4 +1,4 @@
-package com.tool;
+package com.tool.runners;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,8 +10,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import com.items.ProjectCommit;
 import com.items.TestIdentifier;
 import com.items.TestResult;
-import com.tool.git.GitWorker;
-import com.tool.runner.GradleWorker;
+import com.tool.runners.git.GitWorker;
 
 public class ProjectInstance {
 

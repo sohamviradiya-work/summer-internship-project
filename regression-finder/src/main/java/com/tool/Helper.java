@@ -1,15 +1,24 @@
 package com.tool;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.nio.file.Files;
+
 import java.util.Scanner;
 
 public class Helper {
-
 
     static String getRepositoryLink(Scanner scanner) {
         System.out.println("Enter Repository Link");
         String repositoryLink = scanner.nextLine();
         return repositoryLink;
+    }
+
+    public static void create(String path) throws IOException {
+        Path directoryPath = Paths.get(path);
+        Files.createDirectories(directoryPath);
     }
 
     public static void clean(String path) {
@@ -20,7 +29,7 @@ public class Helper {
         if (!directory.exists() || !directory.isDirectory()) {
             return;
         }
-    
+
         File[] files = directory.listFiles();
         if (files != null) {
             for (File file : files) {

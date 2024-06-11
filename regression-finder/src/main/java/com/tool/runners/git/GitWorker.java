@@ -1,4 +1,4 @@
-package com.tool.git;
+package com.tool.runners.git;
 
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
@@ -52,7 +52,6 @@ public class GitWorker {
             throws GitAPIException, IllegalArgumentException, IOException {
         String commitTag = projectCommit.getCommitId();
         Repository repository = git.getRepository();
-        System.out.println("Checked out to commit: " + commitTag);
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
         git.checkout().setName(commit.getName()).call();
     }
@@ -167,8 +166,9 @@ public class GitWorker {
         return gitWorker;
     }
 
-    public static GitWorker getRemoteRepository(String path, String link) throws GitAPIException {
+    public static GitWorker getRemoteRepository(String path, String link) throws GitAPIException, IOException {
         File dir = new File(path);
+        
         System.out.println("Cloning Repository");
         Git git = Git.cloneRepository()
                 .setURI(link)

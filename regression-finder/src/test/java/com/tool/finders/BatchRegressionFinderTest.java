@@ -17,7 +17,7 @@ import com.items.ProjectCommit;
 import com.items.RegressionBlame;
 import com.items.TestIdentifier;
 import com.items.TestResult;
-import com.tool.ProjectInstance;
+import com.tool.runners.ProjectInstance;
 import com.tool.writers.interfaces.ItemWriter;
 
 class BatchRegressionFinderTest {
