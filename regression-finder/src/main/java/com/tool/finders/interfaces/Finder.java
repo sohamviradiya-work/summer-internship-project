@@ -13,4 +13,6 @@ public interface Finder {
             ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException;
 
     void close() throws IOException;
+
+    void setTotalTests(int totalTests);
 }

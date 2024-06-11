@@ -19,16 +19,7 @@ public class LinearRegressionFinder implements Finder {
 
     protected ProjectInstance projectInstance;
     private ItemWriter<RegressionBlame> blameWriter;
-    private int totalTests;
     private int remainingTests;
-
-    public void putBlame(RegressionBlame regressionBlame) throws IOException {
-        remainingTests--;
-        blameWriter.write(regressionBlame);
-        
-        double percentage = (100.0 * remainingTests / totalTests);
-        System.out.println("Remaining Work: " + String.format("%.2f", percentage) + "%");
-    }
 
     public LinearRegressionFinder(ProjectInstance projectInstance, ItemWriter<RegressionBlame> blameWriter) {
         this.projectInstance = projectInstance;
@@ -38,8 +29,6 @@ public class LinearRegressionFinder implements Finder {
     @Override
     public void runForCommitsAndTests(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex,
             ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
-        totalTests = testIdentifiers.size();
-        remainingTests = totalTests;
         ArrayList<TestIdentifier> failedTests = testIdentifiers;
 
         for (int i = endIndex; i >= startIndex; i--) {
@@ -65,6 +54,17 @@ public class LinearRegressionFinder implements Finder {
 
         for(TestIdentifier testIdentifier:failedTests)
             putBlame(new RegressionBlame(testIdentifier, projectCommits.get(startIndex)));
+    }
+
+    public void putBlame(RegressionBlame regressionBlame) throws IOException {
+        remainingTests--;
+        blameWriter.write(regressionBlame);
+        System.out.println("Remaining Tests: " + remainingTests);
+    }
+
+    @Override
+    public void setTotalTests(int totalTests) {
+        this.remainingTests = totalTests;
     }
 
     @Override
