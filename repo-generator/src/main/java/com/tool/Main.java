@@ -9,14 +9,14 @@ import com.utils.Helper;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class Main {
-    static int ITERATIONS = 200;
+    static int ITERATIONS = 10000;
     static int MODULES_PER_SUB_PROJECT = 3;
     static int CLASSES_PER_MODULE = 3;
     static int TESTS_PER_CLASS = 10;
     static int RANDOM_INT_LIMIT = 5;
     static String rootPath = "../test-area/large-repo";
     static String projectName = "large-repo";
-    static double ADDITION_PROB = 0.01;
+    static double ADDITION_PROB = 0.002;
     public static void main(String[] args) {
 
         Dotenv dotenv = Dotenv.configure().directory("../").load();
@@ -41,7 +41,7 @@ public class Main {
                 int randomSubProject = Helper.getRandom(targetProject.getNumOfSubprojects());
                 int randomModuleNumber = Helper.getRandom(MODULES_PER_SUB_PROJECT);
                 int randomClassNumber = Helper.getRandom(CLASSES_PER_MODULE);
-                int randomMethodNumber = Helper.getRandom(MODULES_PER_SUB_PROJECT);
+                int randomMethodNumber = Helper.getRandom(TESTS_PER_CLASS);
 
                 int x = Helper.getRandom(RANDOM_INT_LIMIT);
                 int y = pass_after_fail ? Helper.getRandom(RANDOM_INT_LIMIT) : Helper.getRandom(RANDOM_INT_LIMIT,x);
