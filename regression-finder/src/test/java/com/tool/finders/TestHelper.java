@@ -57,7 +57,7 @@ public class TestHelper {
             int regressionCommitIndex,int num) {
         HashSet<String> expectedBlames = new HashSet<>();
         for (int i = 0; i < num; i++) {
-            expectedBlames.add((new RegressionBlame(createMockIdentifier(i), projectCommits.get(regressionCommitIndex))).toCSVString());
+            expectedBlames.add((new RegressionBlame(createMockIdentifier(i), projectCommits.get(regressionCommitIndex),true)).toCSVString());
         }
     
         assertEquals(expectedBlames.size(), capturedBlames.size(),

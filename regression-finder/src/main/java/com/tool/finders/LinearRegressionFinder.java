@@ -47,13 +47,13 @@ public class LinearRegressionFinder implements Finder {
                 if (newFailedTestsSet.contains(testIdentifier))
                     newFailedTests.add(testIdentifier);
                 else
-                    putBlame(new RegressionBlame(testIdentifier, previousCommit));
+                    putBlame(new RegressionBlame(testIdentifier, previousCommit,true));
             }
             failedTests = newFailedTests;
         }
 
         for(TestIdentifier testIdentifier:failedTests)
-            putBlame(new RegressionBlame(testIdentifier, projectCommits.get(startIndex)));
+            putBlame(new RegressionBlame(testIdentifier, projectCommits.get(startIndex),true));
     }
 
     public void putBlame(RegressionBlame regressionBlame) throws IOException {
