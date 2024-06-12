@@ -23,9 +23,6 @@ import com.items.ProjectCommit;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -162,45 +159,8 @@ public class GitWorker {
 
     public static GitWorker mountGitWorker(File directory) throws IOException {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
-
         Repository repository = builder.findGitDir(directory).build();
         GitWorker gitWorker = new GitWorker(repository);
         return gitWorker;
-    }
-
-    public static GitWorker getRemoteRepository(String path, String link, long lastDays)
-            throws GitAPIException, IOException {
-        File dir = new File(path);
-
-        Instant shallowSinceInstant = LocalDateTime.now().minusDays(lastDays).toInstant(ZoneOffset.UTC);
-
-        Git git = Git.cloneRepository().setShallowSince(shallowSinceInstant)
-                .setURI(link)
-                .setDirectory(dir)
-                .setCloneAllBranches(false)
-                .call();
-
-        git.fetch().call();
-
-        List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
-        for (Ref ref : remoteBranches) {
-            cloneBranchToLocal(git, ref);
-        }
-        System.out.println("Cloning Complete");
-        return new GitWorker(git);
-    }
-
-    private static void cloneBranchToLocal(Git git, Ref ref) {
-        try {
-            String branchName = ref.getName().replace("refs/remotes/origin/", "");
-            git.branchCreate()
-                    .setName(branchName)
-                    .setStartPoint(ref.getName())
-                    .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-                    .call();
-            System.out.println("Cloned branch " + branchName);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
     }
 }

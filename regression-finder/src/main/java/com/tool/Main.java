@@ -2,7 +2,7 @@ package com.tool;
 
 import java.util.Scanner;
 import com.tool.runners.RegressionTool;
-import com.tool.runners.git.GitWorker;
+import com.tool.runners.git.RepositoryCloner;
 
 public class Main {
 
@@ -20,7 +20,7 @@ public class Main {
 
         try {
             Helper.setup(repositoryPath, resultsPath);
-            GitWorker.getRemoteRepository(repositoryPath, repositoryLink, days);
+            RepositoryCloner.getRemoteRepository(repositoryPath, repositoryLink, days);
             long time = RegressionTool.run(repositoryPath, "7.6.4", method, resultsPath, true);
             System.out.println("time: " + time + " ms");
         } catch (Exception e) {
