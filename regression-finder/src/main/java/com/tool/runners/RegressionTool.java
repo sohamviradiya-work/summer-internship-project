@@ -42,9 +42,8 @@ public class RegressionTool {
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
 
             ArrayList<TestResult> testResults = projectInstance.runAllTestsForCommit(projectCommits.get(projectCommits.size()-1));
-
-
             ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
+            
             
             finder.setTotalTests(failingTests.size());
             finder.runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 2, failingTests);

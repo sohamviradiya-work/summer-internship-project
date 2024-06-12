@@ -47,6 +47,14 @@ public class Helper {
         return methodName;
     }
 
+
+    static int getDays(Scanner scanner) {
+        System.out.println("Enter Number of days to consider: ");
+        String days = scanner.nextLine();
+        return Integer.parseInt(days);
+    }
+
+
     static void setup(String repositoryPath, String resultsPath) throws IOException {
         create(resultsPath);
         create(repositoryPath);

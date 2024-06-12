@@ -23,6 +23,9 @@ import com.items.ProjectCommit;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -113,7 +116,6 @@ public class GitWorker {
                 continue;
 
             Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
-            
 
             for (RevCommit commit : commits) {
                 ProjectCommit projectCommit = ProjectCommit.getprojectCommitFromRevCommit(branchName, commit);
@@ -166,11 +168,13 @@ public class GitWorker {
         return gitWorker;
     }
 
-    public static GitWorker getRemoteRepository(String path, String link) throws GitAPIException, IOException {
+    public static GitWorker getRemoteRepository(String path, String link, long lastDays)
+            throws GitAPIException, IOException {
         File dir = new File(path);
-        
-        System.out.println("Cloning Repository");
-        Git git = Git.cloneRepository()
+
+        Instant shallowSinceInstant = LocalDateTime.now().minusDays(lastDays).toInstant(ZoneOffset.UTC);
+
+        Git git = Git.cloneRepository().setShallowSince(shallowSinceInstant)
                 .setURI(link)
                 .setDirectory(dir)
                 .setCloneAllBranches(false)
