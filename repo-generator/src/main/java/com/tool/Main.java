@@ -24,11 +24,12 @@ public class Main {
         String email = dotenv.get("GITHUB_EMAIL");
         String username = dotenv.get("GITHUB_USERNAME");
         String token = dotenv.get("GITHUB_ACCESS_TOKEN");
+        String remote = dotenv.get("GITHUB_REMOTE_LINK");
 
         boolean pass_after_fail = dotenv.get("PASS_AFTER_FAIL")=="TRUE";    
 
         try {
-            TargetProject targetProject = TargetProject.initializeProject(rootPath,projectName,username,email,token);
+            TargetProject targetProject = TargetProject.initializeProject(rootPath,projectName,username,email,token,remote);
             
             targetProject.populate();
             
@@ -37,7 +38,6 @@ public class Main {
                     targetProject.addSubProject(MODULES_PER_SUB_PROJECT, CLASSES_PER_MODULE, TESTS_PER_CLASS, RANDOM_INT_LIMIT);
                     continue;
                 }
-                
                 int randomSubProject = Helper.getRandom(targetProject.getNumOfSubprojects());
                 int randomModuleNumber = Helper.getRandom(MODULES_PER_SUB_PROJECT);
                 int randomClassNumber = Helper.getRandom(CLASSES_PER_MODULE);
@@ -51,7 +51,7 @@ public class Main {
       
             targetProject.pushChanges();
 
-        } catch (IOException | GitAPIException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         
