@@ -11,6 +11,7 @@ import com.items.ProjectCommit;
 import com.items.TestIdentifier;
 import com.items.TestResult;
 import com.tool.runners.git.GitWorker;
+import com.tool.runners.gradle.GradleWorker;
 
 public class ProjectInstance {
 

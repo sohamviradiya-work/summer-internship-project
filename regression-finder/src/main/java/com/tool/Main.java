@@ -20,9 +20,9 @@ public class Main {
 
         try {
             Helper.setup(repositoryPath, resultsPath);
-            GitWorker.getRemoteRepository(repositoryPath, repositoryLink,days);
-          //  long time = RegressionTool.run(repositoryPath, "7.6.4", method, resultsPath, true);
-           // System.out.println("time: " + time + " ms");
+            GitWorker.getRemoteRepository(repositoryPath, repositoryLink, days);
+            long time = RegressionTool.run(repositoryPath, "7.6.4", method, resultsPath, true);
+            System.out.println("time: " + time + " ms");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
