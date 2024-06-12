@@ -8,15 +8,10 @@ import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
-import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.PersonIdent;
-import org.eclipse.jgit.lib.RefUpdate;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -40,13 +35,14 @@ public class GitWorker {
         this.email = email;
     }
 
-    public static GitWorker mountGitWorker(String path, String username, String email, String token, String remote)
+    public static GitWorker mountNewGitWorker(String path, String username, String email, String token, String remote)
             throws IOException, GitAPIException, URISyntaxException {
         File repoDir = new File(path);
         Git git = Git.init().setDirectory(repoDir).call();
 
         git.getRepository().getConfig().setString("user", null, "name", username);
         git.getRepository().getConfig().setString("user", null, "email", email);
+        git.getRepository().getConfig().save();
 
         git.commit()
                 .setMessage("Initial commit")
@@ -58,6 +54,22 @@ public class GitWorker {
                 .setName("origin")
                 .setUri(new URIish(remote))
                 .call();
+
+        return new GitWorker(git, username, email, token);
+    }
+
+    public static GitWorker cloneNewGitWorker(String path, String username, String email, String token, String remote)
+            throws IOException, GitAPIException, URISyntaxException {
+        File repoDir = new File(path);
+
+        Git git = Git.cloneRepository()
+                .setURI(remote)
+                .setDirectory(repoDir)
+                .call();
+
+        git.getRepository().getConfig().setString("user", null, "name", username);
+        git.getRepository().getConfig().setString("user", null, "email", email);
+        git.getRepository().getConfig().save();
 
         return new GitWorker(git, username, email, token);
     }
