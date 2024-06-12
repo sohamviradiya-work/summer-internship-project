@@ -17,6 +17,7 @@ import com.tool.finders.LinearRegressionFinder;
 import com.tool.finders.interfaces.Finder;
 import com.tool.runners.git.GitWorker;
 import com.tool.writers.CSVWriter;
+import com.tool.writers.interfaces.ItemWriter;
 
 public class RegressionTool {
 
@@ -63,7 +64,7 @@ public class RegressionTool {
         }
     }
 
-    private static Finder createFinder(String method, CSVWriter<RegressionBlame> blameWriter,
+    private static Finder createFinder(String method, ItemWriter<RegressionBlame> blameWriter,
             ProjectInstance projectInstance) {
         if (method.startsWith("Linear"))
             return new LinearRegressionFinder(projectInstance, blameWriter);
