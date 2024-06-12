@@ -1,8 +1,11 @@
 package com.initializers;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.utils.Helper;
@@ -41,7 +44,7 @@ public class TestClassWriter {
 
         compilationUnit.setPackageDeclaration(packageName);
         compilationUnit.addType(classDeclaration);
-        
+
         compilationUnit.addImport("org.junit.jupiter.api.Test");
         compilationUnit.addImport("org.junit.jupiter.api.Assertions.assertEquals", true, false);
 
@@ -49,5 +52,28 @@ public class TestClassWriter {
         FileOutputStream output = new FileOutputStream(outputFilePath);
         output.write(compilationUnit.toString().getBytes());
         output.close();
+    }
+
+    public static TestClassWriter readFromFile(String modulePath, String className) throws IOException {
+        String filePath = modulePath + "/" + className + ".java";
+        File file = new File(filePath);
+
+        CompilationUnit cu = StaticJavaParser.parse(new FileInputStream(file));
+
+        ClassOrInterfaceDeclaration classDeclaration = cu.getClassByName(className)
+                .orElseThrow(() -> new RuntimeException("Class not found: " + className));
+
+        TestMethodWriter[] testMethodWriters = classDeclaration.getMethods().stream()
+                .map(method -> {
+                    try {
+                        return TestMethodWriter.readTestMethod(method);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .toArray(TestMethodWriter[]::new);
+
+        return new TestClassWriter(classDeclaration, testMethodWriters);
     }
 }

@@ -1,9 +1,5 @@
 package com.tool;
 
-import java.io.IOException;
-
-import org.eclipse.jgit.api.errors.GitAPIException;
-
 import com.utils.Helper;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -29,9 +25,7 @@ public class Main {
         boolean pass_after_fail = dotenv.get("PASS_AFTER_FAIL")=="TRUE";    
 
         try {
-            TargetProject targetProject = TargetProject.initializeProject(rootPath,projectName,username,email,token,remote);
-            
-            targetProject.populate();
+            TargetProject targetProject = TargetProject.initializeProject(rootPath,projectName,username,email,token,remote,true);
             
             for(int i=0;i<ITERATIONS;i++){
                 if(Math.random() < ADDITION_PROB || targetProject.getNumOfSubprojects()==0){                    

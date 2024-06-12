@@ -1,5 +1,8 @@
 package com.initializers;
 
+import java.io.IOException;
+
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
@@ -36,6 +39,10 @@ public class TestMethodWriter {
         method.setBody(body);
         
         return new TestMethodWriter(method);
+    }
+
+    public static TestMethodWriter readTestMethod(BodyDeclaration<MethodDeclaration> bodyDeclaration) throws IOException {
+       return new TestMethodWriter(bodyDeclaration.asMethodDeclaration());
     }
     
     public void modifyTestMethod(int x, int y) {

@@ -36,6 +36,20 @@ public class TargetProject {
         gitWorker.postCommit("init project");
     }
 
+    public void read() throws GitAPIException, IOException {
+        File rootDirectory = new File(rootPath);
+
+        File[] subProjectDirs = rootDirectory
+                .listFiles(file -> file.isDirectory() && file.getName().startsWith("project"));
+
+        for (File subProjectDir : subProjectDirs) {
+            String subProjectName = subProjectDir.getName();
+            int subProjectNum = Integer.parseInt(subProjectName.substring(7));
+            SubProject subProject = SubProject.readSubProject(rootPath, subProjectNum);
+            subProjects.add(subProject);
+        }
+    }
+
     public void addSubProject(int numOfModules, int numOfClasses, int numOfMethods, int randomCeiling)
             throws IOException, GitAPIException {
         int index = subProjects.size();
@@ -60,13 +74,22 @@ public class TargetProject {
     }
 
     public static TargetProject initializeProject(String rootPath, String projectName, String username, String email,
-            String token, String remote) throws IOException, GitAPIException, URISyntaxException {
-                
+            String token, String remote, Boolean reset) throws IOException, GitAPIException, URISyntaxException {
+
         setUpDirectory(rootPath);
-        GitWorker gitWorker = GitWorker.mountGitWorker(rootPath, username, email, token, remote);
+        GitWorker gitWorker = reset == true ? GitWorker.mountNewGitWorker(rootPath, username, email, token, remote)
+                : GitWorker.cloneNewGitWorker(rootPath, username, email, token, remote);
+
         GradleWriter gradleWriter = GradleWriter.initialize(rootPath, projectName);
 
-        return new TargetProject(gitWorker, gradleWriter, rootPath);
+        TargetProject targetProject = new TargetProject(gitWorker, gradleWriter, rootPath);
+
+        if (reset)
+            targetProject.populate();
+        else
+            targetProject.read();
+
+        return targetProject;
     }
 
     private static void setUpDirectory(String rootPath) throws IOException {

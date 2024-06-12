@@ -1,8 +1,10 @@
 package com.initializers;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import com.utils.Helper;
 
@@ -37,6 +39,30 @@ public class SubProject {
             testModuleWriter.writeTestModule();
         }
     }
+
+    public static SubProject readSubProject(String rootPath, int subProjectNum) throws IOException {
+        String subProjectName = Helper.getSubProjectName(subProjectNum);
+        String subProjectPath = rootPath + "/" + subProjectName;
+        String testSrcPath = subProjectPath + "/src/test/java/com";
+        
+        File[] moduleDirs = new File(testSrcPath).listFiles(File::isDirectory);
+
+        TestModuleWriter[] testModuleWriters = Arrays.stream(moduleDirs)
+                .filter(dir -> dir.getName().startsWith("module"))
+                .map(moduleDir -> {
+                    try {
+                        int moduleNum = Integer.parseInt(moduleDir.getName().substring(6));
+                        return TestModuleWriter.readTestModule(testSrcPath, moduleNum);
+                    } catch (NumberFormatException | IOException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .toArray(TestModuleWriter[]::new);
+
+        return new SubProject(testModuleWriters, subProjectName, subProjectPath);
+    }
+
 
     public void modifySubProject(int moduleNum,int classNum,int methodNum,int x, int y) throws IOException {
         testModuleWriters[moduleNum].modifyTestModule(classNum, methodNum, x, y);
