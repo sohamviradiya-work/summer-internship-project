@@ -16,7 +16,6 @@ import com.tool.writers.interfaces.ItemWriter;
 
 public class LinearRegressionFinder implements Finder {
 
-
     protected ProjectInstance projectInstance;
     private ItemWriter<RegressionBlame> blameWriter;
     private int remainingTests;
@@ -32,28 +31,29 @@ public class LinearRegressionFinder implements Finder {
         ArrayList<TestIdentifier> failedTests = testIdentifiers;
 
         for (int i = endIndex; i >= startIndex; i--) {
-            if(failedTests.isEmpty())
+            if (failedTests.isEmpty())
                 break;
-            
+
             ProjectCommit currentCommit = projectCommits.get(i);
-            ProjectCommit previousCommit = projectCommits.get(i+1);
+            ProjectCommit previousCommit = projectCommits.get(i + 1);
 
             ArrayList<TestIdentifier> newFailedTests = new ArrayList<>();
 
             HashSet<TestIdentifier> newFailedTestsSet = TestResult
-                    .extractFailingTests(this.projectInstance.runTestsForCommit(failedTests, currentCommit,previousCommit));
+                    .extractFailingTests(
+                            this.projectInstance.runTestsForCommit(failedTests, currentCommit, previousCommit));
 
             for (TestIdentifier testIdentifier : failedTests) {
                 if (newFailedTestsSet.contains(testIdentifier))
                     newFailedTests.add(testIdentifier);
                 else
-                    putBlame(new RegressionBlame(testIdentifier, previousCommit,true));
+                    putBlame(new RegressionBlame(testIdentifier, previousCommit, true));
             }
             failedTests = newFailedTests;
         }
 
-        for(TestIdentifier testIdentifier:failedTests)
-            putBlame(new RegressionBlame(testIdentifier, projectCommits.get(startIndex),true));
+        for (TestIdentifier testIdentifier : failedTests)
+            putBlame(projectInstance.blameTestOnAuthor(testIdentifier));
     }
 
     public void putBlame(RegressionBlame regressionBlame) throws IOException {

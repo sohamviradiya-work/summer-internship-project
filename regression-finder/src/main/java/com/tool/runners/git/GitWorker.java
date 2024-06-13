@@ -1,5 +1,6 @@
 package com.tool.runners.git;
 
+import org.eclipse.jgit.api.BlameCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
@@ -7,6 +8,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.blame.BlameResult;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.lib.ObjectId;
@@ -28,6 +30,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GitWorker {
 
@@ -163,5 +167,62 @@ public class GitWorker {
         Repository repository = builder.findGitDir(directory).build();
         GitWorker gitWorker = new GitWorker(repository);
         return gitWorker;
+    }
+
+    public ProjectCommit blameTest(String filePath, String testName) throws GitAPIException {
+        BlameCommand blameCommand = git.blame().setFilePath(filePath);
+        BlameResult blameResult = blameCommand.call();
+
+        String functionSignaturePattern = testName + "\\s*\\([^\\)]*\\)\\s*\\{";
+        Pattern pattern = Pattern.compile(functionSignaturePattern);
+
+        int startLine = -1;
+        int endLine = -1;
+        int bracketBalance = 0;
+        boolean inFunction = false;
+
+        for (int i = 0; i < blameResult.getResultContents().size(); i++) {
+            String line = blameResult.getResultContents().getString(i);
+            if (!inFunction) {
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.find()) {
+                    startLine = i;
+                    inFunction = true;
+                    bracketBalance = 1;
+                }
+            } else {
+                for (char ch : line.toCharArray()) {
+                    if (ch == '{') {
+                        bracketBalance++;
+                    } else if (ch == '}') {
+                        bracketBalance--;
+                        if (bracketBalance == 0) {
+                            endLine = i;
+                            break;
+                        }
+                    }
+                }
+                if (endLine != -1)
+                    break;
+            }
+        }
+
+        if (startLine == -1 || endLine == -1) {
+            throw new IllegalStateException("Function not found in the file.");
+        }
+        
+        RevCommit latestCommit = null;
+        for (int i = startLine; i <= endLine; i++) {
+            RevCommit commit = blameResult.getSourceCommit(i);
+            if (latestCommit == null || commit.getCommitTime() > latestCommit.getCommitTime()) {
+                latestCommit = commit;
+            }
+        }
+
+        if (latestCommit != null) {
+            return ProjectCommit.getprojectCommitFromRevCommit("", latestCommit);
+        } else {
+            throw new IllegalStateException("No commit information found for the function.");
+        }
     }
 }

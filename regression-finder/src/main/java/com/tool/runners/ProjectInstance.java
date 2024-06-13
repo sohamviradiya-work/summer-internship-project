@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.items.ProjectCommit;
+import com.items.RegressionBlame;
 import com.items.TestIdentifier;
 import com.items.TestResult;
 import com.tool.runners.git.GitWorker;
@@ -18,17 +19,17 @@ public class ProjectInstance {
     private static String DEFAULT_GRADLE_VERSION = "7.6.4";
     private GradleWorker gradleWorker;
     private GitWorker gitWorker;
+    private String testSrcPath;
 
-    public ProjectInstance(GradleWorker gradleWorker, GitWorker gitWorker) {
+    public ProjectInstance(GradleWorker gradleWorker, GitWorker gitWorker, String testSrcPath) {
         this.gradleWorker = gradleWorker;
         this.gitWorker = gitWorker;
+        this.testSrcPath = testSrcPath;
     }
-    
 
     public GitWorker getGitWorker() {
         return gitWorker;
     }
-
 
     public void close() throws IOException, GitAPIException {
         this.gitWorker.restoreRepository();
@@ -65,6 +66,17 @@ public class ProjectInstance {
         return false;
     }
 
+    public RegressionBlame blameTestOnAuthor(TestIdentifier testIdentifier) throws GitAPIException {
+
+        String testFilePath = testIdentifier.getTestProject().substring(1) + "/" + testSrcPath + "/" + testIdentifier.getTestClass().replace(".", "/") + ".java";
+
+        testFilePath.replace("//", "/");
+
+        ProjectCommit projectCommit = gitWorker.blameTest(testFilePath, testIdentifier.getTestMethod());
+
+        return new RegressionBlame(testIdentifier, projectCommit, false);
+    }
+
     private boolean isSyncRequired(ProjectCommit commitA, ProjectCommit commitB) {
         String commitIdA = commitA.getCommitId();
         String commitIdB = commitB.getCommitId();
@@ -77,20 +89,21 @@ public class ProjectInstance {
         return false;
     }
 
-    public static ProjectInstance mountLocalProject(String path) throws IOException {
-        return mountLocalProject(path, "");
+    public static ProjectInstance mountLocalProject(String rootPath, String testSrcPath) throws IOException {
+        return mountLocalProject(rootPath, testSrcPath, "");
     }
 
-    public static ProjectInstance mountLocalProject(String path, String gradleVersion) throws IOException {
+    public static ProjectInstance mountLocalProject(String rootPath, String testSrcPath, String gradleVersion)
+            throws IOException {
 
         if (gradleVersion.length() == 0)
             gradleVersion = DEFAULT_GRADLE_VERSION;
 
-        File directory = new File(path);
+        File directory = new File(rootPath);
 
         GradleWorker gradleWorker = GradleWorker.mountGradleWorker(gradleVersion, directory);
         GitWorker gitWorker = GitWorker.mountGitWorker(directory);
-        
-        return new ProjectInstance(gradleWorker, gitWorker);
+
+        return new ProjectInstance(gradleWorker, gitWorker, testSrcPath);
     }
 }

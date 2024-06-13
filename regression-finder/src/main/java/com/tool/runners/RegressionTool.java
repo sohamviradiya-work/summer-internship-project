@@ -21,12 +21,14 @@ import com.tool.writers.interfaces.ItemWriter;
 
 public class RegressionTool {
 
-    public static long run(String path, String gradleVersion, String method, String resultPath, boolean logCommits)
+    public static long run(String repositoryPath, String testSrcPath, String gradleVersion, String method,
+            String resultPath, boolean logCommits)
             throws IOException, NoHeadException, GitAPIException {
 
         CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/" + method + ".csv");
 
-        ProjectInstance projectInstance = ProjectInstance.mountLocalProject(path, gradleVersion);
+        ProjectInstance projectInstance = ProjectInstance.mountLocalProject(repositoryPath, testSrcPath,
+                gradleVersion);
 
         Finder finder = createFinder(method, blameWriter, projectInstance);
 
@@ -34,17 +36,17 @@ public class RegressionTool {
 
         HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch();
 
-        if(logCommits)
+        if (logCommits)
             log(resultPath, branchWiseCommitList);
 
         long start = System.currentTimeMillis();
         for (String branch : branchWiseCommitList.keySet()) {
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
 
-            ArrayList<TestResult> testResults = projectInstance.runAllTestsForCommit(projectCommits.get(projectCommits.size()-1));
+            ArrayList<TestResult> testResults = projectInstance
+                    .runAllTestsForCommit(projectCommits.get(projectCommits.size() - 1));
             ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
-            
-            
+
             finder.setTotalTests(failingTests.size());
             finder.runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 2, failingTests);
         }

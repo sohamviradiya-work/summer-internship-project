@@ -29,8 +29,7 @@ public class ProjectCommit implements CSVItem {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getDefault());
 
-        return authorMail + "," + commitId + "," + branch + "," + dateFormat.format(time) + ","
-                + message;
+        return authorMail + "," + commitId + "," + dateFormat.format(time) + "," + message;
     }
 
     public String getCommitId() {

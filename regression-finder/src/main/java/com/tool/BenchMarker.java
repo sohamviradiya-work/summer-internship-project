@@ -19,7 +19,7 @@ public class BenchMarker {
         
         List<String> methods = List.of("Linear", "Batch 5", "Batch 20", "Batch 50", "Bisect");
         for (String method : methods) {
-            long time = RegressionTool.run(repositoryPath, gradleVersion, method, resultsPath,false);
+            long time = RegressionTool.run(repositoryPath,"/src/test/java" ,gradleVersion, method, resultsPath,false);
             benchMarkWriter.write(new BenchMark(time, method));
         }
         benchMarkWriter.close();
