@@ -24,7 +24,6 @@ public class RepositoryCloner {
         Git git = Git.cloneRepository().setShallowSince(shallowSinceInstant)
                 .setURI(link)
                 .setDirectory(dir)
-                .setCloneAllBranches(false)
                 .call();
     
         git.fetch().call();

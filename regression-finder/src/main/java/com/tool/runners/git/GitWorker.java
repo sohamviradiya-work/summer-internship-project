@@ -85,6 +85,7 @@ public class GitWorker {
                 List<DiffEntry> diffs = diffFormatter.scan(treeParserA, treeParserB);
 
                 for (DiffEntry diff : diffs) {
+                    changedFiles.add(diff.getOldPath());
                     changedFiles.add(diff.getNewPath());
                 }
             }
