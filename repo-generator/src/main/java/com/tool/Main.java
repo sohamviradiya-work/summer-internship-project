@@ -6,13 +6,13 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class Main {
     static int ITERATIONS = 10000;
-    static int MODULES_PER_SUB_PROJECT = 3;
-    static int CLASSES_PER_MODULE = 3;
-    static int TESTS_PER_CLASS = 10;
-    static int RANDOM_INT_LIMIT = 5;
+    static int MODULES_PER_SUB_PROJECT = 2;
+    static int CLASSES_PER_MODULE = 2;
+    static int TESTS_PER_CLASS = 3;
+    static int RANDOM_INT_LIMIT = 2;
     static String rootPath = "../test-area/large-repo";
     static String projectName = "large-repo";
-    static double ADDITION_PROB = 0.002;
+    static double ADDITION_PROB = 0.001;
     public static void main(String[] args) {
 
         Dotenv dotenv = Dotenv.configure().directory("../").load();
