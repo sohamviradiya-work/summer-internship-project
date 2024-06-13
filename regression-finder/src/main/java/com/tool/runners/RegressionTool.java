@@ -46,8 +46,7 @@ public class RegressionTool {
             ProjectCommit lastCommit = projectCommits.get(projectCommits.size() - 1);
             ArrayList<TestIdentifier> testsTorun = projectInstance.extractTestsToRun(firstCommit, lastCommit,blameWriter);
 
-            finder.setTotalTests(testsTorun.size());
-            finder.runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 2, testsTorun);
+            finder.runForTests(projectCommits, testsTorun);
         }
 
         long end = System.currentTimeMillis();

@@ -37,13 +37,14 @@ public class LinearRegressionFinder implements Finder {
             ProjectCommit currentCommit = projectCommits.get(i);
             ProjectCommit previousCommit = projectCommits.get(i + 1);
 
-            if(!projectInstance.isRunRequired(currentCommit, previousCommit)){
+            if (!projectInstance.isRunRequired(currentCommit, previousCommit)) {
                 continue;
             }
 
             ArrayList<TestIdentifier> newFailedTests = new ArrayList<>();
 
-            HashSet<TestIdentifier> newFailedTestsSet = TestResult.extractFailingTests(this.projectInstance.runTestsForCommit(failedTests, currentCommit, previousCommit));
+            HashSet<TestIdentifier> newFailedTestsSet = TestResult.extractFailingTests(
+                    this.projectInstance.runTestsForCommit(failedTests, currentCommit, previousCommit));
 
             for (TestIdentifier testIdentifier : failedTests) {
                 if (newFailedTestsSet.contains(testIdentifier))
@@ -55,7 +56,13 @@ public class LinearRegressionFinder implements Finder {
         }
 
         for (TestIdentifier testIdentifier : failedTests)
-            blameWriter.write(new RegressionBlame(testIdentifier, projectCommits.get(startIndex), true));
+            putBlame(new RegressionBlame(testIdentifier, projectCommits.get(startIndex), true));
+    }
+
+    @Override
+    public void runForTests(ArrayList<ProjectCommit> projectCommits, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
+        setTotalTests(testIdentifiers.size());
+        runForCommitsAndTests(projectCommits,0,projectCommits.size() - 2,testIdentifiers);
     }
 
     public void putBlame(RegressionBlame regressionBlame) throws IOException {
