@@ -39,9 +39,7 @@ public class BisectRegressionFinderTest {
         ArrayList<TestResult> mockTestResults = TestHelper.createMockTestResults(4);
 
         when(mockProjectInstance.runTestsForCommit(any(), any(), any())).thenReturn(mockTestResults);
-        for(TestIdentifier testIdentifier:testIdentifiers){
-            when(mockProjectInstance.blameTestOnAuthor(testIdentifier)).thenReturn(new RegressionBlame(testIdentifier, projectCommits.get(0), false));
-        }
+        when(mockProjectInstance.isRunRequired(any(), any())).thenReturn(true);
 
         finder.runForCommitsAndTests(new ArrayList<>(projectCommits), 0, 99, new ArrayList<>(testIdentifiers));
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -13,6 +14,7 @@ import com.items.TestIdentifier;
 import com.items.TestResult;
 import com.tool.runners.git.GitWorker;
 import com.tool.runners.gradle.GradleWorker;
+import com.tool.writers.interfaces.ItemWriter;
 
 public class ProjectInstance {
 
@@ -60,7 +62,7 @@ public class ProjectInstance {
 
         ArrayList<String> changedFilePaths = gitWorker.getChangedFiles(commitIdA, commitIdB);
         for (String path : changedFilePaths) {
-            if (path.endsWith(".java"))
+            if (path.endsWith(".java") || path.endsWith(".gradle"))
                 return true;
         }
         return false;
@@ -87,6 +89,23 @@ public class ProjectInstance {
                 return true;
         }
         return false;
+    }
+
+    ArrayList<TestIdentifier> extractTestsToRun(ProjectCommit firstCommit, ProjectCommit lastCommit,ItemWriter<RegressionBlame> blameWriter) throws GitAPIException, IOException {
+        ArrayList<TestResult> testResults = runAllTestsForCommit(lastCommit);
+    
+        ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
+    
+        ArrayList<TestResult> lastPhaseTestResults = runTestsForCommit(failingTests, firstCommit,lastCommit);
+    
+        HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(lastPhaseTestResults);
+    
+        gitWorker.checkoutToCommit(lastCommit);
+        for (TestIdentifier testIdentifier : falseWrittenTests) {
+            failingTests.remove(testIdentifier);
+            blameWriter.write(blameTestOnAuthor(testIdentifier));
+        }
+        return failingTests;
     }
 
     public static ProjectInstance mountLocalProject(String rootPath, String testSrcPath) throws IOException {

@@ -52,10 +52,8 @@ public class LinearRegressionFinder implements Finder {
             failedTests = newFailedTests;
         }
 
-        for (TestIdentifier testIdentifier : failedTests){
-            RegressionBlame regressionBlame = startIndex == 0 ? projectInstance.blameTestOnAuthor(testIdentifier): new RegressionBlame(testIdentifier, projectCommits.get(startIndex), true);
-            putBlame(regressionBlame);
-        }
+        for (TestIdentifier testIdentifier : failedTests)
+            blameWriter.write(new RegressionBlame(testIdentifier, projectCommits.get(startIndex), true));
     }
 
     public void putBlame(RegressionBlame regressionBlame) throws IOException {

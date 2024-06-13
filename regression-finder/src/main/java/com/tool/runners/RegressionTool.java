@@ -10,7 +10,6 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 import com.items.ProjectCommit;
 import com.items.RegressionBlame;
 import com.items.TestIdentifier;
-import com.items.TestResult;
 import com.tool.finders.BatchRegressionFinder;
 import com.tool.finders.BisectRegressionFinder;
 import com.tool.finders.LinearRegressionFinder;
@@ -27,8 +26,7 @@ public class RegressionTool {
 
         CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/" + method + ".csv");
 
-        ProjectInstance projectInstance = ProjectInstance.mountLocalProject(repositoryPath, testSrcPath,
-                gradleVersion);
+        ProjectInstance projectInstance = ProjectInstance.mountLocalProject(repositoryPath, testSrcPath, gradleVersion);
 
         Finder finder = createFinder(method, blameWriter, projectInstance);
 
@@ -40,19 +38,23 @@ public class RegressionTool {
             log(resultPath, branchWiseCommitList);
 
         long start = System.currentTimeMillis();
+
         for (String branch : branchWiseCommitList.keySet()) {
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
 
-            ArrayList<TestResult> testResults = projectInstance
-                    .runAllTestsForCommit(projectCommits.get(projectCommits.size() - 1));
-            ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
+            ProjectCommit firstCommit = projectCommits.get(0);
+            ProjectCommit lastCommit = projectCommits.get(projectCommits.size() - 1);
+            ArrayList<TestIdentifier> testsTorun = projectInstance.extractTestsToRun(firstCommit, lastCommit,blameWriter);
 
-            finder.setTotalTests(failingTests.size());
-            finder.runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 2, failingTests);
+            finder.setTotalTests(testsTorun.size());
+            finder.runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 2, testsTorun);
         }
+
         long end = System.currentTimeMillis();
+
         projectInstance.close();
         finder.close();
+
         return end - start;
     }
 

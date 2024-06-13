@@ -40,6 +40,8 @@ class BatchRegressionFinderTest {
         ArrayList<TestResult> mockTestResults = TestHelper.createMockTestResults(4);
 
         when(mockProjectInstance.runTestsForCommit(any(), any(), any())).thenReturn(mockTestResults);
+        when(mockProjectInstance.isRunRequired(any(), any())).thenReturn(true);
+
         for(TestIdentifier testIdentifier:testIdentifiers){
             when(mockProjectInstance.blameTestOnAuthor(testIdentifier)).thenReturn(new RegressionBlame(testIdentifier, projectCommits.get(0), false));
         }
