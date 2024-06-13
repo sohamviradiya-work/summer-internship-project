@@ -15,7 +15,7 @@ import org.eclipse.jgit.lib.Ref;
 
 public class RepositoryCloner {
 
-    public static GitWorker getRemoteRepository(String path, String link, long lastDays)
+    public static void getRemoteRepository(String path, String link, long lastDays)
             throws GitAPIException, IOException {
         File dir = new File(path);
     
@@ -33,7 +33,7 @@ public class RepositoryCloner {
             RepositoryCloner.cloneBranchToLocal(git, ref);
         }
         System.out.println("Cloning Complete");
-        return new GitWorker(git);
+        return;
     }
 
     static void cloneBranchToLocal(Git git, Ref ref) {
