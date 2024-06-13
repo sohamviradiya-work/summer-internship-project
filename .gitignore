@@ -4,7 +4,7 @@
 .vscode/
 
 
-gradle/
+./gradle/
 gradle.properties
 .gradle/
 wrapper/
