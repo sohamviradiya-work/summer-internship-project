@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class Helper {
 
     static String getRepositoryLink(Scanner scanner) {
-        System.out.println("Enter Repository Link");
+        System.out.print("Enter Repository Link: ");
         String repositoryLink = scanner.nextLine();
         return repositoryLink;
     }
@@ -40,16 +40,23 @@ public class Helper {
             }
         }
     }
+    
 
     static String getMethod(Scanner scanner) {
-        System.out.println("Enter Method (Linear, Bisect or Batch XX): ");
+        System.out.print("Enter Method (Linear, Bisect or Batch XX): ");
         String methodName = scanner.nextLine();
         return methodName;
     }
 
+    static String getTestSrcPath(Scanner scanner) {
+        System.out.print("Enter Test Source Folder path relative to subproject/project root (ex: src/test/java/): ");
+        String testPath = scanner.nextLine();
+        return testPath;
+    }
+
 
     static int getDays(Scanner scanner) {
-        System.out.println("Enter Number of days to consider: ");
+        System.out.print("Enter Number of days to consider: ");
         String days = scanner.nextLine();
         return Integer.parseInt(days);
     }
