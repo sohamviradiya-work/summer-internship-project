@@ -41,4 +41,4 @@ The Regression Finder Tool is designed to identify the specific commit that caus
    ```
 
 4. **Output**:  
-   The results will be generated and stored in a CSV file located at `./results/`.
+   The results will be generated and stored in a CSV file located at `./resources/results/`.

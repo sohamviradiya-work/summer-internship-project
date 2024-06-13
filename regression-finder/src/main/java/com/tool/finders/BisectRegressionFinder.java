@@ -20,27 +20,37 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
     }
 
     @Override
-    public void runForCommitsAndTests(ArrayList<ProjectCommit> gitCommits, int startIndex, int endIndex,
+    public void runForCommitsAndTests(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex,
             ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
-        bisectForCommitsAndTest(gitCommits, startIndex, endIndex, endIndex, testIdentifiers);
+        bisectForCommitsAndTest(projectCommits, startIndex, endIndex, endIndex, testIdentifiers);
     }
 
-    private void bisectForCommitsAndTest(ArrayList<ProjectCommit> gitCommits, int startIndex, int endIndex, int lastIndex, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
+    private void bisectForCommitsAndTest(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex, int lastIndex, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
 
         if (startIndex >= endIndex - 1 || testIdentifiers.isEmpty()) {
-            super.runForCommitsAndTests(gitCommits, startIndex, startIndex, testIdentifiers);
+            super.runForCommitsAndTests(projectCommits, startIndex, startIndex, testIdentifiers);
             return;
         }
 
         int midIndex = (startIndex + endIndex) / 2;
 
-        ArrayList<TestResult> testResults = this.projectInstance.runTestsForCommit(testIdentifiers, gitCommits.get(midIndex),gitCommits.get(lastIndex));
+        ProjectCommit previousCommit = projectCommits.get(lastIndex);
+        ProjectCommit currentCommit = projectCommits.get(midIndex);
+
+        if(!projectInstance.isRunRequired(currentCommit, previousCommit)){
+            if(lastIndex > midIndex)
+                bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, testIdentifiers);
+            else
+                bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, testIdentifiers);
+        }
+
+        ArrayList<TestResult> testResults = this.projectInstance.runTestsForCommit(testIdentifiers, projectCommits.get(midIndex),projectCommits.get(lastIndex));
 
         ArrayList<TestIdentifier> failedTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
         ArrayList<TestIdentifier> passedTests = new ArrayList<>(TestResult.extractNotFailingTests(testResults,testIdentifiers));
         
-        bisectForCommitsAndTest(gitCommits, startIndex, midIndex, midIndex, failedTests);
-        bisectForCommitsAndTest(gitCommits, midIndex + 1, endIndex, midIndex, passedTests);
+        bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, failedTests);
+        bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, passedTests);
     }
 
 }

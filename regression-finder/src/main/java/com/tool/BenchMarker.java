@@ -12,14 +12,14 @@ import com.tool.writers.CSVWriter;
 
 public class BenchMarker {
 
-    public static void benchmark(String repositoryPath, String resultsPath, String gradleVersion)
+    public static void benchmark(String repositoryPath, String resultsPath,String testSrcPath ,String gradleVersion)
             throws NoHeadException, IOException, GitAPIException {
 
         CSVWriter<BenchMark> benchMarkWriter = CSVWriter.create(resultsPath + "/bench-mark.csv");
         
         List<String> methods = List.of("Linear", "Batch 5", "Batch 20", "Batch 50", "Bisect");
         for (String method : methods) {
-            long time = RegressionTool.run(repositoryPath,"/src/test/java" ,gradleVersion, method, resultsPath,false);
+            long time = RegressionTool.run(repositoryPath,testSrcPath,gradleVersion, method, resultsPath,false);
             benchMarkWriter.write(new BenchMark(time, method));
         }
         benchMarkWriter.close();

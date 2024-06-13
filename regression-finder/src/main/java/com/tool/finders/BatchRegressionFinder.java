@@ -32,15 +32,19 @@ public class BatchRegressionFinder extends LinearRegressionFinder {
 
         for (; i >= startIndex; i -= batchSize) {
 
-            if(failedTests.isEmpty())
+            if (failedTests.isEmpty())
                 break;
 
             int lastIndex = Math.min(i + batchSize, endIndex);
 
+            if (!projectInstance.isRunRequired(projectCommits.get(i), projectCommits.get(lastIndex)))
+                continue;
+
             ArrayList<TestIdentifier> newFailedTests = new ArrayList<>();
             ArrayList<TestIdentifier> batchTests = new ArrayList<>();
 
-            ArrayList<TestResult> testResults = projectInstance.runTestsForCommit(failedTests,projectCommits.get(i), projectCommits.get(lastIndex));
+            ArrayList<TestResult> testResults = projectInstance.runTestsForCommit(failedTests, projectCommits.get(i),
+                    projectCommits.get(lastIndex));
 
             HashSet<TestIdentifier> newFailedTestsSet = TestResult.extractFailingTests(testResults);
 
@@ -52,7 +56,6 @@ public class BatchRegressionFinder extends LinearRegressionFinder {
             }
 
             super.runForCommitsAndTests(projectCommits, i + 1, Math.min(i + batchSize - 1, endIndex), batchTests);
-            
             failedTests = newFailedTests;
         }
 
