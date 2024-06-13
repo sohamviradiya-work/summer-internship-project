@@ -37,9 +37,8 @@ public class LinearRegressionFinder implements Finder {
             ProjectCommit currentCommit = projectCommits.get(i);
             ProjectCommit previousCommit = projectCommits.get(i + 1);
 
-            if (!projectInstance.isRunRequired(currentCommit, previousCommit)) {
+            if (!projectInstance.isRunRequired(currentCommit, previousCommit))
                 continue;
-            }
 
             ArrayList<TestIdentifier> newFailedTests = new ArrayList<>();
 

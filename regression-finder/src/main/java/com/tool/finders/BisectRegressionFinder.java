@@ -42,6 +42,7 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
                 bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, testIdentifiers);
             else
                 bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, testIdentifiers);
+            return;
         }
 
         ArrayList<TestResult> testResults = this.projectInstance.runTestsForCommit(testIdentifiers, projectCommits.get(midIndex),projectCommits.get(lastIndex));
