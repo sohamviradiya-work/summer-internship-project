@@ -33,9 +33,8 @@ public class TestClassWriter {
         return new TestClassWriter(classDeclaration, testMethodWriters);
     }
 
-    public TestClassWriter modifyTestClass(int methodNum, int x, int y) {
-        testMethodWriters[methodNum].modifyTestMethod(x, y);
-        return this;
+    public String modifyTestClass(int methodNum, double failProb,int randomCeiling) {
+        return  "." + classDeclaration.getNameAsString() + testMethodWriters[methodNum].modifyTestMethod(failProb,randomCeiling);
     }
 
     public void writeToFile(String modulePath, String packageName) throws IOException {

@@ -31,9 +31,11 @@ public class TestModuleWriter {
         return new TestModuleWriter(testClassWriters, modulePath, packageName);
     }
 
-    public TestModuleWriter modifyTestModule(int classNum, int methodNum, int x, int y) throws IOException {
-        this.testClassWriters[classNum].modifyTestClass(methodNum, x, y).writeToFile(modulePath, packageName);
-        return this;
+    public String modifyTestModule(int classNum, int methodNum, double failProb, int randomCeiling) throws IOException {
+        String commitMessage = "." + packageName
+                + this.testClassWriters[classNum].modifyTestClass(methodNum, failProb, randomCeiling);
+        this.testClassWriters[classNum].writeToFile(modulePath, packageName);
+        return commitMessage;
     }
 
     public void writeTestModule() throws IOException {

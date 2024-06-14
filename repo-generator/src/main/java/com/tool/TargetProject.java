@@ -11,7 +11,6 @@ import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import com.git.GitWorker;
 import com.initializers.GradleWriter;
 import com.initializers.SubProject;
-import com.utils.Helper;
 
 public class TargetProject {
 
@@ -60,12 +59,9 @@ public class TargetProject {
         gitWorker.postCommit("added sub project " + index);
     }
 
-    public void modifyProject(int subProjectNum, int moduleNum, int classNum, int methodNum, int x, int y)
+    public void modifyProject(int subProjectNum, int moduleNum, int classNum, int methodNum,double failProb,int randomCeiling)
             throws IOException, GitAPIException {
-        subProjects.get(subProjectNum).modifySubProject(moduleNum, classNum, methodNum, x, y);
-        String commitMessage = "Modified " + Helper.getSubProjectName(subProjectNum) + "."
-                + Helper.getModuleName(moduleNum) + "." + Helper.getTestClassName(classNum) + "."
-                + Helper.getTestMethodName(methodNum) + " to x: " + x + ", y: " + y;
+        String commitMessage = "Modification: " + subProjects.get(subProjectNum).modifySubProject(moduleNum, classNum, methodNum, failProb,randomCeiling);
         gitWorker.postCommit(commitMessage);
     }
 

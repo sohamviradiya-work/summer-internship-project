@@ -64,7 +64,8 @@ public class SubProject {
     }
 
 
-    public void modifySubProject(int moduleNum,int classNum,int methodNum,int x, int y) throws IOException {
-        testModuleWriters[moduleNum].modifyTestModule(classNum, methodNum, x, y);
+    public String modifySubProject(int moduleNum,int classNum,int methodNum,double failProb,int randomCeiling) throws IOException {
+       return  subProjectName + testModuleWriters[moduleNum].modifyTestModule(classNum, methodNum, failProb,randomCeiling);
+        
     }
 }

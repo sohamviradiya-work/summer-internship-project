@@ -6,13 +6,14 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class Main {
     static int ITERATIONS = 10000;
-    static int MODULES_PER_SUB_PROJECT = 2;
-    static int CLASSES_PER_MODULE = 2;
-    static int TESTS_PER_CLASS = 3;
-    static int RANDOM_INT_LIMIT = 2;
+    static int MODULES_PER_SUB_PROJECT = 5;
+    static int CLASSES_PER_MODULE = 4;
+    static int TESTS_PER_CLASS = 10;
+    static int RANDOM_INT_LIMIT = 10;
     static String rootPath = "../test-area/large-repo";
     static String projectName = "large-repo";
-    static double ADDITION_PROB = 0.001;
+    static double ADDITION_PROB = 0.01;
+    static double FAIL_PROB = 0.01;
     public static void main(String[] args) {
 
         Dotenv dotenv = Dotenv.configure().directory("../").load();
@@ -21,8 +22,6 @@ public class Main {
         String username = dotenv.get("GITHUB_USERNAME");
         String token = dotenv.get("GITHUB_ACCESS_TOKEN");
         String remote = dotenv.get("GITHUB_REMOTE_LINK");
-
-        boolean pass_after_fail = dotenv.get("PASS_AFTER_FAIL")=="TRUE";    
 
         try {
             TargetProject targetProject = TargetProject.initializeProject(rootPath,projectName,username,email,token,remote,true);
@@ -37,10 +36,7 @@ public class Main {
                 int randomClassNumber = Helper.getRandom(CLASSES_PER_MODULE);
                 int randomMethodNumber = Helper.getRandom(TESTS_PER_CLASS);
 
-                int x = Helper.getRandom(RANDOM_INT_LIMIT);
-                int y = pass_after_fail ? Helper.getRandom(RANDOM_INT_LIMIT) : Helper.getRandom(RANDOM_INT_LIMIT,x);
-
-                targetProject.modifyProject(randomSubProject, randomModuleNumber, randomClassNumber, randomMethodNumber, x, y);
+                targetProject.modifyProject(randomSubProject, randomModuleNumber, randomClassNumber, randomMethodNumber, FAIL_PROB,RANDOM_INT_LIMIT);
             }
       
             targetProject.pushChanges();
