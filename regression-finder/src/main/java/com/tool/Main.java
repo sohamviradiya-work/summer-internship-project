@@ -14,17 +14,15 @@ public class Main {
         String resultsPath = rootPath + "/results";
         Scanner scanner = new Scanner(System.in);
         String repositoryLink = Helper.getRepositoryLink(scanner);
-        String method = Helper.getMethod(scanner);
         int days = Helper.getDays(scanner);
         try {
             Helper.setup(repositoryPath, resultsPath);
             RepositoryCloner.getRemoteRepository(repositoryPath, repositoryLink, days);
+            String method = Helper.getMethod(scanner);
             String testSrcPath = Helper.getTestSrcPath(scanner);
             scanner.close();    
             
-            long time = RegressionTool.run(repositoryPath, testSrcPath,"7.6.4", method, resultsPath, true);
-            
-
+            long time = RegressionTool.run(repositoryPath, testSrcPath,"7.6.4", method, resultsPath, true);      
             System.out.println("time: " + time + " ms");
         } catch (Exception e) {
             System.out.println(e.getMessage());
