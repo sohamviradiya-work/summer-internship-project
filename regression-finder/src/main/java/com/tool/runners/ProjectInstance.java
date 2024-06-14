@@ -101,11 +101,11 @@ public class ProjectInstance {
 
     private ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier) throws GitAPIException {
 
-        String testFilePath = testIdentifier.getTestProject().substring(1) + "/" + testSrcPath + "/" + testIdentifier.getTestClass().replace(".", "/") + ".java";
+        String testFilePath = testIdentifier.getTestProject() + "/" + testSrcPath + "/" + testIdentifier.getTestClass().replace(".", "/");
 
         testFilePath = testFilePath.replaceAll("\\.", "")  
         .replaceAll(":", "/")   
-        .replaceAll("/{2,}", "/"); 
+        .replaceAll("/{2,}", "/").substring(1) + ".java";
         
         ArrayList<ProjectCommit> authorCommits = gitWorker.blameTest(testFilePath, testIdentifier.getTestMethod());
 

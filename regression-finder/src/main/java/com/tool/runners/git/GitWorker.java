@@ -174,7 +174,7 @@ public class GitWorker {
         BlameResult blameResult = blameCommand.call();
 
         if(blameResult==null){
-            throw new RuntimeException(filePath+"," +testName);
+            throw new RuntimeException("Invalid path: " + filePath + "," +testName);
         }
 
         String functionSignaturePattern = testName + "\\s*\\([^\\)]*\\)\\s*\\{";
