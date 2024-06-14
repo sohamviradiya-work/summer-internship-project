@@ -12,22 +12,35 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class RepositoryCloner {
 
     public static void getRemoteRepository(String path, String link, long lastDays)
             throws GitAPIException, IOException {
+
+        Dotenv dotenv = Dotenv.configure().directory("../").load();
+
+        String email = dotenv.get("GITHUB_EMAIL");
+        String token = dotenv.get("GITHUB_ACCESS_TOKEN");
+
         File dir = new File(path);
-    
+
         Instant shallowSinceInstant = LocalDateTime.now().minusDays(lastDays).toInstant(ZoneOffset.UTC);
-    
-        Git git = Git.cloneRepository().setShallowSince(shallowSinceInstant)
+
+        UsernamePasswordCredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(email, token);
+
+        Git git = Git.cloneRepository()
                 .setURI(link)
+                .setCredentialsProvider(credentialsProvider)
+                .setShallowSince(shallowSinceInstant)
                 .setDirectory(dir)
                 .call();
-    
-        git.fetch().call();
-    
+
+        git.fetch().setCredentialsProvider(credentialsProvider).call();
+
         List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
         for (Ref ref : remoteBranches) {
             RepositoryCloner.cloneBranchToLocal(git, ref);
@@ -49,5 +62,4 @@ public class RepositoryCloner {
             System.out.println(e.getMessage());
         }
     }
-    
 }
