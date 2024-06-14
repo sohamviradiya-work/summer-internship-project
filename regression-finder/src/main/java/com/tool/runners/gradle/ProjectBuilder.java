@@ -24,7 +24,6 @@ public class ProjectBuilder {
         buildLauncher.withArguments("--refresh-dependencies");
 
         try {
-            System.out.println("Syncing Dependencies");
             buildLauncher.run();
         } catch (Exception e) {
             
