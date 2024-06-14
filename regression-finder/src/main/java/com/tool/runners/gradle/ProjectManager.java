@@ -44,6 +44,8 @@ public class ProjectManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if(subProjects.isEmpty())
+            subProjects.add("");
         return subProjects;
     }
 }
