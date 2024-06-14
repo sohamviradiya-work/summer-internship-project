@@ -68,17 +68,6 @@ public class ProjectInstance {
         return false;
     }
 
-    public RegressionBlame blameTestOnAuthor(TestIdentifier testIdentifier) throws GitAPIException {
-
-        String testFilePath = testIdentifier.getTestProject().substring(1) + "/" + testSrcPath + "/" + testIdentifier.getTestClass().replace(".", "/") + ".java";
-
-        testFilePath.replace("//", "/");
-
-        ProjectCommit projectCommit = gitWorker.blameTest(testFilePath, testIdentifier.getTestMethod());
-
-        return new RegressionBlame(testIdentifier, projectCommit, false);
-    }
-
     private boolean isSyncRequired(ProjectCommit commitA, ProjectCommit commitB) {
         String commitIdA = commitA.getCommitId();
         String commitIdB = commitB.getCommitId();
@@ -91,21 +80,39 @@ public class ProjectInstance {
         return false;
     }
 
-    ArrayList<TestIdentifier> extractTestsToRun(ProjectCommit firstCommit, ProjectCommit lastCommit,ItemWriter<RegressionBlame> blameWriter) throws GitAPIException, IOException {
+    public ArrayList<TestIdentifier> extractTestsToRun(ProjectCommit firstCommit, ProjectCommit lastCommit,ItemWriter<RegressionBlame> blameWriter) throws GitAPIException, IOException {
         ArrayList<TestResult> testResults = runAllTestsForCommit(lastCommit);
     
         ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
     
-        ArrayList<TestResult> lastPhaseTestResults = runTestsForCommit(failingTests, firstCommit,lastCommit);
+        ArrayList<TestResult> lastPhaseTestResults = runTestsForCommit(failingTests,firstCommit,lastCommit);
     
         HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(lastPhaseTestResults);
     
         gitWorker.checkoutToCommit(lastCommit);
+       
         for (TestIdentifier testIdentifier : falseWrittenTests) {
             failingTests.remove(testIdentifier);
-            blameWriter.write(blameTestOnAuthor(testIdentifier));
+            blameWriter.writeAll(blameTestOnAuthor(testIdentifier));
         }
+
         return failingTests;
+    }
+
+
+    private ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier) throws GitAPIException {
+
+        String testFilePath = testIdentifier.getTestProject().substring(1) + "/" + testSrcPath + "/" + testIdentifier.getTestClass().replace(".", "/") + ".java";
+
+        testFilePath = testFilePath.replaceAll("/+|/\\./", "/");
+        
+        ArrayList<ProjectCommit> authorCommits = gitWorker.blameTest(testFilePath, testIdentifier.getTestMethod());
+
+        ArrayList<RegressionBlame> regressionBlames = new ArrayList<>(); 
+        for(ProjectCommit authorCommit:authorCommits){
+            regressionBlames.add(new RegressionBlame(testIdentifier,authorCommit, false));
+        }
+        return regressionBlames;
     }
 
     public static ProjectInstance mountLocalProject(String rootPath, String testSrcPath) throws IOException {

@@ -42,10 +42,6 @@ class BatchRegressionFinderTest {
         when(mockProjectInstance.runTestsForCommit(any(), any(), any())).thenReturn(mockTestResults);
         when(mockProjectInstance.isRunRequired(any(), any())).thenReturn(true);
 
-        for(TestIdentifier testIdentifier:testIdentifiers){
-            when(mockProjectInstance.blameTestOnAuthor(testIdentifier)).thenReturn(new RegressionBlame(testIdentifier, projectCommits.get(0), false));
-        }
-
         finder.runForCommitsAndTests(new ArrayList<>(projectCommits), 0, 11, new ArrayList<>(testIdentifiers));
 
         ArgumentCaptor<RegressionBlame> blameCaptor = ArgumentCaptor.forClass(RegressionBlame.class);

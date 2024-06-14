@@ -169,9 +169,13 @@ public class GitWorker {
         return gitWorker;
     }
 
-    public ProjectCommit blameTest(String filePath, String testName) throws GitAPIException {
+    public ArrayList<ProjectCommit> blameTest(String filePath, String testName) throws GitAPIException {
         BlameCommand blameCommand = git.blame().setFilePath(filePath);
         BlameResult blameResult = blameCommand.call();
+
+        if(blameResult==null){
+            throw new RuntimeException(filePath+"," +testName);
+        }
 
         String functionSignaturePattern = testName + "\\s*\\([^\\)]*\\)\\s*\\{";
         Pattern pattern = Pattern.compile(functionSignaturePattern);
@@ -211,18 +215,19 @@ public class GitWorker {
             throw new IllegalStateException("Function not found in the file.");
         }
         
-        RevCommit latestCommit = null;
+        HashSet<String> authorCommitIDs = new HashSet<>();
+        ArrayList<ProjectCommit> authorCommits = new ArrayList<>();
+
         for (int i = startLine; i <= endLine; i++) {
             RevCommit commit = blameResult.getSourceCommit(i);
-            if (latestCommit == null || commit.getCommitTime() > latestCommit.getCommitTime()) {
-                latestCommit = commit;
+            if(authorCommitIDs.contains(commit.getName()))
+                continue;
+            else{
+                authorCommits.add(ProjectCommit.getprojectCommitFromRevCommit("", commit));
+                authorCommitIDs.add(commit.getName());
             }
         }
 
-        if (latestCommit != null) {
-            return ProjectCommit.getprojectCommitFromRevCommit("", latestCommit);
-        } else {
-            throw new IllegalStateException("No commit information found for the function.");
-        }
+        return authorCommits;
     }
 }
