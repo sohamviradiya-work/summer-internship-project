@@ -34,7 +34,6 @@ public class ProjectInstance {
     }
 
     public void close() throws IOException, GitAPIException {
-        this.gitWorker.restoreRepository();
         this.gitWorker.close();
         this.gradleWorker.close();
     }
@@ -104,7 +103,9 @@ public class ProjectInstance {
 
         String testFilePath = testIdentifier.getTestProject().substring(1) + "/" + testSrcPath + "/" + testIdentifier.getTestClass().replace(".", "/") + ".java";
 
-        testFilePath = testFilePath.replaceAll("/+|/\\./", "/");
+        testFilePath = testFilePath.replaceAll("\\.", "")  
+        .replaceAll(":", "/")   
+        .replaceAll("/{2,}", "/"); 
         
         ArrayList<ProjectCommit> authorCommits = gitWorker.blameTest(testFilePath, testIdentifier.getTestMethod());
 
