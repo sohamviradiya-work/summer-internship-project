@@ -10,7 +10,7 @@ import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.model.GradleProject;
 
 public class ProjectManager {
-    
+
     private ProjectConnection projectConnection;
 
     private ProjectManager(ProjectConnection projectConnection) {
@@ -24,27 +24,28 @@ public class ProjectManager {
         return new ProjectManager(projectConnection);
     }
 
-    public ProjectConnection getConnection(){
+    public ProjectConnection getConnection() {
         return this.projectConnection;
     }
 
-    public void close(){
+    public void close() {
         this.projectConnection.close();
     }
 
     public List<String> getSubProjects() {
-    
-        List<String> subProjects = new ArrayList<>();
+
         ModelBuilder<GradleProject> modelBuilder = getConnection().model(GradleProject.class);
-        try {
-            GradleProject rootProject = modelBuilder.get();
-            for (GradleProject subProject : rootProject.getChildren()) {
-                subProjects.add(subProject.getPath());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        GradleProject rootProject = modelBuilder.get();
+        return getSubProjects(rootProject);
+    }
+
+    private List<String> getSubProjects(GradleProject rootProject) {
+        List<String> subProjects = new ArrayList<>();
+        for (GradleProject subProject : rootProject.getChildren()) {
+            subProjects.add(subProject.getPath());
+            subProjects.addAll(getSubProjects(subProject));
         }
-        if(subProjects.isEmpty())
+        if (subProjects.isEmpty())
             subProjects.add("");
         return subProjects;
     }
