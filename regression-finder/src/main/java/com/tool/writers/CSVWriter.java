@@ -21,11 +21,6 @@ public class CSVWriter<T extends CSVItem> implements ItemWriter<T> {
         writer.newLine();
     }
 
-    public static <T extends CSVItem> CSVWriter<T> create(String filePath) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true)); 
-        return new CSVWriter<T>(writer);
-    }
-
     @Override
     public void close() throws IOException {
         if (writer != null) {
@@ -39,5 +34,10 @@ public class CSVWriter<T extends CSVItem> implements ItemWriter<T> {
             this.write(item);
         }
         this.writer.flush();
+    }
+
+    public static <T extends CSVItem> CSVWriter<T> create(String filePath) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true)); 
+        return new CSVWriter<T>(writer);
     }
 }
