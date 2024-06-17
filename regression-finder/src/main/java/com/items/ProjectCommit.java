@@ -26,10 +26,14 @@ public class ProjectCommit implements CSVItem {
 
     @Override
     public String toCSVString() {
+
+        return authorMail + "," + commitId + "," + getDate() + "," + message;
+    }
+
+    public String getDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getDefault());
-
-        return authorMail + "," + commitId + "," + dateFormat.format(time) + "," + message;
+        return dateFormat.format(time);
     }
 
     public String getCommitId() {
