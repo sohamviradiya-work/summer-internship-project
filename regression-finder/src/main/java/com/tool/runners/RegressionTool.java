@@ -52,6 +52,7 @@ public class RegressionTool {
 
         long end = System.currentTimeMillis();
 
+        blameWriter.close();
         projectInstance.close();
         finder.close();
 
