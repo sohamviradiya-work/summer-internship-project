@@ -1,6 +1,7 @@
 package com.tool.runners.gradle;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.events.OperationType;
@@ -47,6 +48,26 @@ public class ProjectBuilder {
             buildLauncher.run();
         } catch (Exception e) {
 
+        }
+        return events;
+    }
+
+    public List<ProgressEvent> runTestSuiteForSubProject(String subProjectName, String testSuiteName) {
+        buildLauncher.forTasks(subProjectName + ":test");
+        buildLauncher.withArguments("--tests", testSuiteName, "--continue", "--quiet", "--parallel");
+        List<ProgressEvent> events = new ArrayList<>();
+
+        buildLauncher.addProgressListener(new ProgressListener() {
+            @Override
+            public void statusChanged(ProgressEvent event) {
+                events.add(event);
+            }
+        }, OperationType.TEST);
+
+        try {
+            buildLauncher.run();
+        } catch (Exception e) {
+            
         }
         return events;
     }
