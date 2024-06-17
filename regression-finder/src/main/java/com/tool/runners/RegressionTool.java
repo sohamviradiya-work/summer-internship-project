@@ -16,6 +16,7 @@ import com.tool.finders.LinearRegressionFinder;
 import com.tool.finders.interfaces.Finder;
 import com.tool.runners.git.GitWorker;
 import com.tool.writers.CSVWriter;
+import com.tool.writers.JiraTicketWriter;
 import com.tool.writers.interfaces.ItemWriter;
 
 public class RegressionTool {
@@ -24,7 +25,7 @@ public class RegressionTool {
             String resultPath, boolean logCommits)
             throws IOException, NoHeadException, GitAPIException {
 
-        CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/" + method + ".csv");
+        JiraTicketWriter<RegressionBlame> blameWriter = JiraTicketWriter.create();
 
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(repositoryPath, testSrcPath, gradleVersion);
 
