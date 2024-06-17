@@ -26,12 +26,12 @@ public class JiraClient {
         return new JiraClient(jiraUrl, username, apiToken);
     }
 
-    public String createIssue(String projectKey, Long issueTypeId, JiraTicket jiraTicket)
+    public void createIssue(String projectKey, Long issueTypeId, JiraTicket jiraTicket)
             throws IOException {
 
         String endpoint = jiraUrl + "/rest/api/3/issue";
         String requestBody = getRequestBody(projectKey, issueTypeId, jiraTicket);
-        return sendPostRequest(endpoint, requestBody);
+        sendPostRequest(endpoint, requestBody);
     }
 
     public void close() {
@@ -90,7 +90,7 @@ public class JiraClient {
         return response.toString();
     }
 
-    private String sendPostRequest(String endpoint, String requestBody) throws IOException {
+    private void sendPostRequest(String endpoint, String requestBody) throws IOException {
         URL url = new URL(endpoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -111,8 +111,6 @@ public class JiraClient {
                 response.append(line);
             }
         }
-
-        return response.toString();
     }
 
     private String getAuthHeader() {
