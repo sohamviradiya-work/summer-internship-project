@@ -80,6 +80,9 @@ public class ProjectInstance {
     }
 
     public ArrayList<TestIdentifier> extractTestsToRun(ProjectCommit firstCommit, ProjectCommit lastCommit,ItemWriter<RegressionBlame> blameWriter) throws GitAPIException, IOException {
+        
+        System.out.println("Initial Run");
+        
         ArrayList<TestResult> testResults = runAllTestsForCommit(lastCommit);
     
         ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
@@ -94,6 +97,8 @@ public class ProjectInstance {
             failingTests.remove(testIdentifier);
             blameWriter.writeAll(blameTestOnAuthor(testIdentifier));
         }
+        System.out.println("Initial Run Complete");
+        
 
         return failingTests;
     }
