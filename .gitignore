@@ -9,6 +9,7 @@ gradle.properties
 .gradle/
 wrapper/
 build/
+bin/
 
 test-area/
 results/

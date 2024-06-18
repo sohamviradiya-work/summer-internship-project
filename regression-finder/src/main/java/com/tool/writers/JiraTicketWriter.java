@@ -2,6 +2,9 @@ package com.tool.writers;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.items.interfaces.JiraItem;
 import com.tool.jira.JiraClient;
@@ -11,31 +14,37 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class JiraTicketWriter<T extends JiraItem> implements ItemWriter<T> {
 
+    private static final int TIMEOUT_MINUTES = 10;
     private JiraClient client;
     private String issueTypeId;
     private String projectKey;
+    private ExecutorService executorService;
 
     public JiraTicketWriter(JiraClient client, String issueTypeId, String projectKey) {
         this.client = client;
         this.issueTypeId = issueTypeId;
         this.projectKey = projectKey;
+        this.executorService = Executors.newCachedThreadPool();
     }
 
     @Override
     public void write(T item) throws IOException {
-        this.client.createIssue(projectKey, Long.parseLong(issueTypeId), item.toJiraTicket());
+        writeIssue(item);
     }
 
     @Override
     public void writeAll(Collection<T> items) throws IOException {
-        for(T item:items){
-            this.write(item);
-        }
+        for (T item : items)
+            write(item);
     }
 
     @Override
     public void close() throws IOException {
-        client.close();
+        executorService.shutdown();
+    }
+
+    protected void writeIssue(T item) throws IOException {
+        this.client.createIssue(projectKey, Long.parseLong(issueTypeId), item.toJiraTicket());
     }
 
     public static <T extends JiraItem> JiraTicketWriter<T> create() throws IOException {
