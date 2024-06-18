@@ -33,7 +33,6 @@ public class ProjectManager {
     }
 
     public List<String> getSubProjects() {
-
         ModelBuilder<GradleProject> modelBuilder = getConnection().model(GradleProject.class);
         GradleProject rootProject = modelBuilder.get();
         return getSubProjects(rootProject);

@@ -16,6 +16,9 @@ import com.tool.runners.git.GitWorker;
 import com.tool.runners.gradle.GradleWorker;
 import com.tool.writers.interfaces.ItemWriter;
 
+
+// TODO: Parallel, one project instance per subproject
+
 public class ProjectInstance {
 
     private static String DEFAULT_GRADLE_VERSION = "7.6.4";

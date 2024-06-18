@@ -35,10 +35,12 @@ public class JiraTicketWriterTest {
         when(jiraItem.toJiraTicket()).thenReturn(new JiraTicket("test summary", "test description", "test@email.com"));
 
         jiraTicketWriter.write(jiraItem);
+        jiraTicketWriter.close();
 
         ArgumentCaptor<JiraTicket> captor = ArgumentCaptor.forClass(JiraTicket.class);
         ArgumentCaptor<String> projectKeyCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Long> issueTypeCaptor = ArgumentCaptor.forClass(Long.class);
+
 
         verify(jiraClient, times(1)).createIssue(projectKeyCaptor.capture(), issueTypeCaptor.capture(), captor.capture());
 
@@ -61,6 +63,7 @@ public class JiraTicketWriterTest {
 
         jiraTicketWriter.write(jiraItem1);
         jiraTicketWriter.write(jiraItem2);
+        jiraTicketWriter.close();
 
         ArgumentCaptor<JiraTicket> captor = ArgumentCaptor.forClass(JiraTicket.class);
         ArgumentCaptor<String> projectKeyCaptor = ArgumentCaptor.forClass(String.class);
@@ -96,6 +99,7 @@ public class JiraTicketWriterTest {
 
         List<JiraItem> items = List.of(jiraItem1, jiraItem2, jiraItem3);
         jiraTicketWriter.writeAll(items);
+        jiraTicketWriter.close();
 
         ArgumentCaptor<JiraTicket> captor = ArgumentCaptor.forClass(JiraTicket.class);
         ArgumentCaptor<String> projectKeyCaptor = ArgumentCaptor.forClass(String.class);
