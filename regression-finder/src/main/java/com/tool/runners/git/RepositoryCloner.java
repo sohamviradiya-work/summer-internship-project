@@ -7,39 +7,39 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import org.apache.sshd.common.session.Session;
 import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-
-import io.github.cdimascio.dotenv.Dotenv;
+import org.eclipse.jgit.transport.SshSessionFactory;
+import org.eclipse.jgit.transport.sshd.JGitKeyCache;
+import org.eclipse.jgit.transport.sshd.SshdSessionFactory;
+import org.eclipse.jgit.transport.sshd.SshdSessionFactoryBuilder;
+import org.eclipse.jgit.util.FS;
 
 public class RepositoryCloner {
 
     public static void getRemoteRepository(String path, String link, long lastDays)
             throws GitAPIException, IOException {
 
-        Dotenv dotenv = Dotenv.configure().directory("../").load();
-
-        String email = dotenv.get("GITHUB_EMAIL");
-        String token = dotenv.get("GITHUB_ACCESS_TOKEN");
-
         File dir = new File(path);
 
         Instant shallowSinceInstant = LocalDateTime.now().minusDays(lastDays).toInstant(ZoneOffset.UTC);
 
-        UsernamePasswordCredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(email, token);
+        File sshDir = new File(FS.DETECTED.userHome(), ".ssh");
+        SshdSessionFactory sshdSessionFactory = new SshdSessionFactoryBuilder()
+                .setPreferredAuthentications("publickey,keyboard-interactive,password")
+                .setHomeDirectory(FS.DETECTED.userHome())
+                .setSshDirectory(sshDir).build(new JGitKeyCache());
+        SshSessionFactory.setInstance(sshdSessionFactory);
 
         Git git = Git.cloneRepository()
                 .setURI(link)
-                .setCredentialsProvider(credentialsProvider)
                 .setShallowSince(shallowSinceInstant)
                 .setDirectory(dir)
                 .call();
-
-        git.fetch().setCredentialsProvider(credentialsProvider).call();
 
         List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
         for (Ref ref : remoteBranches) {

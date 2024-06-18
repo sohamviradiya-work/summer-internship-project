@@ -8,6 +8,10 @@ import java.nio.file.Files;
 
 import java.util.Scanner;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
+
+import com.tool.runners.git.RepositoryCloner;
+
 public class Helper {
 
     public static void create(String path) throws IOException {
@@ -35,6 +39,24 @@ public class Helper {
         }
     }
 
+    static boolean isRepoCloned(Scanner scanner) throws Exception {
+        System.out.print("Is repo already cloned? enter yes/no: ");
+        String prompt = scanner.nextLine();
+        prompt = prompt.trim().toLowerCase();
+        if (prompt.compareTo("yes") == 0)
+            return true;
+        else if (prompt.compareTo("no") == 0)
+            return false;
+        else
+            throw new Exception("Please answer yes or no");
+    }
+
+    static String getRepositoryPath(Scanner scanner) {
+        System.out.print("Get Repository path relative to root of the project: ");
+        String repositoryPath = scanner.nextLine();
+        return repositoryPath.trim();
+    }
+
     static String getRepositoryLink(Scanner scanner) {
         System.out.print("Enter Repository Link: ");
         String repositoryLink = scanner.nextLine();
@@ -48,12 +70,12 @@ public class Helper {
     }
 
     static String getTestSrcPath(Scanner scanner) {
-        // System.out.print("Enter Test Source Folder path relative to subproject/project root (ex: src/test/java/): ");
+        // System.out.print("Enter Test Source Folder path relative to
+        // subproject/project root (ex: src/test/java/): ");
         // String testPath = scanner.nextLine();
         // return testPath.trim();
         return "/src/test/java";
     }
-
 
     static int getDays(Scanner scanner) {
         System.out.print("Enter Number of days to consider: ");
@@ -61,11 +83,25 @@ public class Helper {
         return Integer.parseInt(days);
     }
 
-
-    static void setup(String repositoryPath, String resultsPath) throws IOException {
+    static void setupWithLink(String repositoryPath, String resultsPath,String repositoryLink,long days) throws IOException, GitAPIException {
         create(resultsPath);
         create(repositoryPath);
         clean(repositoryPath);
         clean(resultsPath);
+        RepositoryCloner.getRemoteRepository(repositoryPath, repositoryLink, days);
+    }
+
+    static String setUpRepository(String repositoryPath, String resultsPath, Scanner scanner)
+            throws Exception, IOException, GitAPIException {
+        boolean isRepoCloned = isRepoCloned(scanner);
+    
+        if (isRepoCloned) {
+            repositoryPath = "../" + getRepositoryPath(scanner);
+        } else {
+            String repositoryLink = getRepositoryLink(scanner);
+            int days = getDays(scanner);
+            setupWithLink(repositoryPath, resultsPath, repositoryLink, days);
+        }
+        return repositoryPath;
     }
 }
