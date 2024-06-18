@@ -131,6 +131,7 @@ public class GitWorker {
                 branchCommitMap.get(projectCommit.getBranch()).add(projectCommit);
                 assignedCommits.add(projectCommit.getCommitId());
             }
+            if(!branchCommitMap.containsKey(branchName)) continue;
             Collections.reverse(branchCommitMap.get(branchName));
         }
         return branchCommitMap;

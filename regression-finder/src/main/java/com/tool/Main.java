@@ -28,7 +28,7 @@ public class Main {
             System.out.println("time: " + time + " ms");
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

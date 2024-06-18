@@ -49,6 +49,7 @@ public class RegressionTool {
             ArrayList<TestIdentifier> testsTorun = projectInstance.extractTestsToRun(firstCommit, lastCommit,
                     blameWriter);
             finder.runForTests(projectCommits, testsTorun);
+            gitWorker.checkoutToCommit(lastCommit);
         }
 
         long end = System.currentTimeMillis();
@@ -87,6 +88,7 @@ public class RegressionTool {
             ArrayList<TestIdentifier> testsTorun = projectInstance.extractTestsToRun(firstCommit, lastCommit,
                     blameWriter, tests);
             finder.runForTests(projectCommits, testsTorun);
+            gitWorker.checkoutToCommit(lastCommit);
         }
 
         long end = System.currentTimeMillis();

@@ -95,7 +95,7 @@ public class Helper {
     private static ArrayList<TestIdentifier> getTestInputFromFile(Scanner scanner) throws IOException {
         ArrayList<TestIdentifier> testIdentifiers = new ArrayList<>();
         System.out.print("Enter file path relative to project root: ");
-        String filePath = "../" + scanner.nextLine();
+        String filePath = "../" + scanner.nextLine().trim();
         Path path = Paths.get(filePath);
          List<String> lines = Files.readAllLines(path);
         
