@@ -16,7 +16,6 @@ import com.tool.runners.git.GitWorker;
 import com.tool.runners.gradle.GradleWorker;
 import com.tool.writers.interfaces.ItemWriter;
 
-
 // TODO: Parallel, one project instance per subproject
 
 public class ProjectInstance {
@@ -82,44 +81,48 @@ public class ProjectInstance {
         return false;
     }
 
-    public ArrayList<TestIdentifier> extractTestsToRun(ProjectCommit firstCommit, ProjectCommit lastCommit,ItemWriter<RegressionBlame> blameWriter) throws GitAPIException, IOException {
-        
+    public ArrayList<TestIdentifier> extractTestsToRun(ProjectCommit firstCommit, ProjectCommit lastCommit,
+            ItemWriter<RegressionBlame> blameWriter) throws GitAPIException, IOException {
+
         System.out.println("Initial Run");
-        
+
         ArrayList<TestResult> testResults = runAllTestsForCommit(lastCommit);
-    
+
         ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
-    
-        ArrayList<TestResult> lastPhaseTestResults = runTestsForCommit(failingTests,firstCommit,lastCommit);
-    
+
+        ArrayList<TestResult> lastPhaseTestResults = runTestsForCommit(failingTests, firstCommit, lastCommit);
+
         HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(lastPhaseTestResults);
-    
+
         gitWorker.checkoutToCommit(lastCommit);
-       
+
         for (TestIdentifier testIdentifier : falseWrittenTests) {
             failingTests.remove(testIdentifier);
-            blameWriter.writeAll(blameTestOnAuthor(testIdentifier));
+            blameWriter.writeAll(blameTestOnAuthor(testIdentifier, firstCommit));
         }
         System.out.println("Initial Run Complete");
-        
 
         return failingTests;
     }
 
+    private ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier, ProjectCommit firstCommit)
+            throws GitAPIException {
 
-    private ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier) throws GitAPIException {
+        String testFilePath = testIdentifier.getTestProject() + "/" + testSrcPath + "/"
+                + testIdentifier.getTestClass().replace(".", "/");
 
-        String testFilePath = testIdentifier.getTestProject() + "/" + testSrcPath + "/" + testIdentifier.getTestClass().replace(".", "/");
+        testFilePath = testFilePath.replaceAll("\\.", "")
+                .replaceAll(":", "/")
+                .replaceAll("/{2,}", "/").substring(1) + ".java";
 
-        testFilePath = testFilePath.replaceAll("\\.", "")  
-        .replaceAll(":", "/")   
-        .replaceAll("/{2,}", "/").substring(1) + ".java";
-        
         ArrayList<ProjectCommit> authorCommits = gitWorker.blameTest(testFilePath, testIdentifier.getTestMethod());
 
-        ArrayList<RegressionBlame> regressionBlames = new ArrayList<>(); 
-        for(ProjectCommit authorCommit:authorCommits){
-            regressionBlames.add(new RegressionBlame(testIdentifier,authorCommit, false));
+        ArrayList<RegressionBlame> regressionBlames = new ArrayList<>();
+        for (ProjectCommit authorCommit : authorCommits) {
+            if (authorCommit.getCommitId().compareTo(firstCommit.getCommitId()) == 0)
+                regressionBlames.add(new RegressionBlame(testIdentifier, ProjectCommit.getLastPhaseCommit(), false));
+            else
+                regressionBlames.add(new RegressionBlame(testIdentifier, authorCommit, false));
         }
         return regressionBlames;
     }

@@ -1,6 +1,7 @@
 package com.items;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -55,5 +56,9 @@ public class ProjectCommit implements CSVItem {
                 branchName,
                 commit.getAuthorIdent().getWhen(),
                 commit.getShortMessage());
+    }
+
+    public static ProjectCommit getLastPhaseCommit() {
+        return new ProjectCommit("LAST PHASE", "LAST PHASE", "LAST PHASE", Date.from(Instant.now()), "LAST PHASE");
     }
 }

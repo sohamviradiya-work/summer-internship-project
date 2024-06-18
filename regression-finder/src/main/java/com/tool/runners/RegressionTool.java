@@ -25,8 +25,8 @@ public class RegressionTool {
             String resultPath, boolean logCommits)
             throws IOException, NoHeadException, GitAPIException {
 
-        // CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/blame.csv");
-        JiraTicketWriter<RegressionBlame> blameWriter = JiraTicketWriter.create();
+        CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/blame.csv");
+        // JiraTicketWriter<RegressionBlame> blameWriter = JiraTicketWriter.create();
 
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(repositoryPath, testSrcPath, gradleVersion);
 
