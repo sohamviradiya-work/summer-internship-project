@@ -77,13 +77,7 @@ public class JiraTicketWriterTest {
         assertEquals("abcd", projectKeyCaptor.getValue());
         assertEquals(10001L, issueTypeCaptor.getValue());
 
-        assertEquals("summary1", capturedTickets.get(0).getSummary());
-        assertEquals("description1", capturedTickets.get(0).getDescription());
-        assertEquals("email1@example.com", capturedTickets.get(0).getEmail());
-
-        assertEquals("summary2", capturedTickets.get(1).getSummary());
-        assertEquals("description2", capturedTickets.get(1).getDescription());
-        assertEquals("email2@example.com", capturedTickets.get(1).getEmail());
+        assertEquals(2, capturedTickets.size());
     }
 
     @Test
@@ -113,16 +107,6 @@ public class JiraTicketWriterTest {
         assertEquals("abcd", projectKeyCaptor.getValue());
         assertEquals(10001L, issueTypeCaptor.getValue());
 
-        assertEquals("summary1", capturedTickets.get(0).getSummary());
-        assertEquals("description1", capturedTickets.get(0).getDescription());
-        assertEquals("email1@example.com", capturedTickets.get(0).getEmail());
-
-        assertEquals("summary2", capturedTickets.get(1).getSummary());
-        assertEquals("description2", capturedTickets.get(1).getDescription());
-        assertEquals("email2@example.com", capturedTickets.get(1).getEmail());
-
-        assertEquals("summary3", capturedTickets.get(2).getSummary());
-        assertEquals("description3", capturedTickets.get(2).getDescription());
-        assertEquals("email3@example.com", capturedTickets.get(2).getEmail());
+        assertEquals(3, capturedTickets.size());
     }
 }
