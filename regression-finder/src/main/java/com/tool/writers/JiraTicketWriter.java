@@ -1,10 +1,13 @@
 package com.tool.writers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
 import com.items.interfaces.JiraItem;
 import com.tool.jira.JiraClient;
@@ -14,22 +17,29 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class JiraTicketWriter<T extends JiraItem> implements ItemWriter<T> {
 
-    private static final int TIMEOUT_MINUTES = 10;
     private JiraClient client;
     private String issueTypeId;
     private String projectKey;
     private ExecutorService executorService;
+    private List<Future<?>> futures;
 
     public JiraTicketWriter(JiraClient client, String issueTypeId, String projectKey) {
         this.client = client;
         this.issueTypeId = issueTypeId;
         this.projectKey = projectKey;
         this.executorService = Executors.newCachedThreadPool();
+        this.futures = new ArrayList<>();
     }
 
     @Override
     public void write(T item) throws IOException {
-        writeIssue(item);
+        futures.add(executorService.submit(() -> {
+            try {
+                writeIssue(item);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
     }
 
     @Override
@@ -41,6 +51,13 @@ public class JiraTicketWriter<T extends JiraItem> implements ItemWriter<T> {
     @Override
     public void close() throws IOException {
         executorService.shutdown();
+        for (Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (InterruptedException|ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     protected void writeIssue(T item) throws IOException {
@@ -61,5 +78,4 @@ public class JiraTicketWriter<T extends JiraItem> implements ItemWriter<T> {
 
         return new JiraTicketWriter<>(jiraClient, issueTypeId, projectKey);
     }
-
 }
