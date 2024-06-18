@@ -48,9 +48,10 @@ public class Helper {
     }
 
     static String getTestSrcPath(Scanner scanner) {
-        System.out.print("Enter Test Source Folder path relative to subproject/project root (ex: src/test/java/): ");
-        String testPath = scanner.nextLine();
-        return testPath.trim();
+        // System.out.print("Enter Test Source Folder path relative to subproject/project root (ex: src/test/java/): ");
+        // String testPath = scanner.nextLine();
+        // return testPath.trim();
+        return "/src/test/java";
     }
 
 

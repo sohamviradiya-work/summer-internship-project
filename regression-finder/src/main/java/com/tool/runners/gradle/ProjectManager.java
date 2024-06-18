@@ -35,6 +35,7 @@ public class ProjectManager {
     public List<String> getSubProjects() {
         ModelBuilder<GradleProject> modelBuilder = getConnection().model(GradleProject.class);
         GradleProject rootProject = modelBuilder.get();
+        
         List<String> subProjects = getSubProjects(rootProject);
 
         if (subProjects.isEmpty())
