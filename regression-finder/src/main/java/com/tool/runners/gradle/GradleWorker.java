@@ -31,9 +31,11 @@ public class GradleWorker {
     public ArrayList<TestResult> runTests(List<TestIdentifier> testIdentifiers) throws IOException {
         HashMap<String, HashMap<String, List<String>>> testGroups = TestIdentifier.groupByProjectClass(testIdentifiers);
         ArrayListWriter<TestResult> testResultsWriter = ArrayListWriter.create();
-        for (String testProject : testGroups.keySet()) {
-            testResultsWriter.writeAll(runTestsForProject(testProject, testGroups.get(testProject)));
+        for (String testProjectName : testGroups.keySet()) {
+            System.out.println("Running tests for project: " + testProjectName);
+            testResultsWriter.writeAll(runTestsForProject(testProjectName, testGroups.get(testProjectName)));
         }
+        System.out.println("Test run complete");
 
         return testResultsWriter.getList();
     }
@@ -45,23 +47,26 @@ public class GradleWorker {
         return extractResults(testProjectName, events);
     }
 
-    private ArrayList<TestResult> runAlltestsForProject(String testProjectName) {
-        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager);
-        ArrayList<ProgressEvent> events = projectBuilder.runAlltestsForProject(testProjectName);
-        return extractResults(testProjectName, events);
-    }
 
     public ArrayList<TestResult> runAllTests() throws IOException {
 
         List<String> subProjects = projectManager.getSubProjects();
         ArrayListWriter<TestResult> testResultsWriter = ArrayListWriter.create();
         for (String testProjectName : subProjects) {
+            System.out.println("Running tests for project: " + testProjectName);
             testResultsWriter.writeAll(runAlltestsForProject(testProjectName));
         }
+        System.out.println("Test run complete");
 
         ArrayList<TestResult> testResults = testResultsWriter.getList();
 
         return testResults;
+    }
+
+    private ArrayList<TestResult> runAlltestsForProject(String testProjectName) {
+        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager);
+        ArrayList<ProgressEvent> events = projectBuilder.runAlltestsForProject(testProjectName);
+        return extractResults(testProjectName, events);
     }
 
     public void syncDependencies() {
