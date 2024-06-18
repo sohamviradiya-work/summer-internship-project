@@ -105,6 +105,30 @@ public class ProjectInstance {
         return failingTests;
     }
 
+    public ArrayList<TestIdentifier> extractTestsToRun(ProjectCommit firstCommit, ProjectCommit lastCommit,
+            ItemWriter<RegressionBlame> blameWriter, ArrayList<TestIdentifier> testIdentifiers)
+            throws GitAPIException, IOException {
+
+        System.out.println("Initial Run");
+
+
+        ArrayList<TestIdentifier> failingTests = testIdentifiers;        
+
+        ArrayList<TestResult> lastPhaseTestResults = runTestsForCommit(failingTests, firstCommit, lastCommit);
+
+        HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(lastPhaseTestResults);
+
+        gitWorker.checkoutToCommit(lastCommit);
+
+        for (TestIdentifier testIdentifier : falseWrittenTests) {
+            failingTests.remove(testIdentifier);
+            blameWriter.writeAll(blameTestOnAuthor(testIdentifier, firstCommit));
+        }
+        System.out.println("Initial Run Complete");
+
+        return failingTests;
+    }
+
     private ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier, ProjectCommit firstCommit)
             throws GitAPIException {
 
