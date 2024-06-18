@@ -35,7 +35,12 @@ public class ProjectManager {
     public List<String> getSubProjects() {
         ModelBuilder<GradleProject> modelBuilder = getConnection().model(GradleProject.class);
         GradleProject rootProject = modelBuilder.get();
-        return getSubProjects(rootProject);
+        List<String> subProjects = getSubProjects(rootProject);
+
+        if (subProjects.isEmpty())
+            subProjects.add("");
+
+        return subProjects;
     }
 
     private List<String> getSubProjects(GradleProject rootProject) {
@@ -44,8 +49,6 @@ public class ProjectManager {
             subProjects.add(subProject.getPath());
             subProjects.addAll(getSubProjects(subProject));
         }
-        if (subProjects.isEmpty())
-            subProjects.add("");
         return subProjects;
     }
 }
