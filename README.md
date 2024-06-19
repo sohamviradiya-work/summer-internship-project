@@ -19,6 +19,7 @@ The Regression Finder Tool is designed to identify the specific commit that caus
 - **Gradle**: Ensure Gradle is installed and properly configured.
 
 ## Installation and Setup
+
 1. **Cloning the Repository**:  
    To start using the Regression Finder Tool, clone the repository from GitHub:
    ```sh
@@ -34,11 +35,15 @@ The Regression Finder Tool is designed to identify the specific commit that caus
    gradle wrapper
    ```
 
-3. **Running the Tool**:  
+3. **Setting Up the Config File**:    
+   See format in `./config.json`.
+
+
+4. **Running the Tool**:  
    Execute the tool using the following command:
    ```sh
    ./gradlew :regression-finder:run
    ```
 
-4. **Output**:  
-   The results will be generated and stored in a CSV file located at `./resources/results/`.
+5. **Output**:  
+   The results will be generated and stored in a CSV file located at `./results/`.
