@@ -137,7 +137,7 @@ public class GitWorker {
 
                 branchCommitMap.get(projectCommit.getBranch()).add(projectCommit);
                 assignedCommits.add(projectCommit.getCommitId());
-                if (projectCommit.getCommitId().compareTo(firstCommit) == 0)
+                if (firstCommit!=null && projectCommit.getCommitId().compareTo(firstCommit) == 0)
                     break;
             }
             if (!branchCommitMap.containsKey(branchName))
