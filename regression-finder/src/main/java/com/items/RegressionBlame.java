@@ -51,4 +51,8 @@ public class RegressionBlame implements CSVItem, JiraItem {
 
         return new JiraTicket(summary, description, this.projectCommit.getAuthor());
     }
+
+    public String getInfo() {
+        return this.testIdentifier.toCSVString() + this.projectCommit.getCommitId();
+    }
 }
