@@ -4,6 +4,7 @@ import org.eclipse.jgit.api.BlameCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
@@ -49,13 +50,16 @@ public class GitWorker {
         this.revWalk = new RevWalk(git.getRepository());
     }
 
-    public void close() {
+    public void close(String headRef) throws IOException, GitAPIException {
+        System.out.println(headRef);
+        git.checkout().setName(headRef).call();
         this.git.close();
     }
 
     public void checkoutToCommit(ProjectCommit projectCommit)
             throws GitAPIException, IllegalArgumentException, IOException {
-        System.out.println("Checked out to commit: " + Config.ANSI_YELLOW + projectCommit.getInfo() + Config.ANSI_RESET);
+        System.out
+                .println("Checked out to commit: " + Config.ANSI_YELLOW + projectCommit.getInfo() + Config.ANSI_RESET);
         String commitTag = projectCommit.getCommitId();
         Repository repository = git.getRepository();
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
@@ -116,7 +120,7 @@ public class GitWorker {
             String branchName = branch.getName();
             ObjectId branchObjectId = repository.resolve(branchName);
 
-            if (branchObjectId == null || branchName=="HEAD")
+            if (branchObjectId == null || branchName == "HEAD")
                 continue;
 
             Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
@@ -132,39 +136,14 @@ public class GitWorker {
 
                 branchCommitMap.get(projectCommit.getBranch()).add(projectCommit);
                 assignedCommits.add(projectCommit.getCommitId());
-                if(projectCommit.getCommitId().compareTo(firstCommit)==0)
+                if (projectCommit.getCommitId().compareTo(firstCommit) == 0)
                     break;
             }
-            if(!branchCommitMap.containsKey(branchName)) continue;
+            if (!branchCommitMap.containsKey(branchName))
+                continue;
             Collections.reverse(branchCommitMap.get(branchName));
         }
         return branchCommitMap;
-    }
-
-    public void restoreRepository() throws InvalidRemoteException, TransportException, GitAPIException, IOException {
-        git.fetch().call();
-
-        List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
-
-        for (Ref ref : remoteBranches) {
-            String remoteBranchName = ref.getName();
-            String localBranchName = remoteBranchName.replace("refs/remotes/origin/", "");
-
-            Ref localBranch = git.getRepository().findRef(localBranchName);
-            if (localBranch != null) {
-                git.checkout().setName(localBranchName).call();
-
-                git.reset().setMode(org.eclipse.jgit.api.ResetCommand.ResetType.HARD)
-                        .setRef(remoteBranchName).call();
-            } else {
-                git.checkout().setCreateBranch(true)
-                        .setName(localBranchName)
-                        .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-                        .setStartPoint(remoteBranchName)
-                        .call();
-            }
-            System.out.println("Reseted branch " + localBranchName);
-        }
     }
 
     public static GitWorker mountGitWorker(File directory) throws IOException {
@@ -178,8 +157,8 @@ public class GitWorker {
         BlameCommand blameCommand = git.blame().setFilePath(filePath);
         BlameResult blameResult = blameCommand.call();
 
-        if(blameResult==null){
-            throw new RuntimeException("Invalid path: " + filePath + "," +testName);
+        if (blameResult == null) {
+            throw new RuntimeException("Invalid path: " + filePath + "," + testName);
         }
 
         String functionSignaturePattern = testName + "\\s*\\([^\\)]*\\)\\s*\\{";
@@ -219,15 +198,15 @@ public class GitWorker {
         if (startLine == -1 || endLine == -1) {
             throw new IllegalStateException("Function not found in the file.");
         }
-        
+
         HashSet<String> authorCommitIDs = new HashSet<>();
         ArrayList<ProjectCommit> authorCommits = new ArrayList<>();
 
         for (int i = startLine; i <= endLine; i++) {
             RevCommit commit = blameResult.getSourceCommit(i);
-            if(authorCommitIDs.contains(commit.getName()))
+            if (authorCommitIDs.contains(commit.getName()))
                 continue;
-            else{
+            else {
                 authorCommits.add(ProjectCommit.getprojectCommitFromRevCommit("", commit));
                 authorCommitIDs.add(commit.getName());
             }

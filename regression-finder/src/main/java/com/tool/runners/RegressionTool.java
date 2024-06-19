@@ -38,6 +38,7 @@ public class RegressionTool {
 
         long start = System.currentTimeMillis();
 
+        String initialBranch = "";
         for (String branch : branchWiseCommitList.keySet()) {
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
 
@@ -47,11 +48,12 @@ public class RegressionTool {
             ArrayList<TestIdentifier> testsTorun = projectInstance.extractTestsToRun(firstCommit, lastCommit, blameWriter, tests);
             finder.runForTests(projectCommits, testsTorun);
             gitWorker.checkoutToCommit(lastCommit);
+            initialBranch = branch;
         }
 
         long end = System.currentTimeMillis();
 
-        projectInstance.close();
+        projectInstance.close(initialBranch);
         finder.close();
         blameWriter.close();
 
@@ -92,7 +94,7 @@ public class RegressionTool {
 
         long end = System.currentTimeMillis();
 
-        projectInstance.close();
+       // projectInstance.close();
         finder.close();
         blameWriter.close();
 

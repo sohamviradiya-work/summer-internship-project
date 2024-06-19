@@ -36,8 +36,8 @@ public class ProjectInstance {
         return gitWorker;
     }
 
-    public void close() throws IOException, GitAPIException {
-        this.gitWorker.close();
+    public void close(String mainBranch) throws IOException, GitAPIException {
+        this.gitWorker.close(mainBranch);
         this.gradleWorker.close();
     }
 
