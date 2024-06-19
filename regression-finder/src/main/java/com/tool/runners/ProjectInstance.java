@@ -93,8 +93,6 @@ public class ProjectInstance {
 
         HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(lastPhaseTestResults);
 
-        gitWorker.checkoutToCommit(lastCommit);
-
         for (TestIdentifier testIdentifier : falseWrittenTests) {
             failingTests.remove(testIdentifier);
             blameWriter.writeAll(blameTestOnAuthor(testIdentifier, firstCommit));
@@ -107,7 +105,7 @@ public class ProjectInstance {
             ItemWriter<RegressionBlame> blameWriter, ArrayList<TestIdentifier> testIdentifiers)
             throws GitAPIException, IOException {
 
-        List<TestIdentifier> failingTests =  List.copyOf(TestResult.extractFailingTests(runTestsForCommit(testIdentifiers, lastCommit, lastCommit)));
+        ArrayList<TestIdentifier> failingTests =  new ArrayList<>(List.copyOf(TestResult.extractFailingTests(runTestsForCommit(testIdentifiers, lastCommit, lastCommit))));
 
         HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(runTestsForCommit(failingTests, firstCommit, lastCommit));
 
@@ -115,7 +113,7 @@ public class ProjectInstance {
             failingTests.remove(testIdentifier);
             blameWriter.writeAll(blameTestOnAuthor(testIdentifier, firstCommit));
         }
-        return new ArrayList<>(failingTests);
+        return failingTests;
     }
 
     private ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier, ProjectCommit firstCommit)
