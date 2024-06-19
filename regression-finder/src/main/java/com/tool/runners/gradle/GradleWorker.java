@@ -32,10 +32,8 @@ public class GradleWorker {
         HashMap<String, HashMap<String, List<String>>> testGroups = TestIdentifier.groupByProjectClass(testIdentifiers);
         ArrayListWriter<TestResult> testResultsWriter = ArrayListWriter.create();
         for (String testProjectName : testGroups.keySet()) {
-            System.out.println("Running tests for project: " + testProjectName);
             testResultsWriter.writeAll(runTestsForProject(testProjectName, testGroups.get(testProjectName)));
         }
-        System.out.println("Test run complete");
 
         return testResultsWriter.getList();
     }
@@ -47,16 +45,13 @@ public class GradleWorker {
         return extractResults(testProjectName, events);
     }
 
-
     public ArrayList<TestResult> runAllTests() throws IOException {
 
         List<String> subProjects = projectManager.getSubProjects();
         ArrayListWriter<TestResult> testResultsWriter = ArrayListWriter.create();
         for (String testProjectName : subProjects) {
-            System.out.println("Running tests for project: " + testProjectName);
             testResultsWriter.writeAll(runAlltestsForProject(testProjectName));
         }
-        System.out.println("Test run complete");
 
         ArrayList<TestResult> testResults = testResultsWriter.getList();
 
@@ -78,15 +73,16 @@ public class GradleWorker {
         return new GradleWorker(ProjectManager.mountGradleProject(gradleVersion, directory));
     }
 
-
     private static ArrayList<TestResult> extractResults(String testProjectName,
             ArrayList<ProgressEvent> events) {
         ArrayList<TestResult> testResults = new ArrayList<>();
         for (ProgressEvent event : events) {
             if (event instanceof DefaultTestFinishEvent) {
                 TestResult testResult = GradleWorker.extractResult(event, testProjectName);
-                if (testResult != null)
+                if (testResult != null){
+                    System.out.println("Test run complete: "+ testResult.toCSVString());
                     testResults.add(testResult);
+                }
             }
         }
         return testResults;

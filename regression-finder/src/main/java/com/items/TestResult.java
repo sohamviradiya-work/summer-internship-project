@@ -33,7 +33,7 @@ public class TestResult implements CSVItem{
     }
 
     public String toCSVString() {
-        return testIdentifier.getTestProject() + "," + testIdentifier.getTestClass() + "," + testIdentifier.getTestMethod() + "," + result.name();
+        return testIdentifier.toCSVString() + "," + result.name();
     }
 
     public Result getResult(){
