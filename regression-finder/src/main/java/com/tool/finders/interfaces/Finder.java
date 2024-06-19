@@ -15,6 +15,4 @@ public interface Finder {
     void runForTests(ArrayList<ProjectCommit> projectCommits,ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException;
 
     void close() throws IOException;
-
-    void setTotalTests(int totalTests);
 }

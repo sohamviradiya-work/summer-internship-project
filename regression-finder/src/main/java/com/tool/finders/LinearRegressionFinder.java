@@ -19,7 +19,6 @@ public class LinearRegressionFinder implements Finder {
 
     protected ProjectInstance projectInstance;
     private ItemWriter<RegressionBlame> blameWriter;
-    private int remainingTests;
 
     public LinearRegressionFinder(ProjectInstance projectInstance, ItemWriter<RegressionBlame> blameWriter) {
         this.projectInstance = projectInstance;
@@ -61,20 +60,12 @@ public class LinearRegressionFinder implements Finder {
 
     @Override
     public void runForTests(ArrayList<ProjectCommit> projectCommits, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
-        setTotalTests(testIdentifiers.size());
         runForCommitsAndTests(projectCommits,0,projectCommits.size() - 2,testIdentifiers);
     }
 
     public void putBlame(RegressionBlame regressionBlame) throws IOException {
-        remainingTests--;
         System.out.println("Blame found: "+ Config.ANSI_CYAN + regressionBlame.getInfo() + Config.ANSI_RESET);
         blameWriter.write(regressionBlame);
-        System.out.println("Remaining Tests: " + remainingTests);
-    }
-
-    @Override
-    public void setTotalTests(int totalTests) {
-        this.remainingTests = totalTests;
     }
 
     @Override
