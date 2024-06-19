@@ -46,10 +46,7 @@ public class Config {
 
     public static Config mountConfig()
             throws StreamReadException, DatabindException, IOException, GitAPIException {
-
-        String path = getConfigPath();
-
-        FileReader jsonReader = new FileReader(BASE_DIRECTORY + path);
+        FileReader jsonReader = new FileReader(BASE_DIRECTORY + DEFAULT_CONFIG);
         ObjectMapper objectMapper = new ObjectMapper();
         Config dryConfig = objectMapper.readValue(jsonReader, Config.class);
 
@@ -78,17 +75,6 @@ public class Config {
                 testIdentifiers);
     }
 
-    private static String getConfigPath() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter config path (default: ./config.json) :");
-        String configPath = scanner.nextLine();
-        scanner.close();
-        if (configPath.length() < 1)
-            return DEFAULT_CONFIG;
-        else
-            return configPath;
-
-    }
 
     private static ArrayList<TestIdentifier> getTestInputFromFile(String filePath) throws IOException {
         ArrayList<TestIdentifier> testIdentifiers = new ArrayList<>();
