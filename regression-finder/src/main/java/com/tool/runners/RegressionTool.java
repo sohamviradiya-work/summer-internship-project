@@ -60,9 +60,8 @@ public class RegressionTool {
         return end - start;
     }
 
-
     public static long run(String repositoryPath, String testSrcPath, String gradleVersion, String method,
-            String resultPath, boolean logCommits,String initialCommit)
+            String resultPath, boolean logCommits, String initialCommit)
             throws IOException, NoHeadException, GitAPIException {
 
         CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/blame.csv");
@@ -94,7 +93,7 @@ public class RegressionTool {
 
         long end = System.currentTimeMillis();
 
-       // projectInstance.close();
+        // projectInstance.close();
         finder.close();
         blameWriter.close();
 

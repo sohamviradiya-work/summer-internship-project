@@ -1,14 +1,10 @@
 package com.tool.runners.git;
 
 import org.eclipse.jgit.api.BlameCommand;
-import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListBranchCommand.ListMode;
-import org.eclipse.jgit.api.ResetCommand;
+import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.blame.BlameResult;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -51,7 +47,6 @@ public class GitWorker {
     }
 
     public void close(String headRef) throws IOException, GitAPIException {
-        System.out.println(headRef);
         git.checkout().setName(headRef).call();
         this.git.close();
     }
@@ -63,7 +58,13 @@ public class GitWorker {
         String commitTag = projectCommit.getCommitId();
         Repository repository = git.getRepository();
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
-        git.checkout().setName(commit.getName()).call();
+        try{
+            git.checkout().setName(commit.getName()).call();
+        }
+        catch(CheckoutConflictException e){
+            System.out.println("Failed to checkout, Discard the changes in working directory and re-run the program");
+            System.exit(0);
+        }
     }
 
     public ArrayList<String> getChangedFiles(String commitTagA, String commitTagB) {
