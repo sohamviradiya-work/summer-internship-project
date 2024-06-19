@@ -26,8 +26,10 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
     }
 
     private void bisectForCommitsAndTest(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex, int lastIndex, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
+        if(testIdentifiers.isEmpty())
+            return;
 
-        if (startIndex >= endIndex - 1 || testIdentifiers.isEmpty()) {
+        if (startIndex >= endIndex - 1) {
             super.runForCommitsAndTests(projectCommits, startIndex, startIndex, testIdentifiers);
             return;
         }
@@ -50,8 +52,11 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
         ArrayList<TestIdentifier> failedTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
         ArrayList<TestIdentifier> passedTests = new ArrayList<>(TestResult.extractNotFailingTests(testResults,testIdentifiers));
         
-        bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, failedTests);
-        bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, passedTests);
+        if(!failedTests.isEmpty())
+            bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, failedTests);
+
+        if(!passedTests.isEmpty())
+            bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, passedTests);
     }
 
 }
