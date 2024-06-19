@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.SshSessionFactory;
@@ -18,9 +20,11 @@ import org.eclipse.jgit.util.FS;
 
 public class RepositoryCloner {
 
-    public static void getRemoteRepository(String path, String link, long lastDays)
+    public static void getRemoteRepository(String path, String link, long lastDays,List<String> branches)
             throws GitAPIException, IOException {
-     
+                
+        branches.replaceAll(branch -> ("refs/heads/" + branch));
+
         File dir = new File(path);
 
         Instant shallowSinceInstant = LocalDateTime.now().minusDays(lastDays).toInstant(ZoneOffset.UTC);
@@ -34,9 +38,16 @@ public class RepositoryCloner {
 
         Git git = Git.cloneRepository()
                 .setURI(link)
+                .setBranchesToClone(branches)
                 .setShallowSince(shallowSinceInstant)
                 .setDirectory(dir)
                 .call();
+
+
+        List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
+        for (Ref ref : remoteBranches) {
+            RepositoryCloner.cloneBranchToLocal(git, ref);
+        }
 
         System.out.println("Cloning Complete");
         return;

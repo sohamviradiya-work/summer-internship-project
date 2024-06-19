@@ -25,7 +25,7 @@ public class Config {
     public String method;
     public long days;
     public String resultsPath;
-    public String branch;
+    public List<String> branches;
     public ArrayList<TestIdentifier> tests;
     public String testInputFile;
     public String testSrcPath;
@@ -35,12 +35,9 @@ public class Config {
     public Config() {
     }
 
-    public Config(String repositoryPath, String repositoryLink, long days, String resultsPath, String testSrcPath,
-            String method,
+    public Config(String repositoryPath, String resultsPath, String testSrcPath, String method,
             ArrayList<TestIdentifier> testIdentifiers) {
         this.repositoryPath = repositoryPath;
-        this.repositoryLink = repositoryLink;
-        this.days = days;
         this.resultsPath = resultsPath;
         this.testSrcPath = testSrcPath;
         this.tests = testIdentifiers;
@@ -70,14 +67,15 @@ public class Config {
         if (dryConfig.repositoryLink != null) {
             create(dryConfig.repositoryPath);
             clean(dryConfig.repositoryPath);
-            RepositoryCloner.getRemoteRepository(dryConfig.repositoryPath, dryConfig.repositoryLink, dryConfig.days);
+            RepositoryCloner.getRemoteRepository(dryConfig.repositoryPath, dryConfig.repositoryLink, dryConfig.days,
+                    dryConfig.branches);
         }
 
         create(dryConfig.resultsPath);
         clean(dryConfig.resultsPath);
 
-        return new Config(dryConfig.repositoryPath, dryConfig.repositoryLink, dryConfig.days, dryConfig.resultsPath,
-                dryConfig.testSrcPath, dryConfig.method, testIdentifiers);
+        return new Config(dryConfig.repositoryPath, dryConfig.resultsPath, dryConfig.testSrcPath, dryConfig.method,
+                testIdentifiers);
     }
 
     private static String getConfigPath() {
