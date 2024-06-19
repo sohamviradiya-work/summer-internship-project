@@ -1,8 +1,9 @@
 {
     "repositoryLink" : "git@github.com:sohamviradiya-work/small-test-repo.git",
     "repositoryPath" : "./resources/repository",
-    "branches" : ["main","test"],
+    "branches" : ["main"],
     "days" : 7,
+    "firstCommit" : null,
     "testInputFile" : "./tests.csv",
     "testSrcPath" : "/src/test/java/",
     "tests": [

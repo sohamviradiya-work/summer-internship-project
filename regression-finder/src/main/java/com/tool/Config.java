@@ -29,6 +29,8 @@ public class Config {
     public ArrayList<TestIdentifier> tests;
     public String testInputFile;
     public String testSrcPath;
+    public String firstCommit;
+
     private static final String DEFAULT_CONFIG = "./config.json";
     private static final String BASE_DIRECTORY = "../";
     public static final String ANSI_RESET = "\u001B[0m";
@@ -70,7 +72,7 @@ public class Config {
             create(dryConfig.repositoryPath);
             clean(dryConfig.repositoryPath);
             RepositoryCloner.getRemoteRepository(dryConfig.repositoryPath, dryConfig.repositoryLink, dryConfig.days,
-                    dryConfig.branches);
+                    dryConfig.branches, dryConfig.firstCommit);
         }
 
         create(dryConfig.resultsPath);
@@ -79,7 +81,6 @@ public class Config {
         return new Config(dryConfig.repositoryPath, dryConfig.resultsPath, dryConfig.testSrcPath, dryConfig.method,
                 testIdentifiers);
     }
-
 
     private static ArrayList<TestIdentifier> getTestInputFromFile(String filePath) throws IOException {
         ArrayList<TestIdentifier> testIdentifiers = new ArrayList<>();
@@ -107,7 +108,7 @@ public class Config {
         Files.createDirectories(directoryPath);
     }
 
-    private static void clean(String path) {
+    public static void clean(String path) {
         Config.cleanDirectory(new File(path));
     }
 
