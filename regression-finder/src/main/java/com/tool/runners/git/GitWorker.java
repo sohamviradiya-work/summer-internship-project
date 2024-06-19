@@ -103,7 +103,7 @@ public class GitWorker {
         return changedFiles;
     }
 
-    public HashMap<String, ArrayList<ProjectCommit>> listCommitsByBranch()
+    public HashMap<String, ArrayList<ProjectCommit>> listCommitsByBranch(String firstCommit)
             throws IOException, NoHeadException, GitAPIException {
         List<Ref> branches = git.branchList().call();
         Repository repository = git.getRepository();
@@ -132,6 +132,8 @@ public class GitWorker {
 
                 branchCommitMap.get(projectCommit.getBranch()).add(projectCommit);
                 assignedCommits.add(projectCommit.getCommitId());
+                if(projectCommit.getCommitId().compareTo(firstCommit)==0)
+                    break;
             }
             if(!branchCommitMap.containsKey(branchName)) continue;
             Collections.reverse(branchCommitMap.get(branchName));

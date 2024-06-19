@@ -22,7 +22,7 @@ import com.tool.writers.interfaces.ItemWriter;
 public class RegressionTool {
 
     public static long runWithTests(String repositoryPath, String testSrcPath, String gradleVersion, String method,
-            String resultPath, ArrayList<TestIdentifier> tests)
+            String resultPath, ArrayList<TestIdentifier> tests, String initialCommit)
             throws IOException, NoHeadException, GitAPIException {
 
         CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/blame.csv");
@@ -34,7 +34,7 @@ public class RegressionTool {
 
         GitWorker gitWorker = projectInstance.getGitWorker();
 
-        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch();
+        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch(initialCommit);
 
         long start = System.currentTimeMillis();
 
@@ -61,7 +61,7 @@ public class RegressionTool {
 
 
     public static long run(String repositoryPath, String testSrcPath, String gradleVersion, String method,
-            String resultPath, boolean logCommits)
+            String resultPath, boolean logCommits,String initialCommit)
             throws IOException, NoHeadException, GitAPIException {
 
         CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/blame.csv");
@@ -73,7 +73,7 @@ public class RegressionTool {
 
         GitWorker gitWorker = projectInstance.getGitWorker();
 
-        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch();
+        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch(initialCommit);
 
         if (logCommits)
             log(resultPath, branchWiseCommitList);

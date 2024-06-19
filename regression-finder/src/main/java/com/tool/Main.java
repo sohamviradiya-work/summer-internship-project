@@ -8,7 +8,7 @@ public class Main {
             Config config = Config.mountConfig();
             
             long time = RegressionTool.runWithTests(config.repositoryPath, config.testSrcPath, "7.6.4", config.method,
-                    config.resultsPath, config.tests);
+                    config.resultsPath, config.tests,config.firstCommit);
 
             System.out.println("time: " + time + " ms");
 

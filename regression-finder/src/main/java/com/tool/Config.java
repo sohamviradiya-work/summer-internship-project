@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -43,12 +42,13 @@ public class Config {
     }
 
     public Config(String repositoryPath, String resultsPath, String testSrcPath, String method,
-            ArrayList<TestIdentifier> testIdentifiers) {
+            ArrayList<TestIdentifier> testIdentifiers,String firstCommit) {
         this.repositoryPath = repositoryPath;
         this.resultsPath = resultsPath;
         this.testSrcPath = testSrcPath;
         this.tests = testIdentifiers;
         this.method = method;
+        this.firstCommit = firstCommit;
     }
 
     public static Config mountConfig()
@@ -79,7 +79,7 @@ public class Config {
         clean(dryConfig.resultsPath);
 
         return new Config(dryConfig.repositoryPath, dryConfig.resultsPath, dryConfig.testSrcPath, dryConfig.method,
-                testIdentifiers);
+                testIdentifiers, dryConfig.firstCommit);
     }
 
     private static ArrayList<TestIdentifier> getTestInputFromFile(String filePath) throws IOException {
