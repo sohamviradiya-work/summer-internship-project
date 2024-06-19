@@ -39,7 +39,6 @@ public class RegressionTool {
         long start = System.currentTimeMillis();
 
         for (String branch : branchWiseCommitList.keySet()) {
-            
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
 
             ProjectCommit firstCommit = projectCommits.get(0);

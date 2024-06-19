@@ -116,7 +116,7 @@ public class GitWorker {
             String branchName = branch.getName();
             ObjectId branchObjectId = repository.resolve(branchName);
 
-            if (branchObjectId == null)
+            if (branchObjectId == null || branchName=="HEAD")
                 continue;
 
             Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
