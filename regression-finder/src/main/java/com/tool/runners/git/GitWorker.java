@@ -21,6 +21,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
 import com.items.ProjectCommit;
+import com.tool.Config;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -54,7 +55,7 @@ public class GitWorker {
 
     public void checkoutToCommit(ProjectCommit projectCommit)
             throws GitAPIException, IllegalArgumentException, IOException {
-        System.out.println("Checked out to commit: " + projectCommit.getInfo());
+        System.out.println("Checked out to commit: " + Config.ANSI_YELLOW + projectCommit.getInfo() + Config.ANSI_RESET);
         String commitTag = projectCommit.getCommitId();
         Repository repository = git.getRepository();
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));

@@ -10,6 +10,7 @@ import com.items.ProjectCommit;
 import com.items.RegressionBlame;
 import com.items.TestIdentifier;
 import com.items.TestResult;
+import com.tool.Config;
 import com.tool.finders.interfaces.Finder;
 import com.tool.runners.ProjectInstance;
 import com.tool.writers.interfaces.ItemWriter;
@@ -66,6 +67,7 @@ public class LinearRegressionFinder implements Finder {
 
     public void putBlame(RegressionBlame regressionBlame) throws IOException {
         remainingTests--;
+        System.out.println("Blame found: "+ Config.ANSI_CYAN + regressionBlame.getInfo() + Config.ANSI_RESET);
         blameWriter.write(regressionBlame);
         System.out.println("Remaining Tests: " + remainingTests);
     }

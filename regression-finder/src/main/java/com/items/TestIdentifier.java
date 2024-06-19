@@ -77,6 +77,6 @@ public final class TestIdentifier implements Comparable<TestIdentifier>, CSVItem
 
     @Override
     public String toCSVString() {
-        return testProject.substring(1) + "," + testClass + "," + testMethod;
+        return testProject.substring(1) + ", " + testClass + ", " + testMethod;
     }
 }
