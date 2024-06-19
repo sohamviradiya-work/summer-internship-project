@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -40,7 +41,7 @@ public class ProjectInstance {
         this.gradleWorker.close();
     }
 
-    public ArrayList<TestResult> runTestsForCommit(ArrayList<TestIdentifier> testIdentifiers,
+    public ArrayList<TestResult> runTestsForCommit(List<TestIdentifier> testIdentifiers,
             ProjectCommit projectCommit, ProjectCommit previousCommit) throws GitAPIException, IOException {
         gitWorker.checkoutToCommit(projectCommit);
         syncIfRequired(projectCommit, previousCommit);
@@ -111,12 +112,9 @@ public class ProjectInstance {
 
         System.out.println("Initial Run");
 
+        List<TestIdentifier> failingTests =  List.copyOf(TestResult.extractFailingTests(runTestsForCommit(testIdentifiers, lastCommit, lastCommit)));
 
-        ArrayList<TestIdentifier> failingTests = testIdentifiers;        
-
-        ArrayList<TestResult> lastPhaseTestResults = runTestsForCommit(failingTests, firstCommit, lastCommit);
-
-        HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(lastPhaseTestResults);
+        HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(runTestsForCommit(failingTests, firstCommit, lastCommit));
 
         gitWorker.checkoutToCommit(lastCommit);
 
@@ -126,7 +124,7 @@ public class ProjectInstance {
         }
         System.out.println("Initial Run Complete");
 
-        return failingTests;
+        return new ArrayList<>(failingTests);
     }
 
     private ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier, ProjectCommit firstCommit)

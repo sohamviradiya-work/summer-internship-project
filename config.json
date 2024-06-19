@@ -1,0 +1,23 @@
+{
+    "repositoryLink" : null,
+    "repositoryPath" : "./resources/repository",
+    "branch" : "master",
+    "days" : 7,
+    "testInputFile" : "./tests.csv",
+    "testSrcPath" : "/src/test/java/",
+    "tests": [
+        {
+            "testProject": "calculator",
+            "testClass" : "org.advanced.AdvancedCalculatorTest",
+            "testMethod" : "testCosNegative"
+        },
+        {
+            "testProject": "statistics",
+            "testClass" : "org.advanced.AdvancedStatisticsTest",
+            "testMethod" : "testCorrelationSimple"
+        }
+    ],
+
+    "resultsPath" : "./results",
+    "method" : "Bisect"
+}

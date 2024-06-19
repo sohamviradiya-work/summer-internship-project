@@ -8,7 +8,7 @@ The Regression Finder Tool is designed to identify the specific commit that caus
 - **Input Handling**: Accepts a list of failed tests in a suite.
 - **Data Export**: Exports details of unit tests, commits, and authors to an Excel file.
 - **Performance Optimization**: Optimized to work efficiently with large repositories.
-- **Result Storage**: Stores the results in a CSV file located at `./results/blame-tests.csv`.
+- **Result Storage**: Stores the results in a CSV file.
 - **Future Enhancements**:
   - Integration with Microsoft Teams for alert notifications.
   - Integration with Jira API for issue tracking and management.
@@ -37,7 +37,7 @@ The Regression Finder Tool is designed to identify the specific commit that caus
 3. **Running the Tool**:  
    Execute the tool using the following command:
    ```sh
-   ./gradlew :run:regression-finder
+   ./gradlew :regression-finder:run
    ```
 
 4. **Output**:  

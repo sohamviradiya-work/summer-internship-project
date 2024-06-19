@@ -1,0 +1,141 @@
+package com.tool;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
+
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.items.TestIdentifier;
+import com.tool.runners.git.RepositoryCloner;
+
+public class Config {
+
+    public String repositoryPath;
+    public String repositoryLink;
+    public String method;
+    public long days;
+    public String resultsPath;
+    public String branch;
+    public ArrayList<TestIdentifier> tests;
+    public String testInputFile;
+    public String testSrcPath;
+    private static final String DEFAULT_CONFIG = "./config.json";
+    private static final String BASE_DIRECTORY = "../";
+
+    public Config() {
+    }
+
+    public Config(String repositoryPath, String repositoryLink, long days, String resultsPath, String testSrcPath,
+            String method,
+            ArrayList<TestIdentifier> testIdentifiers) {
+        this.repositoryPath = repositoryPath;
+        this.repositoryLink = repositoryLink;
+        this.days = days;
+        this.resultsPath = resultsPath;
+        this.testSrcPath = testSrcPath;
+        this.tests = testIdentifiers;
+        this.method = method;
+    }
+
+    public static Config mountConfig()
+            throws StreamReadException, DatabindException, IOException, GitAPIException {
+
+        String path = getConfigPath();
+
+        FileReader jsonReader = new FileReader(BASE_DIRECTORY + path);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Config dryConfig = objectMapper.readValue(jsonReader, Config.class);
+
+        ArrayList<TestIdentifier> testIdentifiers;
+
+        if (dryConfig.testInputFile != null) {
+            testIdentifiers = getTestInputFromFile(BASE_DIRECTORY + dryConfig.testInputFile);
+        } else {
+            testIdentifiers = dryConfig.tests;
+        }
+
+        dryConfig.repositoryPath = BASE_DIRECTORY + dryConfig.repositoryPath;
+        dryConfig.resultsPath = BASE_DIRECTORY + dryConfig.resultsPath;
+
+        if (dryConfig.repositoryLink != null) {
+            create(dryConfig.repositoryPath);
+            clean(dryConfig.repositoryPath);
+            RepositoryCloner.getRemoteRepository(dryConfig.repositoryPath, dryConfig.repositoryLink, dryConfig.days);
+        }
+
+        create(dryConfig.resultsPath);
+        clean(dryConfig.resultsPath);
+
+        return new Config(dryConfig.repositoryPath, dryConfig.repositoryLink, dryConfig.days, dryConfig.resultsPath,
+                dryConfig.testSrcPath, dryConfig.method, testIdentifiers);
+    }
+
+    private static String getConfigPath() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter config path (default: ./config.json) :");
+        String configPath = scanner.nextLine();
+        scanner.close();
+        if (configPath.length() < 1)
+            return DEFAULT_CONFIG;
+        else
+            return configPath;
+
+    }
+
+    private static ArrayList<TestIdentifier> getTestInputFromFile(String filePath) throws IOException {
+        ArrayList<TestIdentifier> testIdentifiers = new ArrayList<>();
+        Path path = Paths.get(filePath);
+        List<String> lines = Files.readAllLines(path);
+
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts.length == 3) {
+                String testProject = ":" + parts[0].trim();
+                if (testProject.length() == 1)
+                    testProject = "";
+                String testClass = parts[1].trim();
+                String testMethod = parts[2].trim();
+                testIdentifiers.add(new TestIdentifier(testProject, testClass, testMethod));
+            } else {
+                System.out.println("Invalid format in line: " + line);
+            }
+        }
+        return testIdentifiers;
+    }
+
+    private static void create(String path) throws IOException {
+        Path directoryPath = Paths.get(path);
+        Files.createDirectories(directoryPath);
+    }
+
+    private static void clean(String path) {
+        Config.cleanDirectory(new File(path));
+    }
+
+    private static void cleanDirectory(File directory) {
+        if (!directory.exists() || !directory.isDirectory()) {
+            return;
+        }
+
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    cleanDirectory(file);
+                }
+                file.delete();
+            }
+        }
+    }
+
+}

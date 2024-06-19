@@ -21,6 +21,45 @@ import com.tool.writers.interfaces.ItemWriter;
 
 public class RegressionTool {
 
+    public static long runWithTests(String repositoryPath, String testSrcPath, String gradleVersion, String method,
+            String resultPath, ArrayList<TestIdentifier> tests)
+            throws IOException, NoHeadException, GitAPIException {
+
+        CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/blame.csv");
+        // JiraTicketWriter<RegressionBlame> blameWriter = JiraTicketWriter.create();
+
+        ProjectInstance projectInstance = ProjectInstance.mountLocalProject(repositoryPath, testSrcPath, gradleVersion);
+
+        Finder finder = createFinder(method, blameWriter, projectInstance);
+
+        GitWorker gitWorker = projectInstance.getGitWorker();
+
+        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch();
+
+        long start = System.currentTimeMillis();
+
+        for (String branch : branchWiseCommitList.keySet()) {
+            
+            ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
+
+            ProjectCommit firstCommit = projectCommits.get(0);
+            ProjectCommit lastCommit = projectCommits.get(projectCommits.size() - 1);
+
+            ArrayList<TestIdentifier> testsTorun = projectInstance.extractTestsToRun(firstCommit, lastCommit, blameWriter, tests);
+            finder.runForTests(projectCommits, testsTorun);
+            gitWorker.checkoutToCommit(lastCommit);
+        }
+
+        long end = System.currentTimeMillis();
+
+        projectInstance.close();
+        finder.close();
+        blameWriter.close();
+
+        return end - start;
+    }
+
+
     public static long run(String repositoryPath, String testSrcPath, String gradleVersion, String method,
             String resultPath, boolean logCommits)
             throws IOException, NoHeadException, GitAPIException {
@@ -48,45 +87,6 @@ public class RegressionTool {
             ProjectCommit lastCommit = projectCommits.get(projectCommits.size() - 1);
             ArrayList<TestIdentifier> testsTorun = projectInstance.extractTestsToRun(firstCommit, lastCommit,
                     blameWriter);
-            finder.runForTests(projectCommits, testsTorun);
-            gitWorker.checkoutToCommit(lastCommit);
-        }
-
-        long end = System.currentTimeMillis();
-
-        projectInstance.close();
-        finder.close();
-        blameWriter.close();
-
-        return end - start;
-    }
-
-    public static long runWithTests(String repositoryPath, String testSrcPath, String gradleVersion, String method,
-            String resultPath, ArrayList<TestIdentifier> tests)
-            throws IOException, NoHeadException, GitAPIException {
-
-        CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/blame.csv");
-        // JiraTicketWriter<RegressionBlame> blameWriter = JiraTicketWriter.create();
-
-        ProjectInstance projectInstance = ProjectInstance.mountLocalProject(repositoryPath, testSrcPath, gradleVersion);
-
-        Finder finder = createFinder(method, blameWriter, projectInstance);
-
-        GitWorker gitWorker = projectInstance.getGitWorker();
-
-        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch();
-
-        long start = System.currentTimeMillis();
-
-        for (String branch : branchWiseCommitList.keySet()) {
-            
-            ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
-
-            ProjectCommit firstCommit = projectCommits.get(0);
-            ProjectCommit lastCommit = projectCommits.get(projectCommits.size() - 1);
-
-            ArrayList<TestIdentifier> testsTorun = projectInstance.extractTestsToRun(firstCommit, lastCommit,
-                    blameWriter, tests);
             finder.runForTests(projectCommits, testsTorun);
             gitWorker.checkoutToCommit(lastCommit);
         }

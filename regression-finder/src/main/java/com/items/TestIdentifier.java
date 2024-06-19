@@ -8,9 +8,11 @@ import java.util.Objects;
 import com.items.interfaces.CSVItem;
 
 public final class TestIdentifier implements Comparable<TestIdentifier>, CSVItem {
-    private String testClass;
-    private String testMethod;
-    private String testProject;
+    public String testClass;
+    public String testMethod;
+    public String testProject;
+
+    public TestIdentifier() {}
 
     public TestIdentifier(String testProject, String testClass, String testMethod) {
         this.testProject = testProject;
