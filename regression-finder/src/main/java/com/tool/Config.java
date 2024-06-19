@@ -63,6 +63,7 @@ public class Config {
             testIdentifiers = getTestInputFromFile(BASE_DIRECTORY + dryConfig.testInputFile);
         } else {
             testIdentifiers = dryConfig.tests;
+            testIdentifiers.replaceAll(testIdentifier -> new TestIdentifier(":"+ testIdentifier.testProject, testIdentifier.testClass, testIdentifier.testMethod));
         }
 
         dryConfig.repositoryPath = BASE_DIRECTORY + dryConfig.repositoryPath;
