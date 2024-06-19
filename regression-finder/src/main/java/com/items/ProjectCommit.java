@@ -27,7 +27,6 @@ public class ProjectCommit implements CSVItem {
 
     @Override
     public String toCSVString() {
-
         return authorMail + "," + commitId + "," + getDate() + "," + message;
     }
 
@@ -35,6 +34,10 @@ public class ProjectCommit implements CSVItem {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getDefault());
         return dateFormat.format(time);
+    }
+
+    public String getInfo(){
+        return commitId + ", " + getDate();
     }
 
     public String getCommitId() {
