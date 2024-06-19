@@ -85,8 +85,6 @@ public class ProjectInstance {
     public ArrayList<TestIdentifier> extractTestsToRun(ProjectCommit firstCommit, ProjectCommit lastCommit,
             ItemWriter<RegressionBlame> blameWriter) throws GitAPIException, IOException {
 
-        System.out.println("Initial Run");
-
         ArrayList<TestResult> testResults = runAllTestsForCommit(lastCommit);
 
         ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
@@ -101,7 +99,6 @@ public class ProjectInstance {
             failingTests.remove(testIdentifier);
             blameWriter.writeAll(blameTestOnAuthor(testIdentifier, firstCommit));
         }
-        System.out.println("Initial Run Complete");
 
         return failingTests;
     }
@@ -110,20 +107,14 @@ public class ProjectInstance {
             ItemWriter<RegressionBlame> blameWriter, ArrayList<TestIdentifier> testIdentifiers)
             throws GitAPIException, IOException {
 
-        System.out.println("Initial Run");
-
         List<TestIdentifier> failingTests =  List.copyOf(TestResult.extractFailingTests(runTestsForCommit(testIdentifiers, lastCommit, lastCommit)));
 
         HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(runTestsForCommit(failingTests, firstCommit, lastCommit));
-
-        gitWorker.checkoutToCommit(lastCommit);
 
         for (TestIdentifier testIdentifier : falseWrittenTests) {
             failingTests.remove(testIdentifier);
             blameWriter.writeAll(blameTestOnAuthor(testIdentifier, firstCommit));
         }
-        System.out.println("Initial Run Complete");
-
         return new ArrayList<>(failingTests);
     }
 
