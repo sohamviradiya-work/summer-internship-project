@@ -18,8 +18,11 @@ public class BenchMarker {
         CSVWriter<BenchMark> benchMarkWriter = CSVWriter.create(resultsPath + "/bench-mark.csv");
         
         List<String> methods = List.of("Linear", "Batch 5", "Batch 20", "Batch 50", "Bisect");
+        Config config = Config.mountConfig();
+            
         for (String method : methods) {
-            long time = RegressionTool.run(repositoryPath,testSrcPath,gradleVersion, method, resultsPath,false,"");
+            long time = RegressionTool.runWithTests(config.repositoryPath, config.testSrcPath, "7.6.4", method,
+            config.resultsPath, config.tests,config.firstCommit);
             benchMarkWriter.write(new BenchMark(time, method));
         }
         benchMarkWriter.close();
