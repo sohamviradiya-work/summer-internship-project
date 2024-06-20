@@ -47,14 +47,14 @@ public class RepositoryCloner {
         Git git;
         if (firstCommit != null)
             git = fetchFromPoint(path, link, branches, firstCommit, dir, shallowSinceInstant);
-        else 
+        else
             git = fetchFromInstant(link, branches, dir, shallowSinceInstant);
 
         List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
         for (Ref ref : remoteBranches) {
             RepositoryCloner.cloneBranchToLocal(git, ref);
         }
-
+        git.close();
         System.out.println("Cloning Complete");
 
         return;
@@ -62,14 +62,12 @@ public class RepositoryCloner {
 
     private static Git fetchFromInstant(String link, List<String> branches, File dir, Instant shallowSinceInstant)
             throws GitAPIException, InvalidRemoteException, TransportException {
-        Git git;
-        git = Git.cloneRepository()
+        return Git.cloneRepository()
                 .setURI(link)
                 .setBranchesToClone(branches)
                 .setShallowSince(shallowSinceInstant)
                 .setDirectory(dir)
                 .call();
-        return git;
     }
 
     private static Git fetchFromPoint(String path, String link, List<String> branches, String firstCommit, File dir,
