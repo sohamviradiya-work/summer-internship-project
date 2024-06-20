@@ -55,6 +55,7 @@ public class RepositoryCloner {
             RepositoryCloner.cloneBranchToLocal(git, ref);
         }
         git.close();
+
         System.out.println("Cloning Complete");
 
         return;

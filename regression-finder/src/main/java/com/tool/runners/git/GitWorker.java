@@ -113,17 +113,26 @@ public class GitWorker {
         return changedFiles;
     }
 
-    public HashMap<String, ArrayList<ProjectCommit>> listCommitsByBranch(String firstCommit)
+    public HashMap<String, ArrayList<ProjectCommit>> listCommitsByBranch(String firstCommit,List<String> branchesToConsider)
             throws IOException, NoHeadException, GitAPIException {
-        List<Ref> branches = git.branchList().call();
+
         Repository repository = git.getRepository();
 
         HashMap<String, ArrayList<ProjectCommit>> branchCommitMap = new HashMap<>();
         HashSet<String> assignedCommits = new HashSet<String>();
 
-        for (Ref branch : branches) {
+        branchesToConsider.replaceAll(branchName -> ("refs/heads/"+ branchName));
+        HashSet<String> branchNameSet = new HashSet<>(branchesToConsider);
 
+        List<Ref> branches = git.branchList().call();
+
+        for (Ref branch : branches) {
+            
             String branchName = branch.getName();
+
+            if(!branchNameSet.contains(branchName))
+                continue;
+
             ObjectId branchObjectId = repository.resolve(branchName);
 
             if (branchObjectId == null || branchName == "HEAD")

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
@@ -25,7 +26,7 @@ import com.tool.writers.interfaces.ItemWriter;
 public class RegressionTool {
 
     public static long runWithTests(String repositoryPath, String testSrcPath, String gradleVersion, String method,
-            String resultPath, ArrayList<TestIdentifier> tests, String initialCommit)
+            String resultPath, ArrayList<TestIdentifier> tests, String initialCommit, List<String> branches)
             throws IOException, NoHeadException, GitAPIException {
 
         CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/blame.csv");
@@ -38,7 +39,7 @@ public class RegressionTool {
 
         GitWorker gitWorker = projectInstance.getGitWorker();
 
-        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch(initialCommit);
+        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch(initialCommit,branches);
 
         long start = System.currentTimeMillis();
 

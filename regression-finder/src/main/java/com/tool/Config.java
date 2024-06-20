@@ -43,13 +43,14 @@ public class Config {
     }
 
     public Config(String repositoryPath, String resultsPath, String testSrcPath, String method,
-            ArrayList<TestIdentifier> testIdentifiers, String firstCommit) {
+            ArrayList<TestIdentifier> testIdentifiers, String firstCommit, List<String> branches) {
         this.repositoryPath = repositoryPath;
         this.resultsPath = resultsPath;
         this.testSrcPath = testSrcPath;
         this.tests = testIdentifiers;
         this.method = method;
         this.firstCommit = firstCommit;
+        this.branches = branches;
     }
 
     public static Config mountConfig()
@@ -85,13 +86,14 @@ public class Config {
         clean(dryConfig.resultsPath);
 
         return new Config(dryConfig.repositoryPath, dryConfig.resultsPath, dryConfig.testSrcPath, dryConfig.method,
-                testIdentifiers, dryConfig.firstCommit);
+                testIdentifiers, dryConfig.firstCommit, dryConfig.branches);
     }
 
     private static String getProjectRoot() throws URISyntaxException {
         String classPath = Config.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
         File file = new File(classPath);
-        final String BASE_DIRECTORY = file.getParentFile().getParentFile().getParentFile().getParentFile().getParent() + "/";
+        final String BASE_DIRECTORY = file.getParentFile().getParentFile().getParentFile().getParentFile().getParent()
+                + "/";
         return BASE_DIRECTORY;
     }
 
