@@ -19,6 +19,7 @@ import com.tool.finders.LinearRegressionFinder;
 import com.tool.finders.interfaces.Finder;
 import com.tool.runners.git.GitWorker;
 import com.tool.writers.CSVWriter;
+import com.tool.writers.JiraTicketWriter;
 import com.tool.writers.interfaces.ItemWriter;
 
 public class RegressionTool {

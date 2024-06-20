@@ -3,6 +3,7 @@ package com.tool;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.Files;
@@ -31,7 +32,7 @@ public class Config {
     public String firstCommit;
 
     private static final String DEFAULT_CONFIG = "./config.json";
-    private static final String BASE_DIRECTORY = "../";
+
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
@@ -42,7 +43,7 @@ public class Config {
     }
 
     public Config(String repositoryPath, String resultsPath, String testSrcPath, String method,
-            ArrayList<TestIdentifier> testIdentifiers,String firstCommit) {
+            ArrayList<TestIdentifier> testIdentifiers, String firstCommit) {
         this.repositoryPath = repositoryPath;
         this.resultsPath = resultsPath;
         this.testSrcPath = testSrcPath;
@@ -52,7 +53,10 @@ public class Config {
     }
 
     public static Config mountConfig()
-            throws StreamReadException, DatabindException, IOException, GitAPIException {
+            throws StreamReadException, DatabindException, IOException, GitAPIException, URISyntaxException {
+
+        final String BASE_DIRECTORY = getProjectRoot();
+
         FileReader jsonReader = new FileReader(BASE_DIRECTORY + DEFAULT_CONFIG);
         ObjectMapper objectMapper = new ObjectMapper();
         Config dryConfig = objectMapper.readValue(jsonReader, Config.class);
@@ -63,7 +67,8 @@ public class Config {
             testIdentifiers = getTestInputFromFile(BASE_DIRECTORY + dryConfig.testInputFile);
         } else {
             testIdentifiers = dryConfig.tests;
-            testIdentifiers.replaceAll(testIdentifier -> new TestIdentifier(":"+ testIdentifier.testProject, testIdentifier.testClass, testIdentifier.testMethod));
+            testIdentifiers.replaceAll(testIdentifier -> new TestIdentifier(":" + testIdentifier.testProject,
+                    testIdentifier.testClass, testIdentifier.testMethod));
         }
 
         dryConfig.repositoryPath = BASE_DIRECTORY + dryConfig.repositoryPath;
@@ -81,6 +86,13 @@ public class Config {
 
         return new Config(dryConfig.repositoryPath, dryConfig.resultsPath, dryConfig.testSrcPath, dryConfig.method,
                 testIdentifiers, dryConfig.firstCommit);
+    }
+
+    private static String getProjectRoot() throws URISyntaxException {
+        String classPath = Config.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+        File file = new File(classPath);
+        final String BASE_DIRECTORY = file.getParentFile().getParentFile().getParentFile().getParentFile().getParent() + "/";
+        return BASE_DIRECTORY;
     }
 
     private static ArrayList<TestIdentifier> getTestInputFromFile(String filePath) throws IOException {

@@ -1,6 +1,7 @@
 package com.tool;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -13,7 +14,7 @@ import com.tool.writers.CSVWriter;
 public class BenchMarker {
 
     public static void benchmark(String repositoryPath, String resultsPath,String testSrcPath ,String gradleVersion)
-            throws NoHeadException, IOException, GitAPIException {
+            throws NoHeadException, IOException, GitAPIException, URISyntaxException {
 
         CSVWriter<BenchMark> benchMarkWriter = CSVWriter.create(resultsPath + "/bench-mark.csv");
         

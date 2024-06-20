@@ -64,10 +64,9 @@ public class GitWorker {
         String commitTag = projectCommit.getCommitId();
         Repository repository = git.getRepository();
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
-        try{
+        try {
             git.checkout().setName(commit.getName()).call();
-        }
-        catch(CheckoutConflictException e){
+        } catch (CheckoutConflictException e) {
             System.out.println("Failed to checkout, Discard the changes in working directory and re-run the program");
             System.exit(0);
         }
@@ -143,7 +142,7 @@ public class GitWorker {
 
                 branchCommitMap.get(projectCommit.getBranch()).add(projectCommit);
                 assignedCommits.add(projectCommit.getCommitId());
-                if (firstCommit!=null && projectCommit.getCommitId().compareTo(firstCommit) == 0)
+                if (firstCommit != null && projectCommit.getCommitId().compareTo(firstCommit) == 0)
                     break;
             }
             if (!branchCommitMap.containsKey(branchName))
@@ -156,7 +155,7 @@ public class GitWorker {
     public static GitWorker mountGitWorker(File directory, OutputStream logStream) throws IOException {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         Repository repository = builder.findGitDir(directory).build();
-        GitWorker gitWorker = new GitWorker(repository,logStream);
+        GitWorker gitWorker = new GitWorker(repository, logStream);
         return gitWorker;
     }
 

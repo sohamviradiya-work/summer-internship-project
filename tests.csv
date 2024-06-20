@@ -9,3 +9,6 @@ calculator,org.basic.BasicCalculatorTest,testSubtract_bothZero
 calculator,org.basic.BasicCalculatorTest,testModulus_validModulus
 calculator,org.basic.BasicCalculatorTest,testDivide_validDivision
 trigonometry,org.tool.TrigonometryTest,testMedianLength_Case2
+series,org.tool.SeriesTest,testSumArithmetic
+statistics,org.basic.BasicStatisticsTest,testMode1
+statistics,org.basic.BasicStatisticsTest,testMode2
