@@ -23,6 +23,7 @@ import com.tool.Config;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,10 +36,12 @@ public class GitWorker {
 
     private RevWalk revWalk;
     private Git git;
+    private OutputStream logStream;
 
-    public GitWorker(Repository repository) {
+    public GitWorker(Repository repository, OutputStream logStream) {
         this.revWalk = new RevWalk(repository);
         this.git = new Git(repository);
+        this.logStream = logStream;
     }
 
     public GitWorker(Git git) {
@@ -55,6 +58,9 @@ public class GitWorker {
             throws GitAPIException, IllegalArgumentException, IOException {
         System.out
                 .println("Checked out to commit: " + Config.ANSI_YELLOW + projectCommit.getInfo() + Config.ANSI_RESET);
+
+        logStream.write((projectCommit.toCSVString() + "\n").getBytes());
+
         String commitTag = projectCommit.getCommitId();
         Repository repository = git.getRepository();
         RevCommit commit = revWalk.parseCommit(repository.resolve(commitTag));
@@ -147,10 +153,10 @@ public class GitWorker {
         return branchCommitMap;
     }
 
-    public static GitWorker mountGitWorker(File directory) throws IOException {
+    public static GitWorker mountGitWorker(File directory, OutputStream logStream) throws IOException {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         Repository repository = builder.findGitDir(directory).build();
-        GitWorker gitWorker = new GitWorker(repository);
+        GitWorker gitWorker = new GitWorker(repository,logStream);
         return gitWorker;
     }
 

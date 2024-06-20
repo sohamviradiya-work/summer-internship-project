@@ -1,5 +1,6 @@
 package com.tool.runners.gradle;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,14 +11,16 @@ import org.gradle.tooling.events.ProgressListener;
 
 public class ProjectBuilder {
     private BuildLauncher buildLauncher;
+    private OutputStream logStream;
 
-    private ProjectBuilder(BuildLauncher buildLauncher) {
+    private ProjectBuilder(BuildLauncher buildLauncher, OutputStream logStream) {
+        this.logStream = logStream;
         this.buildLauncher = buildLauncher;
     }
 
-    public static ProjectBuilder mountProjectBuilder(ProjectManager projectManager) {
+    public static ProjectBuilder mountProjectBuilder(ProjectManager projectManager, OutputStream logStream) {
         BuildLauncher buildLauncher = projectManager.getConnection().newBuild();
-        return new ProjectBuilder(buildLauncher);
+        return new ProjectBuilder(buildLauncher, logStream);
     }
 
     public void syncDependencies() {
@@ -25,9 +28,10 @@ public class ProjectBuilder {
         buildLauncher.withArguments("--refresh-dependencies");
 
         try {
+            buildLauncher.setStandardOutput(logStream);
             buildLauncher.run();
         } catch (Exception e) {
-            
+
         }
     }
 
@@ -45,6 +49,7 @@ public class ProjectBuilder {
         }, OperationType.TEST);
 
         try {
+            buildLauncher.setStandardOutput(logStream);
             buildLauncher.run();
         } catch (Exception e) {
 
@@ -67,7 +72,7 @@ public class ProjectBuilder {
         try {
             buildLauncher.run();
         } catch (Exception e) {
-            
+
         }
         return events;
     }

@@ -2,6 +2,7 @@ package com.tool.runners.gradle;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,9 +20,11 @@ import com.tool.writers.ArrayListWriter;
 
 public class GradleWorker {
     ProjectManager projectManager;
+    private OutputStream logStream;
 
-    public GradleWorker(ProjectManager projectManager) {
+    public GradleWorker(ProjectManager projectManager, OutputStream logStream) {
         this.projectManager = projectManager;
+        this.logStream = logStream;
     }
 
     public void close() {
@@ -40,7 +43,7 @@ public class GradleWorker {
 
     private ArrayList<TestResult> runTestsForProject(String testProjectName,
             HashMap<String, List<String>> testMethods) {
-        ProjectTester projectTester = ProjectTester.mountProjectTester(projectManager);
+        ProjectTester projectTester = ProjectTester.mountProjectTester(projectManager, logStream);
         ArrayList<ProgressEvent> events = projectTester.runTestsForProject(testProjectName, testMethods);
         return extractResults(testProjectName, events);
     }
@@ -50,7 +53,7 @@ public class GradleWorker {
         List<String> subProjects = projectManager.getSubProjects();
         ArrayListWriter<TestResult> testResultsWriter = ArrayListWriter.create();
         for (String testProjectName : subProjects) {
-            testResultsWriter.writeAll(runAlltestsForProject(testProjectName));
+            testResultsWriter.writeAll(runAllTestsForProject(testProjectName));
         }
 
         ArrayList<TestResult> testResults = testResultsWriter.getList();
@@ -58,19 +61,19 @@ public class GradleWorker {
         return testResults;
     }
 
-    private ArrayList<TestResult> runAlltestsForProject(String testProjectName) {
-        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager);
+    private ArrayList<TestResult> runAllTestsForProject(String testProjectName) {
+        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager,logStream);
         ArrayList<ProgressEvent> events = projectBuilder.runAlltestsForProject(testProjectName);
         return extractResults(testProjectName, events);
     }
 
     public void syncDependencies() {
-        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager);
+        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager,logStream);
         projectBuilder.syncDependencies();
     }
 
-    public static GradleWorker mountGradleWorker(String gradleVersion, File directory) {
-        return new GradleWorker(ProjectManager.mountGradleProject(gradleVersion, directory));
+    public static GradleWorker mountGradleWorker(String gradleVersion, File directory, OutputStream logStream) {
+        return new GradleWorker(ProjectManager.mountGradleProject(gradleVersion, directory), logStream);
     }
 
     private static ArrayList<TestResult> extractResults(String testProjectName,
@@ -79,8 +82,8 @@ public class GradleWorker {
         for (ProgressEvent event : events) {
             if (event instanceof DefaultTestFinishEvent) {
                 TestResult testResult = GradleWorker.extractResult(event, testProjectName);
-                if (testResult != null){
-                    System.out.println("Test run complete: "+ testResult.toCSVString());
+                if (testResult != null) {
+                    System.out.println("Test run complete: " + testResult.toCSVString());
                     testResults.add(testResult);
                 }
             }

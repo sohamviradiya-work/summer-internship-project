@@ -1,5 +1,6 @@
 package com.tool.runners.gradle;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,23 +13,24 @@ import org.gradle.tooling.events.ProgressListener;
 
 public class ProjectTester {
     private TestLauncher testLauncher;
+    private OutputStream logStream;
 
-    private ProjectTester(TestLauncher testLauncher) {
+    private ProjectTester(TestLauncher testLauncher, OutputStream logStream) {
         this.testLauncher = testLauncher;
+        this.logStream = logStream;
     }
 
-    public static ProjectTester mountProjectTester(ProjectManager projectManager) {
+    public static ProjectTester mountProjectTester(ProjectManager projectManager, OutputStream logStream) {
         TestLauncher testLauncher = projectManager.getConnection().newTestLauncher();
-        return new ProjectTester(testLauncher);
+        return new ProjectTester(testLauncher,logStream);
     }
 
     public ArrayList<ProgressEvent> runTestsForProject(String testProjectName, HashMap<String, List<String>> testMethods) {
-        
         for (String testClass : testMethods.keySet()) {
             testLauncher.withTaskAndTestMethods(testProjectName + ":test", testClass, testMethods.get(testClass));
         }
-        testLauncher.addArguments("--parallel");
-        
+        testLauncher.addArguments("--parallel", "--console=verbose");
+
         ArrayList<ProgressEvent> events = new ArrayList<>();
         testLauncher.addProgressListener(new ProgressListener() {
             @Override
@@ -37,6 +39,7 @@ public class ProjectTester {
             }
         }, OperationType.TEST);
         try {
+            testLauncher.setStandardOutput(logStream);
             testLauncher.run();
         } catch (Exception e) {
 

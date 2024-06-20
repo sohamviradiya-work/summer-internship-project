@@ -3,6 +3,7 @@ package com.tool.runners;
 import java.io.File;
 import java.io.IOException;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -44,6 +45,7 @@ public class ProjectInstance {
     public ArrayList<TestResult> runTestsForCommit(List<TestIdentifier> testIdentifiers,
             ProjectCommit projectCommit, ProjectCommit previousCommit) throws GitAPIException, IOException {
         gitWorker.checkoutToCommit(projectCommit);
+        
         syncIfRequired(projectCommit, previousCommit);
         return gradleWorker.runTests(testIdentifiers);
     }
@@ -138,20 +140,15 @@ public class ProjectInstance {
         return regressionBlames;
     }
 
-    public static ProjectInstance mountLocalProject(String rootPath, String testSrcPath) throws IOException {
-        return mountLocalProject(rootPath, testSrcPath, "");
-    }
-
-    public static ProjectInstance mountLocalProject(String rootPath, String testSrcPath, String gradleVersion)
+    public static ProjectInstance mountLocalProject(String rootPath, String testSrcPath, String gradleVersion, OutputStream logStream)
             throws IOException {
 
         if (gradleVersion.length() == 0)
             gradleVersion = DEFAULT_GRADLE_VERSION;
 
         File directory = new File(rootPath);
-
-        GradleWorker gradleWorker = GradleWorker.mountGradleWorker(gradleVersion, directory);
-        GitWorker gitWorker = GitWorker.mountGitWorker(directory);
+        GradleWorker gradleWorker = GradleWorker.mountGradleWorker(gradleVersion, directory, logStream);
+        GitWorker gitWorker = GitWorker.mountGitWorker(directory,logStream);
 
         return new ProjectInstance(gradleWorker, gitWorker, testSrcPath);
     }
