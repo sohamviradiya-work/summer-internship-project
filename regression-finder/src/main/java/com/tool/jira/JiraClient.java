@@ -42,9 +42,14 @@ public class JiraClient {
 
         String assigneeId = getIdByEmail(jiraTicket.getEmail());
 
+        String assigneeEntry = "";
+        
+        if(assigneeId!=null)
+           assigneeEntry = "\"assignee\": { \"id\": \"" + assigneeId + "\" }, ";
+
         String requestBody = "{ \"fields\": { \"project\": { \"key\": \"" + projectKey + "\" }, " +
                 "\"summary\": \"" + jiraTicket.getSummary() + "\", " +
-                "\"assignee\": { \"id\": \"" + assigneeId + "\" }, " +
+                assigneeEntry + 
                 "\"description\": { " +
                 "\"type\": \"doc\", " +
                 "\"version\": 1, " +
@@ -61,6 +66,9 @@ public class JiraClient {
     }
 
     public String getIdByEmail(String email) throws IOException {
+
+        if(email=="LAST PHASE")
+            return null;
 
         if (!emailMap.containsKey(email)) {
             String endpoint = jiraUrl + "/rest/api/3/user/search?query=" + URLEncoder.encode(email, "UTF-8");

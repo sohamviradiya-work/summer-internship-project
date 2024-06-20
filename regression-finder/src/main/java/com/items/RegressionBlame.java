@@ -31,22 +31,28 @@ public class RegressionBlame implements CSVItem, JiraItem {
     @Override
     public JiraTicket toJiraTicket() {
 
-        String description;
-
         String summary = "Your commit " + this.projectCommit.getCommitId() + " at " + this.projectCommit.getDate()
                 + " failed some tests";
 
-        if (type == BlameType.TEST_WRITE) {
+        String description = "Your commit " + this.projectCommit.getCommitId() + " caused the test "
+                + this.testIdentifier.getTestProject() + ":" + this.testIdentifier.getTestClass() + "."
+                + this.testIdentifier.getTestMethod() + " to fail";
 
+        if (this.projectCommit.getCommitId().compareTo("LAST PHASE") == 0) {
+            summary = "This failing test was changed in the last phase";
+
+            description = "Test "
+                    + this.testIdentifier.getTestProject() + ": "
+                    + this.testIdentifier.getTestClass() + "." + this.testIdentifier.getTestMethod()
+                    + " was changed in the last phase, which has been failing since last phase";
+        } else if (type == BlameType.TEST_WRITE) {
+            summary = "Your commit " + this.projectCommit.getCommitId() + " at " + this.projectCommit.getDate()
+            + " changed some tests which are failing";
+            
             description = "Your commit " + this.projectCommit.getCommitId() + " changed the test "
                     + this.testIdentifier.getTestProject() + ": "
                     + this.testIdentifier.getTestClass() + "." + this.testIdentifier.getTestMethod()
                     + " which has been failing since last phase";
-
-        } else {
-            description = "Your commit " + this.projectCommit.getCommitId() + " caused the test "
-                    + this.testIdentifier.getTestProject() + ":" + this.testIdentifier.getTestClass() + "."
-                    + this.testIdentifier.getTestMethod() + " to fail";
         }
 
         return new JiraTicket(summary, description, this.projectCommit.getAuthor());
