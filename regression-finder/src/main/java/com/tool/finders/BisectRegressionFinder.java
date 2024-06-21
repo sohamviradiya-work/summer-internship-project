@@ -14,7 +14,6 @@ import com.tool.writers.interfaces.ItemWriter;
 
 public class BisectRegressionFinder extends LinearRegressionFinder {
 
-
     public BisectRegressionFinder(ProjectInstance projectInstance, ItemWriter<RegressionBlame> blameWriter) {
         super(projectInstance, blameWriter);
     }
@@ -22,12 +21,13 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
     @Override
     public void runForCommitsAndTests(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex,
             ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
-        bisectForCommitsAndTest(projectCommits, startIndex, endIndex, endIndex, testIdentifiers);
+        bisectForCommitsAndTest(projectCommits, startIndex, endIndex + 1, endIndex, testIdentifiers);
     }
 
-    private void bisectForCommitsAndTest(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex, int lastIndex, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
-        
-        if(testIdentifiers.isEmpty())
+    private void bisectForCommitsAndTest(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex,
+            int lastIndex, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
+        System.out.println(startIndex + "," + endIndex);
+        if (testIdentifiers.isEmpty())
             return;
 
         if (startIndex >= endIndex - 1) {
@@ -40,23 +40,25 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
         ProjectCommit previousCommit = projectCommits.get(lastIndex);
         ProjectCommit currentCommit = projectCommits.get(midIndex);
 
-        if(!projectInstance.isRunRequired(currentCommit, previousCommit)){
-            if(lastIndex > midIndex)
+        if (!projectInstance.isRunRequired(currentCommit, previousCommit)) {
+            if (lastIndex > midIndex)
                 bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, testIdentifiers);
             else
                 bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, testIdentifiers);
             return;
         }
 
-        ArrayList<TestResult> testResults = this.projectInstance.runTestsForCommit(testIdentifiers, projectCommits.get(midIndex),projectCommits.get(lastIndex));
+        ArrayList<TestResult> testResults = this.projectInstance.runTestsForCommit(testIdentifiers,
+                projectCommits.get(midIndex), projectCommits.get(lastIndex));
 
         ArrayList<TestIdentifier> failedTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
-        ArrayList<TestIdentifier> passedTests = new ArrayList<>(TestResult.extractNotFailingTests(testResults,testIdentifiers));
-        
-        if(!failedTests.isEmpty())
+        ArrayList<TestIdentifier> passedTests = new ArrayList<>(
+                TestResult.extractNotFailingTests(testResults, testIdentifiers));
+
+        if (!failedTests.isEmpty())
             bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, failedTests);
 
-        if(!passedTests.isEmpty())
+        if (!passedTests.isEmpty())
             bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, passedTests);
     }
 }
