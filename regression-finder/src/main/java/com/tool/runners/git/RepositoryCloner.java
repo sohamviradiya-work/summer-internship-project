@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode;
@@ -31,7 +32,8 @@ public class RepositoryCloner {
             String firstCommit)
             throws GitAPIException, IOException {
 
-        branches.replaceAll(branch -> ("refs/heads/" + branch));
+        List<String> branchesToConsider = new ArrayList<>(branches);
+        branchesToConsider.replaceAll(branch -> ("refs/heads/" + branch));
 
         File dir = new File(path);
 
@@ -46,14 +48,15 @@ public class RepositoryCloner {
 
         Git git;
         if (firstCommit != null)
-            git = fetchFromPoint(path, link, branches, firstCommit, dir, shallowSinceInstant);
+            git = fetchFromPoint(path, link, branchesToConsider, firstCommit, dir, shallowSinceInstant);
         else
-            git = fetchFromInstant(link, branches, dir, shallowSinceInstant);
+            git = fetchFromInstant(link, branchesToConsider, dir, shallowSinceInstant);
 
         List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
         for (Ref ref : remoteBranches) {
             RepositoryCloner.cloneBranchToLocal(git, ref);
         }
+
         git.close();
 
         System.out.println("Cloning Complete");
@@ -91,7 +94,6 @@ public class RepositoryCloner {
                 .setBranchesToClone(branches)
                 .setDirectory(dir)
                 .setDepth(depth)
-                .setNoCheckout(false)
                 .call();
     }
 
