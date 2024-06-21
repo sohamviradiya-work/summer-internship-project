@@ -45,7 +45,7 @@ public class ProjectInstance {
     public ArrayList<TestResult> runTestsForCommit(List<TestIdentifier> testIdentifiers,
             ProjectCommit projectCommit, ProjectCommit previousCommit) throws GitAPIException, IOException {
         gitWorker.checkoutToCommit(projectCommit);
-        
+
         syncIfRequired(projectCommit, previousCommit);
         return gradleWorker.runTests(testIdentifiers);
     }
@@ -84,43 +84,8 @@ public class ProjectInstance {
         return false;
     }
 
-    public ArrayList<TestIdentifier> extractTestsToRun(ProjectCommit firstCommit, ProjectCommit lastCommit,
-            ItemWriter<RegressionBlame> blameWriter) throws GitAPIException, IOException {
-
-        ArrayList<TestResult> testResults = runAllTestsForCommit(lastCommit);
-
-        ArrayList<TestIdentifier> failingTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
-
-        ArrayList<TestResult> lastPhaseTestResults = runTestsForCommit(failingTests, firstCommit, lastCommit);
-
-        HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(lastPhaseTestResults);
-
-        for (TestIdentifier testIdentifier : falseWrittenTests) {
-            failingTests.remove(testIdentifier);
-            blameWriter.writeAll(blameTestOnAuthor(testIdentifier, firstCommit));
-        }
-
-        return failingTests;
-    }
-
-    public ArrayList<TestIdentifier> extractTestsToRun(ProjectCommit firstCommit, ProjectCommit lastCommit,
-            ItemWriter<RegressionBlame> blameWriter, ArrayList<TestIdentifier> testIdentifiers)
-            throws GitAPIException, IOException {
-
-        ArrayList<TestIdentifier> failingTests =  new ArrayList<>(List.copyOf(testIdentifiers));
-
-        HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(runTestsForCommit(failingTests, firstCommit, lastCommit));
-
-        for (TestIdentifier testIdentifier : falseWrittenTests) {
-            failingTests.remove(testIdentifier);
-            blameWriter.writeAll(blameTestOnAuthor(testIdentifier, firstCommit));
-        }
-        return failingTests;
-    }
-
     public ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier, ProjectCommit firstCommit)
             throws GitAPIException {
-
         String testFilePath = testIdentifier.getTestProject() + "/" + testSrcPath + "/"
                 + testIdentifier.getTestClass().replace(".", "/");
 
@@ -133,14 +98,16 @@ public class ProjectInstance {
         ArrayList<RegressionBlame> regressionBlames = new ArrayList<>();
         for (ProjectCommit authorCommit : authorCommits) {
             if (authorCommit.getCommitId().compareTo(firstCommit.getCommitId()) == 0)
-                regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, ProjectCommit.getLastPhaseCommit(), false));
+                regressionBlames
+                        .add(RegressionBlame.constructBlame(testIdentifier, ProjectCommit.getLastPhaseCommit(), false));
             else
                 regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, authorCommit, false));
         }
         return regressionBlames;
     }
 
-    public static ProjectInstance mountLocalProject(String rootPath, String testSrcPath, String gradleVersion, OutputStream logStream)
+    public static ProjectInstance mountLocalProject(String rootPath, String testSrcPath, String gradleVersion,
+            OutputStream logStream)
             throws IOException {
 
         if (gradleVersion.length() == 0)
@@ -148,7 +115,7 @@ public class ProjectInstance {
 
         File directory = new File(rootPath);
         GradleWorker gradleWorker = GradleWorker.mountGradleWorker(gradleVersion, directory, logStream);
-        GitWorker gitWorker = GitWorker.mountGitWorker(directory,logStream);
+        GitWorker gitWorker = GitWorker.mountGitWorker(directory, logStream);
 
         return new ProjectInstance(gradleWorker, gitWorker, testSrcPath);
     }
