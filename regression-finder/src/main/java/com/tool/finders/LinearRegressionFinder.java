@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.bouncycastle.util.test.Test;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.items.ProjectCommit;
 import com.items.RegressionBlame;
 import com.items.TestIdentifier;
 import com.items.TestResult;
-import com.tool.Config;
 import com.tool.finders.interfaces.Finder;
 import com.tool.runners.ProjectInstance;
 import com.tool.writers.interfaces.ItemWriter;
@@ -36,9 +34,9 @@ public class LinearRegressionFinder implements Finder {
                 break;
 
             ProjectCommit currentCommit = projectCommits.get(i);
-            ProjectCommit previousCommit = projectCommits.get(i + 1);
+            ProjectCommit previousCommit = projectCommits.get(Math.min(i + 1,projectCommits.size() - 1));
 
-            if (!projectInstance.isRunRequired(currentCommit, previousCommit))
+            if (currentCommit.getCommitId().compareTo(previousCommit.getCommitId())!=0 && !projectInstance.isRunRequired(currentCommit, previousCommit))
                 continue;
 
             ArrayList<TestIdentifier> newFailedTests = new ArrayList<>();
@@ -49,30 +47,35 @@ public class LinearRegressionFinder implements Finder {
             for (TestIdentifier testIdentifier : failedTests) {
                 if (newFailedTestsSet.contains(testIdentifier))
                     newFailedTests.add(testIdentifier);
-                else
-                    putBlame(testIdentifier, previousCommit, true);
+                else if(currentCommit.getCommitId().compareTo(previousCommit.getCommitId())!=0)
+                    putBlame(testIdentifier, previousCommit);
             }
             failedTests = newFailedTests;
         }
 
-        for (TestIdentifier testIdentifier : failedTests) {
-            putBlame(testIdentifier, projectCommits.get(startIndex), (startIndex > 0));
-
+        if (startIndex > 0) {
+            for (TestIdentifier testIdentifier : failedTests)
+                putBlame(testIdentifier, projectCommits.get(startIndex));
+            return;
         }
+        
+        putBlameOnAuthor(testIdentifiers, projectCommits);
     }
 
     @Override
     public void runForTests(ArrayList<ProjectCommit> projectCommits, ArrayList<TestIdentifier> testIdentifiers)
             throws GitAPIException, IOException {
-        runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 2, testIdentifiers);
+        runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 1, testIdentifiers);
     }
 
-    public void putBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit, boolean isTestFail)
+    public void putBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit)
             throws IOException, GitAPIException {
-        if (!isTestFail)
-            blameWriter.writeAll(projectInstance.blameTestOnAuthor(testIdentifier, projectCommit));
-        else
-            blameWriter.write(RegressionBlame.constructBlame(testIdentifier, projectCommit, true));
+        blameWriter.write(RegressionBlame.constructBlame(testIdentifier, projectCommit, true));
+    }
+
+    public void putBlameOnAuthor(ArrayList<TestIdentifier> testIdentifiers,  ArrayList<ProjectCommit> projectCommits)
+            throws IOException, GitAPIException {
+        blameWriter.writeAll(projectInstance.blameTestsOnAuthor(testIdentifiers, projectCommits));
     }
 
     @Override

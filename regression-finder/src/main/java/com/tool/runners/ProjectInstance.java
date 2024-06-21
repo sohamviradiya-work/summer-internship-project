@@ -16,9 +16,6 @@ import com.items.TestIdentifier;
 import com.items.TestResult;
 import com.tool.runners.git.GitWorker;
 import com.tool.runners.gradle.GradleWorker;
-import com.tool.writers.interfaces.ItemWriter;
-
-// TODO: Parallel, one project instance per subproject
 
 public class ProjectInstance {
 
@@ -84,8 +81,10 @@ public class ProjectInstance {
         return false;
     }
 
-    public ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier, ProjectCommit firstCommit)
-            throws GitAPIException {
+    public ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier,
+            HashSet<String> projectCommitsSet)
+            throws GitAPIException, IllegalArgumentException, IOException {
+
         String testFilePath = testIdentifier.getTestProject() + "/" + testSrcPath + "/"
                 + testIdentifier.getTestClass().replace(".", "/");
 
@@ -97,11 +96,30 @@ public class ProjectInstance {
 
         ArrayList<RegressionBlame> regressionBlames = new ArrayList<>();
         for (ProjectCommit authorCommit : authorCommits) {
-            if (authorCommit.getCommitId().compareTo(firstCommit.getCommitId()) == 0)
-                regressionBlames
-                        .add(RegressionBlame.constructBlame(testIdentifier, ProjectCommit.getLastPhaseCommit(), false));
-            else
+            if (projectCommitsSet.contains(authorCommit.getCommitId()))
                 regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, authorCommit, false));
+        }
+        if(regressionBlames.isEmpty())
+            regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, ProjectCommit.getLastPhaseCommit(), false));
+        return regressionBlames;
+    }
+
+    public List<RegressionBlame> blameTestsOnAuthor(ArrayList<TestIdentifier> testIdentifiers,
+            ArrayList<ProjectCommit> projectCommits)
+            throws IllegalArgumentException, GitAPIException, IOException {
+
+        gitWorker.checkoutToCommit(projectCommits.get(projectCommits.size() - 1));
+
+        ArrayList<RegressionBlame> regressionBlames = new ArrayList<>();
+
+        HashSet<String> projectCommitSet = new HashSet<>();
+
+        projectCommits.forEach(projectCommit -> projectCommitSet.add(projectCommit.getCommitId()));
+
+        projectCommitSet.remove(projectCommits.get(0).getCommitId());
+
+        for (TestIdentifier testIdentifier : testIdentifiers) {
+            regressionBlames.addAll(blameTestOnAuthor(testIdentifier, projectCommitSet));
         }
         return regressionBlames;
     }
