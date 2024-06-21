@@ -16,6 +16,7 @@ import org.gradle.tooling.events.test.internal.DefaultTestSkippedResult;
 
 import com.items.TestIdentifier;
 import com.items.TestResult;
+import com.tool.Config;
 import com.tool.writers.ArrayListWriter;
 
 public class GradleWorker {
@@ -62,13 +63,16 @@ public class GradleWorker {
     }
 
     private ArrayList<TestResult> runAllTestsForProject(String testProjectName) {
-        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager,logStream);
+        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager, logStream);
         ArrayList<ProgressEvent> events = projectBuilder.runAlltestsForProject(testProjectName);
         return extractResults(testProjectName, events);
     }
 
     public void syncDependencies() {
-        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager,logStream);
+
+        System.out.println(Config.ANSI_PURPLE + "Syncing Dependencies " + Config.ANSI_RESET);
+
+        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager, logStream);
         projectBuilder.syncDependencies();
     }
 

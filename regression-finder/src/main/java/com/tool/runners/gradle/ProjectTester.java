@@ -10,6 +10,8 @@ import org.gradle.tooling.events.OperationType;
 import org.gradle.tooling.events.ProgressEvent;
 import org.gradle.tooling.events.ProgressListener;
 
+import com.tool.Config;
+
 
 public class ProjectTester {
     private TestLauncher testLauncher;
@@ -39,6 +41,7 @@ public class ProjectTester {
             }
         }, OperationType.TEST);
         try {
+            System.out.println(Config.ANSI_PURPLE + "Building " + testProjectName + Config.ANSI_RESET);
             testLauncher.setStandardOutput(logStream);
             testLauncher.run();
         } catch (Exception e) {
