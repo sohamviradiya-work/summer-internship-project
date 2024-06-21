@@ -60,7 +60,7 @@ public class RegressionBlame implements CSVItem, JiraItem {
     }
 
     public static RegressionBlame constructBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit,boolean isTestFail){
-        RegressionBlame regressionBlame = new RegressionBlame(testIdentifier, projectCommit,false);
+        RegressionBlame regressionBlame = new RegressionBlame(testIdentifier, projectCommit,isTestFail);
         System.out.println("Blame found: "+ Config.ANSI_CYAN + regressionBlame.getInfo() + Config.ANSI_RESET);
         return regressionBlame;
     }
