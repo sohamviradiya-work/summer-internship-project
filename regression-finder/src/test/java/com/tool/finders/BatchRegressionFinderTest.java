@@ -48,10 +48,10 @@ class BatchRegressionFinderTest {
         verify(mockBlameWriter, atLeastOnce()).writeAll(blameCaptor.capture());
         
         ArgumentCaptor<ProjectCommit> commitCaptor = ArgumentCaptor.forClass(ProjectCommit.class);
-        verify(mockProjectInstance, times(6)).runTestsForCommit(any(),commitCaptor.capture(), any());
+        verify(mockProjectInstance, times(4)).runTestsForCommit(any(),commitCaptor.capture(), any());
         List<ProjectCommit> capturedProjectCommits = commitCaptor.getAllValues();
        
-        int i = 14;
+        int i = 12;
         for(ProjectCommit projectCommit:capturedProjectCommits){
             if(i>=3)
                 i-=3;

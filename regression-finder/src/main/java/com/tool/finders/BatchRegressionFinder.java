@@ -28,7 +28,7 @@ public class BatchRegressionFinder extends LinearRegressionFinder {
             ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
 
         ArrayList<TestIdentifier> failedTests = testIdentifiers;
-        int i = endIndex;
+        int i = endIndex - batchSize + 1;
 
         for (; i >= startIndex; i -= batchSize) {
 
