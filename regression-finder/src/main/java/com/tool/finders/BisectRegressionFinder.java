@@ -59,4 +59,10 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
             bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, passedTests);
     }
 
+
+    @Override
+    public void runForTests(ArrayList<ProjectCommit> projectCommits, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
+        runForCommitsAndTests(projectCommits,0,projectCommits.size() - 1,testIdentifiers);
+    }
+
 }

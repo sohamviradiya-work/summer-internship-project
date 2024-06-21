@@ -58,7 +58,13 @@ public class BatchRegressionFinder extends LinearRegressionFinder {
             super.runForCommitsAndTests(projectCommits, i + 1, Math.min(i + batchSize - 1, endIndex), batchTests);
             failedTests = newFailedTests;
         }
+        if(!failedTests.isEmpty())
+            super.runForCommitsAndTests(projectCommits, startIndex, Math.min(i + batchSize - 1, endIndex), failedTests);
+    }
 
-        super.runForCommitsAndTests(projectCommits, startIndex, Math.min(i + batchSize - 1, endIndex), failedTests);
+
+    @Override
+    public void runForTests(ArrayList<ProjectCommit> projectCommits, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
+        runForCommitsAndTests(projectCommits,0,projectCommits.size() - 1,testIdentifiers);
     }
 }

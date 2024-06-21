@@ -107,7 +107,7 @@ public class ProjectInstance {
             ItemWriter<RegressionBlame> blameWriter, ArrayList<TestIdentifier> testIdentifiers)
             throws GitAPIException, IOException {
 
-        ArrayList<TestIdentifier> failingTests =  new ArrayList<>(List.copyOf(TestResult.extractFailingTests(runTestsForCommit(testIdentifiers, lastCommit, lastCommit))));
+        ArrayList<TestIdentifier> failingTests =  new ArrayList<>(List.copyOf(testIdentifiers));
 
         HashSet<TestIdentifier> falseWrittenTests = TestResult.extractFailingTests(runTestsForCommit(failingTests, firstCommit, lastCommit));
 
