@@ -26,6 +26,7 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
     }
 
     private void bisectForCommitsAndTest(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex, int lastIndex, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
+        
         if(testIdentifiers.isEmpty())
             return;
 

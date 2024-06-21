@@ -59,7 +59,7 @@ public class LinearRegressionFinder implements Finder {
             return;
         }
         
-        putBlameOnAuthor(testIdentifiers, projectCommits);
+        putBlameOnAuthor(failedTests, projectCommits);
     }
 
     @Override
