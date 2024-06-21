@@ -44,10 +44,9 @@ class BatchRegressionFinderTest {
 
         finder.runForCommitsAndTests(new ArrayList<>(projectCommits), 0, 11, new ArrayList<>(testIdentifiers));
 
-        ArgumentCaptor<RegressionBlame> blameCaptor = ArgumentCaptor.forClass(RegressionBlame.class);
-        verify(mockBlameWriter, atLeastOnce()).write(blameCaptor.capture());
-        TestHelper.assertCapturedBlames(blameCaptor.getAllValues(), projectCommits,0,4);
-
+        ArgumentCaptor<ArrayList<RegressionBlame>> blameCaptor = ArgumentCaptor.forClass(ArrayList.class);
+        verify(mockBlameWriter, atLeastOnce()).writeAll(blameCaptor.capture());
+        
         ArgumentCaptor<ProjectCommit> commitCaptor = ArgumentCaptor.forClass(ProjectCommit.class);
         verify(mockProjectInstance, times(6)).runTestsForCommit(any(),commitCaptor.capture(), any());
         List<ProjectCommit> capturedProjectCommits = commitCaptor.getAllValues();

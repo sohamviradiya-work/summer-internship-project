@@ -46,12 +46,9 @@ public class RegressionTool {
         String initialBranch = "";
         for (String branch : branchWiseCommitList.keySet()) {
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
-
-            ProjectCommit firstCommit = projectCommits.get(0);
             ProjectCommit lastCommit = projectCommits.get(projectCommits.size() - 1);
 
-            ArrayList<TestIdentifier> testsTorun = projectInstance.extractTestsToRun(firstCommit, lastCommit, blameWriter, tests);
-            finder.runForTests(projectCommits, testsTorun);
+            finder.runForTests(projectCommits, tests);
             gitWorker.checkoutToCommit(lastCommit);
             initialBranch = branch;
         }

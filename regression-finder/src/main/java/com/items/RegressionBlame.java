@@ -3,6 +3,7 @@ package com.items;
 import com.items.interfaces.CSVItem;
 import com.items.interfaces.JiraItem;
 import com.items.interfaces.JiraTicket;
+import com.tool.Config;
 
 public class RegressionBlame implements CSVItem, JiraItem {
 
@@ -15,7 +16,7 @@ public class RegressionBlame implements CSVItem, JiraItem {
     private TestIdentifier testIdentifier;
     private BlameType type;
 
-    public RegressionBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit, boolean isTestFail) {
+    private RegressionBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit, boolean isTestFail) {
         this.testIdentifier = testIdentifier;
         this.projectCommit = projectCommit;
         this.type = isTestFail ? BlameType.TEST_FAIL : BlameType.TEST_WRITE;
@@ -56,6 +57,12 @@ public class RegressionBlame implements CSVItem, JiraItem {
         }
 
         return new JiraTicket(summary, description, this.projectCommit.getAuthor());
+    }
+
+    public static RegressionBlame constructBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit,boolean isTestFail){
+        RegressionBlame regressionBlame = new RegressionBlame(testIdentifier, projectCommit,false);
+        System.out.println("Blame found: "+ Config.ANSI_CYAN + regressionBlame.getInfo() + Config.ANSI_RESET);
+        return regressionBlame;
     }
 
     public String getInfo() {

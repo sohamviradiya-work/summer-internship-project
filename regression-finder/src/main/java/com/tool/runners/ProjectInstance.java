@@ -118,7 +118,7 @@ public class ProjectInstance {
         return failingTests;
     }
 
-    private ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier, ProjectCommit firstCommit)
+    public ArrayList<RegressionBlame> blameTestOnAuthor(TestIdentifier testIdentifier, ProjectCommit firstCommit)
             throws GitAPIException {
 
         String testFilePath = testIdentifier.getTestProject() + "/" + testSrcPath + "/"
@@ -133,9 +133,9 @@ public class ProjectInstance {
         ArrayList<RegressionBlame> regressionBlames = new ArrayList<>();
         for (ProjectCommit authorCommit : authorCommits) {
             if (authorCommit.getCommitId().compareTo(firstCommit.getCommitId()) == 0)
-                regressionBlames.add(new RegressionBlame(testIdentifier, ProjectCommit.getLastPhaseCommit(), false));
+                regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, ProjectCommit.getLastPhaseCommit(), false));
             else
-                regressionBlames.add(new RegressionBlame(testIdentifier, authorCommit, false));
+                regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, authorCommit, false));
         }
         return regressionBlames;
     }

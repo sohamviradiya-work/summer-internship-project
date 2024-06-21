@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.bouncycastle.util.test.Test;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import com.items.ProjectCommit;
@@ -49,23 +50,29 @@ public class LinearRegressionFinder implements Finder {
                 if (newFailedTestsSet.contains(testIdentifier))
                     newFailedTests.add(testIdentifier);
                 else
-                    putBlame(new RegressionBlame(testIdentifier, previousCommit, true));
+                    putBlame(testIdentifier, previousCommit, true);
             }
             failedTests = newFailedTests;
         }
 
-        for (TestIdentifier testIdentifier : failedTests)
-            putBlame(new RegressionBlame(testIdentifier, projectCommits.get(startIndex), true));
+        for (TestIdentifier testIdentifier : failedTests) {
+            putBlame(testIdentifier, projectCommits.get(startIndex), (startIndex > 0));
+
+        }
     }
 
     @Override
-    public void runForTests(ArrayList<ProjectCommit> projectCommits, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
-        runForCommitsAndTests(projectCommits,0,projectCommits.size() - 2,testIdentifiers);
+    public void runForTests(ArrayList<ProjectCommit> projectCommits, ArrayList<TestIdentifier> testIdentifiers)
+            throws GitAPIException, IOException {
+        runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 2, testIdentifiers);
     }
 
-    public void putBlame(RegressionBlame regressionBlame) throws IOException {
-        System.out.println("Blame found: "+ Config.ANSI_CYAN + regressionBlame.getInfo() + Config.ANSI_RESET);
-        blameWriter.write(regressionBlame);
+    public void putBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit, boolean isTestFail)
+            throws IOException, GitAPIException {
+        if (!isTestFail)
+            blameWriter.writeAll(projectInstance.blameTestOnAuthor(testIdentifier, projectCommit));
+        else
+            blameWriter.write(RegressionBlame.constructBlame(testIdentifier, projectCommit, true));
     }
 
     @Override
