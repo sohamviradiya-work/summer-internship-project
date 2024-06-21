@@ -41,6 +41,8 @@ public class RegressionTool {
 
         HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch(initialCommit,branches);
 
+        log(resultPath, branchWiseCommitList);
+
         long start = System.currentTimeMillis();
 
         String initialBranch = "";
@@ -73,5 +75,14 @@ public class RegressionTool {
             return new BatchRegressionFinder(projectInstance, blameWriter, batchSize);
         } else
             throw new IllegalArgumentException("Method must be one of Linear, Bisect or Batch XX received: " + method);
+    }
+
+    private static void log(String resultPath, HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList)
+            throws IOException {
+        CSVWriter<ProjectCommit> commitsWriter = CSVWriter.create(resultPath + "/" + "commits.csv");
+        for (String branch : branchWiseCommitList.keySet()) {
+            ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
+            commitsWriter.writeAll(projectCommits);
+        }
     }
 }
