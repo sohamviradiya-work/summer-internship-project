@@ -21,17 +21,24 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
     @Override
     public void runForCommitsAndTests(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex,
             ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
-        bisectForCommitsAndTest(projectCommits, startIndex, endIndex + 1, endIndex, testIdentifiers);
+        bisectForCommitsAndTest(projectCommits, startIndex, endIndex, endIndex, testIdentifiers);
     }
 
     private void bisectForCommitsAndTest(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex,
             int lastIndex, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
-                
+        System.out.println(startIndex + "," + endIndex);
         if (testIdentifiers.isEmpty())
             return;
 
         if (startIndex >= endIndex - 1) {
-            super.runForCommitsAndTests(projectCommits, startIndex, startIndex, testIdentifiers);
+            if (startIndex == endIndex) {
+                for (TestIdentifier testIdentifier : testIdentifiers) {
+                    putBlame(testIdentifier, projectCommits.get(startIndex));
+                }
+            } else if (lastIndex == endIndex)
+                super.runForCommitsAndTests(projectCommits, startIndex, startIndex, testIdentifiers);
+            else
+                super.runForCommitsAndTests(projectCommits, endIndex, endIndex, testIdentifiers);
             return;
         }
 

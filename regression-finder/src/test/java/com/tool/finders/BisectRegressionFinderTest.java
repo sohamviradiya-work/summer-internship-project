@@ -50,7 +50,7 @@ public class BisectRegressionFinderTest {
         verify(mockProjectInstance, times(7)).runTestsForCommit(any(),commitCaptor.capture(), any());
         List<ProjectCommit> capturedProjectCommits = commitCaptor.getAllValues();
 
-        int i = 100;
+        int i = 99;
         
         for(ProjectCommit projectCommit:capturedProjectCommits){
             i/=2;
