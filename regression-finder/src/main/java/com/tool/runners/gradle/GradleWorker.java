@@ -3,7 +3,9 @@ package com.tool.runners.gradle;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class GradleWorker {
     }
 
     private ArrayList<TestResult> runTestsForProject(String testProjectName,
-            HashMap<String, List<String>> testMethods) {
+            HashMap<String, List<String>> testMethods) throws IOException {
         ProjectTester projectTester = ProjectTester.mountProjectTester(projectManager, logStream);
         ArrayList<ProgressEvent> events = projectTester.runTestsForProject(testProjectName, testMethods);
         return extractResults(testProjectName, events);
@@ -62,7 +64,7 @@ public class GradleWorker {
         return testResults;
     }
 
-    private ArrayList<TestResult> runAllTestsForProject(String testProjectName) {
+    private ArrayList<TestResult> runAllTestsForProject(String testProjectName) throws IOException {
         ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager, logStream);
         ArrayList<ProgressEvent> events = projectBuilder.runAlltestsForProject(testProjectName);
         return extractResults(testProjectName, events);
@@ -80,10 +82,13 @@ public class GradleWorker {
         return new GradleWorker(ProjectManager.mountGradleProject(gradleVersion, directory), logStream);
     }
 
-    private static ArrayList<TestResult> extractResults(String testProjectName,
-            ArrayList<ProgressEvent> events) {
+    private ArrayList<TestResult> extractResults(String testProjectName,
+            ArrayList<ProgressEvent> events) throws IOException {
         ArrayList<TestResult> testResults = new ArrayList<>();
         for (ProgressEvent event : events) {
+
+            logEvent(event);
+            
             if (event instanceof DefaultTestFinishEvent) {
                 TestResult testResult = GradleWorker.extractResult(event, testProjectName);
                 if (testResult != null) {
@@ -93,6 +98,11 @@ public class GradleWorker {
             }
         }
         return testResults;
+    }
+
+    private void logEvent(ProgressEvent event) throws IOException {
+        String eventInfoString = event.getDisplayName() + " at " + Date.from(Instant.ofEpochMilli(event.getEventTime())) + "\n";
+        logStream.write(eventInfoString.getBytes());
     }
 
     public static TestResult extractResult(ProgressEvent event, String testProjectName) {
