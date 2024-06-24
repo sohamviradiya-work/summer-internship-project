@@ -21,11 +21,13 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
     @Override
     public void runForCommitsAndTests(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex,
             ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
-        bisectForCommitsAndTest(projectCommits, startIndex, endIndex, endIndex, testIdentifiers);
+        bisectForCommitsAndTest(projectCommits, startIndex, endIndex, endIndex, testIdentifiers, true);
     }
 
     private void bisectForCommitsAndTest(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex,
-            int lastIndex, ArrayList<TestIdentifier> testIdentifiers) throws GitAPIException, IOException {
+            int lastIndex, ArrayList<TestIdentifier> testIdentifiers, boolean left)
+            throws GitAPIException, IOException {
+                
         if (testIdentifiers.isEmpty())
             return;
 
@@ -34,10 +36,8 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
                 for (TestIdentifier testIdentifier : testIdentifiers) {
                     putBlame(testIdentifier, projectCommits.get(startIndex));
                 }
-            } else if (lastIndex == endIndex)
+            } else
                 super.runForCommitsAndTests(projectCommits, startIndex, startIndex, testIdentifiers);
-            else
-                super.runForCommitsAndTests(projectCommits, endIndex, endIndex, testIdentifiers);
             return;
         }
 
@@ -47,10 +47,10 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
         ProjectCommit currentCommit = projectCommits.get(midIndex);
 
         if (!projectInstance.isRunRequired(currentCommit, previousCommit)) {
-            if (lastIndex > midIndex)
-                bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, testIdentifiers);
+            if (left)
+                bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, testIdentifiers, true);
             else
-                bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, testIdentifiers);
+                bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, testIdentifiers, false);
             return;
         }
 
@@ -62,9 +62,9 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
                 TestResult.extractNotFailingTests(testResults, testIdentifiers));
 
         if (!failedTests.isEmpty())
-            bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, failedTests);
+            bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, failedTests, true);
 
         if (!passedTests.isEmpty())
-            bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, passedTests);
+            bisectForCommitsAndTest(projectCommits, midIndex + 1, endIndex, midIndex, passedTests, false);
     }
 }
