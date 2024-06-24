@@ -20,6 +20,7 @@ import com.tool.finders.interfaces.Finder;
 import com.tool.runners.git.GitWorker;
 import com.tool.writers.CSVWriter;
 import com.tool.writers.JiraTicketWriter;
+import com.tool.writers.JointWriter;
 import com.tool.writers.interfaces.ItemWriter;
 
 public class RegressionTool {
@@ -27,10 +28,14 @@ public class RegressionTool {
     public static long runWithTests(Config config, String gradleVersion)
             throws IOException, NoHeadException, GitAPIException {
 
-        CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(config.resultsPath + "/blame.csv");
-        OutputStream logStream = config.logToConsole ? System.out
-                : new FileOutputStream(new File(config.resultsPath + "/.log"));
-        // JiraTicketWriter<RegressionBlame> blameWriter = JiraTicketWriter.create();
+        OutputStream logStream = config.logToConsole ? System.out : new FileOutputStream(new File(config.resultsPath + "/.log"));
+        
+        CSVWriter<RegressionBlame> csvblameWriter = CSVWriter.create(config.resultsPath + "/blame.csv");
+        JiraTicketWriter<RegressionBlame> jiraBlameWriter = JiraTicketWriter.create();
+
+        JointWriter<RegressionBlame> blameWriter = JointWriter.create();
+        blameWriter.addWriter(csvblameWriter);
+        // blameWriter.addWriter(jiraBlameWriter);
 
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(config.repositoryPath, config.testSrcPath,
                 gradleVersion, logStream);
