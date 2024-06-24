@@ -144,9 +144,9 @@ public class GitWorker {
             if (branchObjectId == null)
                 continue;
 
-            Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
+            RevCommit commit = repository.parseCommit(branchObjectId);
 
-            for (RevCommit commit : commits) {
+            while (commit != null) {
                 ProjectCommit projectCommit = ProjectCommit.getprojectCommitFromRevCommit(branchName, commit);
 
                 if (firstCommit != null && projectCommit.getDateMilli() < firstCommit.getDateMilli())
@@ -155,16 +155,19 @@ public class GitWorker {
                 if (projectCommit.getDateMilli() < System.currentTimeMillis() - days * Config.MILLISECONDS_PER_DAY)
                     break;
 
+
                 if (assignedCommits.contains(projectCommit.getCommitId()))
                     continue;
+                
+                branchCommitMap
+                    .computeIfAbsent(branchName, k -> new ArrayList<>())
+                    .add(projectCommit);
 
-                if (!branchCommitMap.containsKey(projectCommit.getBranch()))
-                    branchCommitMap.put(projectCommit.getBranch(), new ArrayList<>());
-
-                branchCommitMap.get(projectCommit.getBranch()).add(projectCommit);
                 assignedCommits.add(projectCommit.getCommitId());
 
+                commit = revWalk.parseCommit(commit.getParent(0).getId());
             }
+
             if (!branchCommitMap.containsKey(branchName))
                 continue;
             Collections.reverse(branchCommitMap.get(branchName));

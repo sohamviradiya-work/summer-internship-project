@@ -6,14 +6,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 
 import com.items.ProjectCommit;
 import com.items.RegressionBlame;
-import com.items.TestIdentifier;
 import com.tool.Config;
 import com.tool.finders.BatchRegressionFinder;
 import com.tool.finders.BisectRegressionFinder;
