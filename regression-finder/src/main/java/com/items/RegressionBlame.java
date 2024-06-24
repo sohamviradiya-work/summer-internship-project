@@ -32,7 +32,7 @@ public class RegressionBlame implements CSVItem, JiraItem {
     @Override
     public JiraTicket toJiraTicket() {
 
-        String summary = "Your commit " + this.projectCommit.getCommitId() + " at " + this.projectCommit.getDate()
+        String summary = "Your commit " + this.projectCommit.getCommitId() + " at " + this.projectCommit.getDateString()
                 + " failed some tests";
 
         String description = "Your commit " + this.projectCommit.getCommitId() + " caused the test "
@@ -47,7 +47,7 @@ public class RegressionBlame implements CSVItem, JiraItem {
                     + this.testIdentifier.getTestClass() + "." + this.testIdentifier.getTestMethod()
                     + " was changed in the last phase, which has been failing since last phase";
         } else if (type == BlameType.TEST_WRITE) {
-            summary = "Your commit " + this.projectCommit.getCommitId() + " at " + this.projectCommit.getDate()
+            summary = "Your commit " + this.projectCommit.getCommitId() + " at " + this.projectCommit.getDateString()
             + " changed some tests which are failing";
             
             description = "Your commit " + this.projectCommit.getCommitId() + " changed the test "
