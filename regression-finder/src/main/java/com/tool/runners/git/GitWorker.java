@@ -165,6 +165,9 @@ public class GitWorker {
 
                 assignedCommits.add(projectCommit.getCommitId());
 
+                if(commit.getParentCount()==0)
+                    break;
+
                 commit = revWalk.parseCommit(commit.getParent(0).getId());
             }
 
