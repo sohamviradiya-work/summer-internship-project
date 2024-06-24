@@ -33,6 +33,8 @@ public class Config {
 
     private static final String DEFAULT_CONFIG = "./config.json";
 
+    public static final long MILLISECONDS_PER_DAY = 86400000;
+
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
@@ -44,7 +46,7 @@ public class Config {
     }
 
     public Config(String repositoryPath, String resultsPath, String testSrcPath, String method,
-            ArrayList<TestIdentifier> testIdentifiers, String firstCommit, List<String> branches) {
+            ArrayList<TestIdentifier> testIdentifiers, String firstCommit, List<String> branches, long days) {
         this.repositoryPath = repositoryPath;
         this.resultsPath = resultsPath;
         this.testSrcPath = testSrcPath;
@@ -52,6 +54,7 @@ public class Config {
         this.method = method;
         this.firstCommit = firstCommit;
         this.branches = branches;
+        this.days = days;
     }
 
     public static Config mountConfig()
@@ -80,14 +83,14 @@ public class Config {
             create(dryConfig.repositoryPath);
             clean(dryConfig.repositoryPath);
             RepositoryCloner.getRemoteRepository(dryConfig.repositoryPath, dryConfig.repositoryLink, dryConfig.days,
-                    dryConfig.branches, dryConfig.firstCommit);
+                    dryConfig.branches);
         }
 
         create(dryConfig.resultsPath);
         clean(dryConfig.resultsPath);
 
         return new Config(dryConfig.repositoryPath, dryConfig.resultsPath, dryConfig.testSrcPath, dryConfig.method,
-                testIdentifiers, dryConfig.firstCommit, dryConfig.branches);
+                testIdentifiers, dryConfig.firstCommit, dryConfig.branches, dryConfig.days);
     }
 
     private static String getProjectRoot() throws URISyntaxException {

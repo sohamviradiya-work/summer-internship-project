@@ -113,7 +113,8 @@ public class GitWorker {
         return changedFiles;
     }
 
-    public HashMap<String, ArrayList<ProjectCommit>> listCommitsByBranch(String firstCommit,List<String> inputBranches)
+    public HashMap<String, ArrayList<ProjectCommit>> listCommitsByBranch(String firstCommitId,
+            List<String> inputBranches, long days)
             throws IOException, NoHeadException, GitAPIException {
 
         Repository repository = git.getRepository();
@@ -122,28 +123,37 @@ public class GitWorker {
         HashSet<String> assignedCommits = new HashSet<String>();
 
         List<String> branchesToConsider = new ArrayList<>(inputBranches);
-        branchesToConsider.replaceAll(branchName -> ("refs/heads/"+ branchName));
+        branchesToConsider.replaceAll(branchName -> ("refs/heads/" + branchName));
 
         HashSet<String> branchNameSet = new HashSet<>(branchesToConsider);
 
         List<Ref> branches = git.branchList().call();
 
+        RevCommit firstRevCommit = repository.parseCommit(ObjectId.fromString(firstCommitId));
+        ProjectCommit firstCommit = ProjectCommit.getprojectCommitFromRevCommit(null, firstRevCommit);
+
         for (Ref branch : branches) {
-            
+
             String branchName = branch.getName();
 
-            if(!branchNameSet.contains(branchName))
+            if (!branchNameSet.contains(branchName))
                 continue;
 
             ObjectId branchObjectId = repository.resolve(branchName);
 
-            if (branchObjectId == null || branchName == "HEAD")
+            if (branchObjectId == null)
                 continue;
 
             Iterable<RevCommit> commits = git.log().add(branchObjectId).call();
 
             for (RevCommit commit : commits) {
                 ProjectCommit projectCommit = ProjectCommit.getprojectCommitFromRevCommit(branchName, commit);
+
+                if (firstCommit != null && projectCommit.getDateMilli() < firstCommit.getDateMilli())
+                    break;
+
+                if (projectCommit.getDateMilli() < System.currentTimeMillis() - days * Config.MILLISECONDS_PER_DAY)
+                    break;
 
                 if (assignedCommits.contains(projectCommit.getCommitId()))
                     continue;
@@ -153,8 +163,7 @@ public class GitWorker {
 
                 branchCommitMap.get(projectCommit.getBranch()).add(projectCommit);
                 assignedCommits.add(projectCommit.getCommitId());
-                if (firstCommit != null && projectCommit.getCommitId().compareTo(firstCommit) == 0)
-                    break;
+
             }
             if (!branchCommitMap.containsKey(branchName))
                 continue;

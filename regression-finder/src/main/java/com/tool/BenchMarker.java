@@ -13,17 +13,17 @@ import com.tool.writers.CSVWriter;
 
 public class BenchMarker {
 
-    public static void benchmark(String repositoryPath, String resultsPath,String testSrcPath ,String gradleVersion)
+    public static void benchmark(String repositoryPath, String resultsPath, String testSrcPath, String gradleVersion)
             throws NoHeadException, IOException, GitAPIException, URISyntaxException {
 
         CSVWriter<BenchMark> benchMarkWriter = CSVWriter.create(resultsPath + "/bench-mark.csv");
-        
+
         List<String> methods = List.of("Linear", "Batch 5", "Batch 20", "Batch 50", "Bisect");
         Config config = Config.mountConfig();
-            
+
         for (String method : methods) {
             long time = RegressionTool.runWithTests(config.repositoryPath, config.testSrcPath, "7.6.4", method,
-            config.resultsPath, config.tests,config.firstCommit, config.branches);
+                    config.resultsPath, config.tests, config.firstCommit, config.branches, config.days);
             benchMarkWriter.write(new BenchMark(time, method));
         }
         benchMarkWriter.close();

@@ -26,11 +26,11 @@ import com.tool.writers.interfaces.ItemWriter;
 public class RegressionTool {
 
     public static long runWithTests(String repositoryPath, String testSrcPath, String gradleVersion, String method,
-            String resultPath, ArrayList<TestIdentifier> tests, String initialCommit, List<String> branches)
+            String resultPath, ArrayList<TestIdentifier> tests, String initialCommit, List<String> branches,long days)
             throws IOException, NoHeadException, GitAPIException {
 
         CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/blame.csv");
-        OutputStream logStream = new FileOutputStream(new File(resultPath + "/.log"));
+        OutputStream logStream = System.out;
         // JiraTicketWriter<RegressionBlame> blameWriter = JiraTicketWriter.create();
 
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(repositoryPath, testSrcPath, gradleVersion, logStream);
@@ -39,7 +39,7 @@ public class RegressionTool {
 
         GitWorker gitWorker = projectInstance.getGitWorker();
 
-        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch(initialCommit,branches);
+        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch(initialCommit,branches,days);
 
         log(resultPath, branchWiseCommitList);
 

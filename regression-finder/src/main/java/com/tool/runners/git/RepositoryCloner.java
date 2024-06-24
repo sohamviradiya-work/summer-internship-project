@@ -14,8 +14,7 @@ import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
-import org.eclipse.jgit.errors.IncorrectObjectTypeException;
-import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.SshSessionFactory;
@@ -24,12 +23,11 @@ import org.eclipse.jgit.transport.sshd.SshdSessionFactory;
 import org.eclipse.jgit.transport.sshd.SshdSessionFactoryBuilder;
 import org.eclipse.jgit.util.FS;
 
-import com.tool.Config;
+import com.items.ProjectCommit;
 
 public class RepositoryCloner {
 
-    public static void getRemoteRepository(String path, String link, long lastDays, List<String> branches,
-            String firstCommit)
+    public static void getRemoteRepository(String path, String link, long lastDays, List<String> branches)
             throws GitAPIException, IOException {
 
         List<String> branchesToConsider = new ArrayList<>(branches);
@@ -46,11 +44,7 @@ public class RepositoryCloner {
                 .setSshDirectory(sshDir).build(new JGitKeyCache());
         SshSessionFactory.setInstance(sshdSessionFactory);
 
-        Git git;
-        if (firstCommit != null)
-            git = fetchFromPoint(path, link, branchesToConsider, firstCommit, dir, shallowSinceInstant);
-        else
-            git = fetchFromInstant(link, branchesToConsider, dir, shallowSinceInstant);
+        Git git = fetchFromInstant(link, branchesToConsider, dir, shallowSinceInstant);
 
         List<Ref> remoteBranches = git.branchList().setListMode(ListMode.REMOTE).call();
         for (Ref ref : remoteBranches) {
@@ -74,36 +68,18 @@ public class RepositoryCloner {
                 .call();
     }
 
-    private static Git fetchFromPoint(String path, String link, List<String> branches, String firstCommit, File dir,
-            Instant shallowSinceInstant) throws GitAPIException, InvalidRemoteException, TransportException,
-            MissingObjectException, IncorrectObjectTypeException {
-        Git git = Git.cloneRepository()
-                .setURI(link)
-                .setBranchesToClone(branches)
-                .setShallowSince(shallowSinceInstant)
-                .setDirectory(dir)
-                .setNoCheckout(false)
-                .call();
-
-        int depth = computeDepth(git, firstCommit);
-
-        git.close();
-        Config.clean(path);
-        return Git.cloneRepository()
-                .setURI(link)
-                .setBranchesToClone(branches)
-                .setDirectory(dir)
-                .setDepth(depth)
-                .call();
-    }
-
     static int computeDepth(Git git, String commitToFind)
-            throws GitAPIException, MissingObjectException, IncorrectObjectTypeException {
+            throws GitAPIException, IOException {
         Iterable<RevCommit> commits = git.log().call();
+
+        ProjectCommit firstCommit = ProjectCommit.getprojectCommitFromRevCommit(null, git.getRepository().parseCommit(ObjectId.fromString(commitToFind)));
+
         int count = 0;
         for (RevCommit commit : commits) {
             count++;
-            if (commit.getName().compareTo(commitToFind) == 0)
+            ProjectCommit projectCommit = ProjectCommit.getprojectCommitFromRevCommit(null, commit);
+
+            if (projectCommit.getDateMilli() < firstCommit.getDateMilli())
                 break;
         }
         return count;

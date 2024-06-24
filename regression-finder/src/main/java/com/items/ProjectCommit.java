@@ -40,8 +40,6 @@ public class ProjectCommit implements CSVItem {
         return time.getTime();
     }
 
-    
-
     public String getInfo(){
         return commitId + ", " + getDateString();
     }
