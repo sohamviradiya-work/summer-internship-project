@@ -2,7 +2,6 @@ package com.items;
 
 import com.items.interfaces.CSVItem;
 import com.items.interfaces.JiraItem;
-import com.items.interfaces.JiraTicket;
 import com.tool.Config;
 
 public class RegressionBlame implements CSVItem, JiraItem {

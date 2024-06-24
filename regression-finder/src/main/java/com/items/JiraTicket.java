@@ -1,4 +1,4 @@
-package com.items.interfaces;
+package com.items;
 
 public class JiraTicket {
     private String summary;

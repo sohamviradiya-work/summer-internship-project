@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.Base64;
 import java.util.HashMap;
 
-import com.items.interfaces.JiraTicket;
+import com.items.JiraTicket;
 
 public class JiraClient {
     private final String jiraUrl;

@@ -12,8 +12,8 @@ import org.mockito.MockitoAnnotations;
 import java.io.IOException;
 import java.util.List;
 
+import com.items.JiraTicket;
 import com.items.interfaces.JiraItem;
-import com.items.interfaces.JiraTicket;
 import com.tool.jira.JiraClient;
 
 public class JiraTicketWriterTest {
