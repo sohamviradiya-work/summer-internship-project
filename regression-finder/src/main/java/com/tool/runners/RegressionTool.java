@@ -14,6 +14,7 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 import com.items.ProjectCommit;
 import com.items.RegressionBlame;
 import com.items.TestIdentifier;
+import com.tool.Config;
 import com.tool.finders.BatchRegressionFinder;
 import com.tool.finders.BisectRegressionFinder;
 import com.tool.finders.LinearRegressionFinder;
@@ -25,23 +26,25 @@ import com.tool.writers.interfaces.ItemWriter;
 
 public class RegressionTool {
 
-    public static long runWithTests(String repositoryPath, String testSrcPath, String gradleVersion, String method,
-            String resultPath, ArrayList<TestIdentifier> tests, String initialCommit, List<String> branches,long days)
+    public static long runWithTests(Config config, String gradleVersion)
             throws IOException, NoHeadException, GitAPIException {
 
-        CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(resultPath + "/blame.csv");
-        OutputStream logStream = System.out;
+        CSVWriter<RegressionBlame> blameWriter = CSVWriter.create(config.resultsPath + "/blame.csv");
+        OutputStream logStream = config.logToConsole ? System.out
+                : new FileOutputStream(new File(config.resultsPath + "/.log"));
         // JiraTicketWriter<RegressionBlame> blameWriter = JiraTicketWriter.create();
 
-        ProjectInstance projectInstance = ProjectInstance.mountLocalProject(repositoryPath, testSrcPath, gradleVersion, logStream);
+        ProjectInstance projectInstance = ProjectInstance.mountLocalProject(config.repositoryPath, config.testSrcPath,
+                gradleVersion, logStream);
 
-        Finder finder = createFinder(method, blameWriter, projectInstance);
+        Finder finder = createFinder(config.method, blameWriter, projectInstance);
 
         GitWorker gitWorker = projectInstance.getGitWorker();
 
-        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker.listCommitsByBranch(initialCommit,branches,days);
+        HashMap<String, ArrayList<ProjectCommit>> branchWiseCommitList = gitWorker
+                .listCommitsByBranch(config.firstCommit, config.branches, config.days);
 
-        log(resultPath, branchWiseCommitList);
+        log(config.resultsPath, branchWiseCommitList);
 
         long start = System.currentTimeMillis();
 
@@ -50,7 +53,7 @@ public class RegressionTool {
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
             ProjectCommit lastCommit = projectCommits.get(projectCommits.size() - 1);
 
-            finder.runForTests(projectCommits, tests);
+            finder.runForTests(projectCommits, config.tests);
             gitWorker.checkoutToCommit(lastCommit);
             initialBranch = branch;
         }

@@ -92,7 +92,6 @@ public class GradleWorker {
             if (event instanceof DefaultTestFinishEvent) {
                 TestResult testResult = GradleWorker.extractResult(event, testProjectName);
                 if (testResult != null) {
-                    System.out.println("Test run complete: " + testResult.toCSVString());
                     testResults.add(testResult);
                 }
             }

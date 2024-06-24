@@ -22,8 +22,7 @@ public class BenchMarker {
         Config config = Config.mountConfig();
 
         for (String method : methods) {
-            long time = RegressionTool.runWithTests(config.repositoryPath, config.testSrcPath, "7.6.4", method,
-                    config.resultsPath, config.tests, config.firstCommit, config.branches, config.days);
+            long time = RegressionTool.runWithTests(config, "7.6.4");
             benchMarkWriter.write(new BenchMark(time, method));
         }
         benchMarkWriter.close();

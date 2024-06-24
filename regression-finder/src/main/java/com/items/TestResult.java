@@ -49,8 +49,10 @@ public class TestResult implements CSVItem {
     public static HashSet<TestIdentifier> extractFailingTests(ArrayList<TestResult> testResults) {
         HashSet<TestIdentifier> failingTests = new HashSet<>();
         for (TestResult testResult : testResults) {
-            if (testResult.getResult() == TestResult.Result.FAILED)
+            if (testResult.getResult() == TestResult.Result.FAILED){
                 failingTests.add(testResult.getIdentifier());
+                System.out.println("Test failed: " + Config.ANSI_RED + testResult.testIdentifier.toCSVString() + Config.ANSI_RESET);
+            }
         }
         return failingTests;
     }

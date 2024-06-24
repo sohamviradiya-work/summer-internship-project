@@ -30,6 +30,7 @@ public class Config {
     public String testInputFile;
     public String testSrcPath;
     public String firstCommit;
+    public boolean logToConsole;
 
     private static final String DEFAULT_CONFIG = "./config.json";
 
@@ -46,7 +47,8 @@ public class Config {
     }
 
     public Config(String repositoryPath, String resultsPath, String testSrcPath, String method,
-            ArrayList<TestIdentifier> testIdentifiers, String firstCommit, List<String> branches, long days) {
+            ArrayList<TestIdentifier> testIdentifiers, String firstCommit, List<String> branches, long days,
+            boolean logToConsole) {
         this.repositoryPath = repositoryPath;
         this.resultsPath = resultsPath;
         this.testSrcPath = testSrcPath;
@@ -55,6 +57,7 @@ public class Config {
         this.firstCommit = firstCommit;
         this.branches = branches;
         this.days = days;
+        this.logToConsole = logToConsole;
     }
 
     public static Config mountConfig()
@@ -90,7 +93,7 @@ public class Config {
         clean(dryConfig.resultsPath);
 
         return new Config(dryConfig.repositoryPath, dryConfig.resultsPath, dryConfig.testSrcPath, dryConfig.method,
-                testIdentifiers, dryConfig.firstCommit, dryConfig.branches, dryConfig.days);
+                testIdentifiers, dryConfig.firstCommit, dryConfig.branches, dryConfig.days, dryConfig.logToConsole);
     }
 
     private static String getProjectRoot() throws URISyntaxException {

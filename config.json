@@ -1,9 +1,9 @@
 {
-    "repositoryLink" : null,
+    "repositoryLink" : "git@github.com:sohamviradiya-work/small-test-repo.git",
     "repositoryPath" : "./resources/repository",
-    "branches" : ["main"],
-    "days" : 7,
-    "firstCommit" : "095f8c07a87034b93acc7f83fde350a98649bfcb",
+    "branches" : ["branch1"],
+    "days" : 20,
+    "firstCommit" : "6eb82d29421fba8e8df76d06d7517a9152fd8690",
     "testInputFile" : "./tests.csv",
     "testSrcPath" : "/src/test/java/",
     "tests": [
@@ -18,7 +18,7 @@
             "testMethod" : "testCorrelationSimple"
         }
     ],
-
+    "logToConsole": false,
     "resultsPath" : "./results",
     "method" : "Bisect"
 }
