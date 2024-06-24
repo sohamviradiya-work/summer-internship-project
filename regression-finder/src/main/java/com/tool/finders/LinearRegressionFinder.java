@@ -58,8 +58,8 @@ public class LinearRegressionFinder implements Finder {
                 putBlame(testIdentifier, projectCommits.get(startIndex));
             return;
         }
-        
-        putBlameOnAuthor(failedTests, projectCommits);
+        if(failedTests.size() > 0)
+            putBlameOnAuthor(failedTests, projectCommits);
     }
 
     @Override
