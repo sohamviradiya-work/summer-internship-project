@@ -30,12 +30,9 @@ public class RegressionTool {
 
         OutputStream logStream = config.logToConsole ? System.out : new FileOutputStream(new File(config.resultsPath + "/.log"));
         
-        CSVWriter<RegressionBlame> csvblameWriter = CSVWriter.create(config.resultsPath + "/blame.csv");
-        JiraTicketWriter<RegressionBlame> jiraBlameWriter = JiraTicketWriter.create();
-
         JointWriter<RegressionBlame> blameWriter = JointWriter.create();
-        blameWriter.addWriter(csvblameWriter);
-        // blameWriter.addWriter(jiraBlameWriter);
+        blameWriter.addWriter(CSVWriter.create(config.resultsPath + "/blame.csv"));
+        // blameWriter.addWriter(JiraTicketWriter.create());
 
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(config.repositoryPath, config.testSrcPath,
                 gradleVersion, logStream);
