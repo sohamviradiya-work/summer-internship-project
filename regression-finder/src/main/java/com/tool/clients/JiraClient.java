@@ -5,6 +5,8 @@ import java.net.*;
 import java.util.Base64;
 import java.util.HashMap;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.items.JiraTicket;
 import com.tool.Config;
 
@@ -18,8 +20,6 @@ public class JiraClient extends NetworkServiceClient {
     private final HashMap<String, String> emailMap;
     private final long issueTypeId;
     private final String projectKey;
-    private static final int ID_OFFSET = 13;
-    private static final int ID_LENGTH = 43;
 
     public JiraClient(String jiraUrl, String username, String apiToken, String issueTypeId, String projectKey) {
         this.jiraUrl = jiraUrl;
@@ -76,8 +76,9 @@ public class JiraClient extends NetworkServiceClient {
         if (!emailMap.containsKey(email)) {
             String endpoint = jiraUrl + "/rest/api/3/user/search?query=" + URLEncoder.encode(email, "UTF-8");
             String response = sendGetRequest(endpoint);
-            int idStart = response.indexOf("\"accountId\"", 0) + ID_OFFSET;
-            String assigneeId = response.substring(idStart, idStart + ID_LENGTH);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonResponse = mapper.readTree(response);
+            String assigneeId = jsonResponse.get(0).get("accountId").asText();
             emailMap.put(email, assigneeId);
         }
 
