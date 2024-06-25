@@ -63,7 +63,7 @@ public class JiraTicketWriter<T extends JiraItem> implements ItemWriter<T> {
 
     public static <T extends JiraItem> JiraTicketWriter<T> create() throws IOException, DotenvException, URISyntaxException {
 
-        JiraClient jiraClient = JiraClient.createClient();
+        JiraClient jiraClient = JiraClient.create();
 
         return new JiraTicketWriter<>(jiraClient);
     }

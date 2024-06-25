@@ -92,7 +92,7 @@ public class JiraClient extends NetworkServiceClient {
         return "Basic " + encodedAuth;
     }
 
-    public static JiraClient createClient() throws DotenvException, URISyntaxException {
+    public static JiraClient create() throws DotenvException, URISyntaxException {
 
         Dotenv dotenv = Dotenv.configure().directory(Config.getProjectRoot()).load();
 

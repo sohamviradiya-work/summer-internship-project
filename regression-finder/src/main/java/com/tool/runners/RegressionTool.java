@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -26,13 +27,14 @@ import com.tool.writers.interfaces.ItemWriter;
 public class RegressionTool {
 
     public static long runWithTests(Config config, String gradleVersion)
-            throws IOException, NoHeadException, GitAPIException {
+            throws IOException, NoHeadException, GitAPIException, URISyntaxException {
 
         OutputStream logStream = config.logToConsole ? System.out : new FileOutputStream(new File(config.resultsPath + "/.log"));
         
         JointWriter<RegressionBlame> blameWriter = JointWriter.create();
         blameWriter.addWriter(CSVWriter.create(config.resultsPath + "/blame.csv"));
         // blameWriter.addWriter(JiraTicketWriter.create());
+        // blameWriter.addWriter(TeamsNotificationWriter.create());
 
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(config.repositoryPath, config.testSrcPath,
                 gradleVersion, logStream);

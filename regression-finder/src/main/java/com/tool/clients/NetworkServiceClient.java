@@ -32,23 +32,36 @@ public abstract class NetworkServiceClient {
         }
         connection.disconnect();
     }
-
     protected String sendGetRequest(String endpoint) throws IOException {
         URL url = new URL(endpoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", getAuthHeader());
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+    
+        int status = connection.getResponseCode();
+    
+        BufferedReader reader;
+        if (status == HttpURLConnection.HTTP_OK) {
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        } else {
+            reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+            StringBuilder errorResponse = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                errorResponse.append(line);
+            }
+            reader.close();
+            connection.disconnect();
+            throw new IOException("HTTP request failed with status code " + status + ": " + errorResponse.toString());
+        }
+    
         StringBuilder response = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
             response.append(line);
         }
         reader.close();
-
         connection.disconnect();
-
         return response.toString();
     }
 
