@@ -14,7 +14,7 @@ import java.util.List;
 
 import com.items.JiraTicket;
 import com.items.interfaces.JiraItem;
-import com.tool.jira.JiraClient;
+import com.tool.clients.JiraClient;
 
 public class JiraTicketWriterTest {
 

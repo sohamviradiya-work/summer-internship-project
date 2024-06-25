@@ -22,6 +22,5 @@ public class JiraTicket {
     public String getEmail() {
         return email;
     }
-
 }
 

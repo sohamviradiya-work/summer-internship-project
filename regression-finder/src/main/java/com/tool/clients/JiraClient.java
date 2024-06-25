@@ -1,4 +1,4 @@
-package com.tool.jira;
+package com.tool.clients;
 
 import java.io.*;
 import java.net.*;
@@ -11,7 +11,7 @@ import com.tool.Config;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.github.cdimascio.dotenv.DotenvException;
 
-public class JiraClient {
+public class JiraClient extends NetworkServiceClient {
     private final String jiraUrl;
     private final String username;
     private final String apiToken;
@@ -84,47 +84,7 @@ public class JiraClient {
         return emailMap.get(email);
     }
 
-    private String sendGetRequest(String endpoint) throws IOException {
-        URL url = new URL(endpoint);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Authorization", getAuthHeader());
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            response.append(line);
-        }
-        reader.close();
-
-        return response.toString();
-    }
-
-    private void sendPostRequest(String endpoint, String requestBody) throws IOException {
-        URL url = new URL(endpoint);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestProperty("Authorization", getAuthHeader());
-        connection.setDoOutput(true);
-
-        try (OutputStream os = connection.getOutputStream()) {
-            byte[] input = requestBody.getBytes("utf-8");
-            os.write(input, 0, input.length);
-        }
-
-        StringBuilder response = new StringBuilder();
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-        }
-    }
-
-    private String getAuthHeader() {
+    protected String getAuthHeader() {
         String auth = username + ":" + apiToken;
         byte[] authBytes = auth.getBytes();
         String encodedAuth = Base64.getEncoder().encodeToString(authBytes);

@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import com.items.interfaces.JiraItem;
-import com.tool.jira.JiraClient;
+import com.tool.clients.JiraClient;
 import com.tool.writers.interfaces.ItemWriter;
 
 import io.github.cdimascio.dotenv.DotenvException;
