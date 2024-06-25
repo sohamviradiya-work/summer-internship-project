@@ -155,17 +155,19 @@ public class GitWorker {
                 if (projectCommit.getDateMilli() < System.currentTimeMillis() - days * Config.MILLISECONDS_PER_DAY)
                     break;
 
-
                 if (assignedCommits.contains(projectCommit.getCommitId()))
                     continue;
-                
+
                 branchCommitMap
-                    .computeIfAbsent(branchName, k -> new ArrayList<>())
-                    .add(projectCommit);
+                        .computeIfAbsent(branchName, k -> new ArrayList<>())
+                        .add(projectCommit);
 
                 assignedCommits.add(projectCommit.getCommitId());
 
-                if(commit.getParentCount()==0)
+                if (commit.getParentCount() == 0)
+                    break;
+
+                if (projectCommit.getCommitId().equals(firstCommit.getCommitId()))
                     break;
 
                 commit = revWalk.parseCommit(commit.getParent(0).getId());
