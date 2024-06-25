@@ -2,18 +2,19 @@ package com.items;
 
 import com.items.interfaces.CSVItem;
 import com.items.interfaces.JiraItem;
+import com.items.interfaces.TeamsItem;
 import com.tool.Config;
 
-public class RegressionBlame implements CSVItem, JiraItem {
+public class RegressionBlame implements CSVItem, JiraItem, TeamsItem {
 
     enum BlameType {
         TEST_FAIL,
         TEST_WRITE
     }
 
-    private ProjectCommit projectCommit;
-    private TestIdentifier testIdentifier;
-    private BlameType type;
+    ProjectCommit projectCommit;
+    TestIdentifier testIdentifier;
+    BlameType type;
 
     private RegressionBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit, boolean isTestFail) {
         this.testIdentifier = testIdentifier;
@@ -30,32 +31,12 @@ public class RegressionBlame implements CSVItem, JiraItem {
 
     @Override
     public JiraTicket toJiraTicket() {
+        return JiraTicket.convert(this);
+    }
 
-        String summary = "Your commit " + this.projectCommit.getCommitId() + " at " + this.projectCommit.getDateString()
-                + " failed some tests";
-
-        String description = "Your commit " + this.projectCommit.getCommitId() + " caused the test "
-                + this.testIdentifier.getTestProject() + ":" + this.testIdentifier.getTestClass() + "."
-                + this.testIdentifier.getTestMethod() + " to fail";
-
-        if (this.projectCommit.getCommitId().compareTo("LAST PHASE") == 0) {
-            summary = "This failing test was changed in the last phase";
-
-            description = "Test "
-                    + this.testIdentifier.getTestProject() + ": "
-                    + this.testIdentifier.getTestClass() + "." + this.testIdentifier.getTestMethod()
-                    + " was changed in the last phase, which has been failing since last phase";
-        } else if (type == BlameType.TEST_WRITE) {
-            summary = "Your commit " + this.projectCommit.getCommitId() + " at " + this.projectCommit.getDateString()
-            + " changed some tests which are failing";
-            
-            description = "Your commit " + this.projectCommit.getCommitId() + " changed the test "
-                    + this.testIdentifier.getTestProject() + ": "
-                    + this.testIdentifier.getTestClass() + "." + this.testIdentifier.getTestMethod()
-                    + " which has been failing since last phase";
-        }
-
-        return new JiraTicket(summary, description, this.projectCommit.getAuthor());
+    @Override
+    public TeamsNotification toTeamsNotification(){
+        return TeamsNotification.convert(this);
     }
 
     public static RegressionBlame constructBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit,boolean isTestFail){
