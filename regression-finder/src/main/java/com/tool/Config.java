@@ -31,6 +31,7 @@ public class Config {
     public String testSrcPath;
     public String firstCommit;
     public boolean logToConsole;
+    public static final long MILLISECONDS_PER_SECOND = 1000;
 
     private static final String DEFAULT_CONFIG = "./config.json";
 

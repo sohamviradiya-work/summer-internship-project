@@ -8,6 +8,7 @@ import java.util.TimeZone;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.items.interfaces.CSVItem;
+import com.tool.Config;
 
 public class ProjectCommit implements CSVItem {
     private String authorMail;
@@ -61,7 +62,7 @@ public class ProjectCommit implements CSVItem {
                 commit.getAuthorIdent().getEmailAddress(),
                 commit.getName(),
                 branchName,
-                commit.getAuthorIdent().getWhen(),
+                Date.from(Instant.ofEpochMilli(commit.getCommitTime()*Config.MILLISECONDS_PER_SECOND)),
                 commit.getShortMessage());
     }
 
