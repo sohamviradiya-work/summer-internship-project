@@ -26,7 +26,7 @@ public class JiraTicketWriterTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        jiraTicketWriter = new JiraTicketWriter<>(jiraClient, "10001", "abcd");
+        jiraTicketWriter = new JiraTicketWriter<>(jiraClient);
     }
 
     @Test
@@ -38,14 +38,8 @@ public class JiraTicketWriterTest {
         jiraTicketWriter.close();
 
         ArgumentCaptor<JiraTicket> captor = ArgumentCaptor.forClass(JiraTicket.class);
-        ArgumentCaptor<String> projectKeyCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Long> issueTypeCaptor = ArgumentCaptor.forClass(Long.class);
 
-
-        verify(jiraClient, times(1)).createIssue(projectKeyCaptor.capture(), issueTypeCaptor.capture(), captor.capture());
-
-        assertEquals("abcd", projectKeyCaptor.getValue());
-        assertEquals(10001L, issueTypeCaptor.getValue());
+        verify(jiraClient, times(1)).createIssue(captor.capture());
 
         JiraTicket capturedTicket = captor.getValue();
         assertEquals("test summary", capturedTicket.getSummary());
@@ -66,17 +60,10 @@ public class JiraTicketWriterTest {
         jiraTicketWriter.close();
 
         ArgumentCaptor<JiraTicket> captor = ArgumentCaptor.forClass(JiraTicket.class);
-        ArgumentCaptor<String> projectKeyCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Long> issueTypeCaptor = ArgumentCaptor.forClass(Long.class);
 
-        verify(jiraClient, times(2)).createIssue(projectKeyCaptor.capture(), issueTypeCaptor.capture(), captor.capture());
+        verify(jiraClient, times(2)).createIssue(captor.capture());
 
         List<JiraTicket> capturedTickets = captor.getAllValues();
-        assertEquals(2, capturedTickets.size());
-
-        assertEquals("abcd", projectKeyCaptor.getValue());
-        assertEquals(10001L, issueTypeCaptor.getValue());
-
         assertEquals(2, capturedTickets.size());
     }
 
@@ -96,17 +83,10 @@ public class JiraTicketWriterTest {
         jiraTicketWriter.close();
 
         ArgumentCaptor<JiraTicket> captor = ArgumentCaptor.forClass(JiraTicket.class);
-        ArgumentCaptor<String> projectKeyCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Long> issueTypeCaptor = ArgumentCaptor.forClass(Long.class);
 
-        verify(jiraClient, times(3)).createIssue(projectKeyCaptor.capture(), issueTypeCaptor.capture(), captor.capture());
+        verify(jiraClient, times(3)).createIssue(captor.capture());
 
         List<JiraTicket> capturedTickets = captor.getAllValues();
-        assertEquals(3, capturedTickets.size());
-
-        assertEquals("abcd", projectKeyCaptor.getValue());
-        assertEquals(10001L, issueTypeCaptor.getValue());
-
         assertEquals(3, capturedTickets.size());
     }
 }

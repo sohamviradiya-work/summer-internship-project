@@ -97,7 +97,7 @@ public class Config {
                 testIdentifiers, dryConfig.firstCommit, dryConfig.branches, dryConfig.days, dryConfig.logToConsole);
     }
 
-    private static String getProjectRoot() throws URISyntaxException {
+    public static String getProjectRoot() throws URISyntaxException {
         String classPath = Config.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
         File file = new File(classPath);
         final String BASE_DIRECTORY = file.getParentFile().getParentFile().getParentFile().getParentFile().getParent()

@@ -6,31 +6,34 @@ import java.util.Base64;
 import java.util.HashMap;
 
 import com.items.JiraTicket;
+import com.tool.Config;
+
+import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvException;
 
 public class JiraClient {
     private final String jiraUrl;
     private final String username;
     private final String apiToken;
     private final HashMap<String, String> emailMap;
+    private final long issueTypeId;
+    private final String projectKey;
     private static final int ID_OFFSET = 13;
     private static final int ID_LENGTH = 43;
 
-    public JiraClient(String jiraUrl, String username, String apiToken) {
+    public JiraClient(String jiraUrl, String username, String apiToken, String issueTypeId, String projectKey) {
         this.jiraUrl = jiraUrl;
         this.username = username;
         this.apiToken = apiToken;
+        this.issueTypeId = Long.parseLong(issueTypeId);
+        this.projectKey = projectKey;
         this.emailMap = new HashMap<>();
     }
 
-    public static JiraClient createAPI(String jiraUrl, String username, String apiToken) {
-        return new JiraClient(jiraUrl, username, apiToken);
-    }
-
-    public void createIssue(String projectKey, Long issueTypeId, JiraTicket jiraTicket)
+    public void createIssue(JiraTicket jiraTicket)
             throws IOException {
-
         String endpoint = jiraUrl + "/rest/api/3/issue";
-        String requestBody = getRequestBody(projectKey, issueTypeId, jiraTicket);
+        String requestBody = getRequestBody(jiraTicket);
         sendPostRequest(endpoint, requestBody);
     }
 
@@ -38,18 +41,18 @@ public class JiraClient {
         System.out.println("Closed Jira Client");
     }
 
-    private String getRequestBody(String projectKey, Long issueTypeId, JiraTicket jiraTicket) throws IOException {
+    private String getRequestBody(JiraTicket jiraTicket) throws IOException {
 
         String assigneeId = getIdByEmail(jiraTicket.getEmail());
 
         String assigneeEntry = "";
-        
-        if(assigneeId!=null)
-           assigneeEntry = "\"assignee\": { \"id\": \"" + assigneeId + "\" }, ";
+
+        if (assigneeId != null)
+            assigneeEntry = "\"assignee\": { \"id\": \"" + assigneeId + "\" }, ";
 
         String requestBody = "{ \"fields\": { \"project\": { \"key\": \"" + projectKey + "\" }, " +
                 "\"summary\": \"" + jiraTicket.getSummary() + "\", " +
-                assigneeEntry + 
+                assigneeEntry +
                 "\"description\": { " +
                 "\"type\": \"doc\", " +
                 "\"version\": 1, " +
@@ -65,9 +68,9 @@ public class JiraClient {
         return requestBody;
     }
 
-    public String getIdByEmail(String email) throws IOException {
+    private String getIdByEmail(String email) throws IOException {
 
-        if(email=="LAST PHASE")
+        if (email == "LAST PHASE")
             return null;
 
         if (!emailMap.containsKey(email)) {
@@ -126,5 +129,18 @@ public class JiraClient {
         byte[] authBytes = auth.getBytes();
         String encodedAuth = Base64.getEncoder().encodeToString(authBytes);
         return "Basic " + encodedAuth;
+    }
+
+    public static JiraClient createClient() throws DotenvException, URISyntaxException {
+
+        Dotenv dotenv = Dotenv.configure().directory(Config.getProjectRoot()).load();
+
+        final String jiraUrl = dotenv.get("JIRA_SERVER");
+        final String email = dotenv.get("JIRA_MAIL");
+        final String token = dotenv.get("JIRA_TOKEN");
+        final String issueTypeId = dotenv.get("JIRA_ISSUE_TYPE");
+        final String projectKey = dotenv.get("JIRA_PROJECT_KEY");
+        JiraClient jiraClient = new JiraClient(jiraUrl, email, token, issueTypeId, projectKey);
+        return jiraClient;
     }
 }

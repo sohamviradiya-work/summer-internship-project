@@ -1,6 +1,7 @@
 package com.tool.writers;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,20 +14,16 @@ import com.items.interfaces.JiraItem;
 import com.tool.jira.JiraClient;
 import com.tool.writers.interfaces.ItemWriter;
 
-import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvException;
 
 public class JiraTicketWriter<T extends JiraItem> implements ItemWriter<T> {
 
     private JiraClient client;
-    private String issueTypeId;
-    private String projectKey;
     private ExecutorService executorService;
     private List<Future<?>> futures;
 
-    public JiraTicketWriter(JiraClient client, String issueTypeId, String projectKey) {
+    public JiraTicketWriter(JiraClient client) {
         this.client = client;
-        this.issueTypeId = issueTypeId;
-        this.projectKey = projectKey;
         this.executorService = Executors.newCachedThreadPool();
         this.futures = new ArrayList<>();
     }
@@ -54,28 +51,20 @@ public class JiraTicketWriter<T extends JiraItem> implements ItemWriter<T> {
         for (Future<?> future : futures) {
             try {
                 future.get();
-            } catch (InterruptedException|ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
     }
 
     protected void writeIssue(T item) throws IOException {
-        this.client.createIssue(projectKey, Long.parseLong(issueTypeId), item.toJiraTicket());
+        this.client.createIssue(item.toJiraTicket());
     }
 
-    public static <T extends JiraItem> JiraTicketWriter<T> create() throws IOException {
+    public static <T extends JiraItem> JiraTicketWriter<T> create() throws IOException, DotenvException, URISyntaxException {
 
-        Dotenv dotenv = Dotenv.configure().directory("../").load();
+        JiraClient jiraClient = JiraClient.createClient();
 
-        final String jiraUrl = dotenv.get("JIRA_SERVER");
-        final String email = dotenv.get("JIRA_MAIL");
-        final String token = dotenv.get("JIRA_TOKEN");
-        final String issueTypeId = dotenv.get("JIRA_ISSUE_TYPE");
-        final String projectKey = dotenv.get("JIRA_PROJECT_KEY");
-
-        JiraClient jiraClient = new JiraClient(jiraUrl, email, token);
-
-        return new JiraTicketWriter<>(jiraClient, issueTypeId, projectKey);
+        return new JiraTicketWriter<>(jiraClient);
     }
 }
