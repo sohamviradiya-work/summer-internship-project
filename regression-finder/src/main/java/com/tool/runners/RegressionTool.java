@@ -33,7 +33,7 @@ public class RegressionTool {
         
         JointWriter<RegressionBlame> blameWriter = JointWriter.create();
         blameWriter.addWriter(CSVWriter.create(config.resultsPath + "/blame.csv"));
-        // blameWriter.addWriter(JiraTicketWriter.create());
+        blameWriter.addWriter(JiraTicketWriter.create());
         // blameWriter.addWriter(TeamsNotificationWriter.create());
 
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(config.repositoryPath, config.testSrcPath,

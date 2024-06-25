@@ -20,12 +20,14 @@ public class JiraClient extends NetworkServiceClient {
     private final HashMap<String, String> emailMap;
     private final long issueTypeId;
     private final String projectKey;
+    private final String issueTransitionId;
 
-    public JiraClient(String jiraUrl, String username, String apiToken, String issueTypeId, String projectKey) {
+    public JiraClient(String jiraUrl, String username, String apiToken, String issueTypeId, String issueTransitionId, String projectKey) {
         this.jiraUrl = jiraUrl;
         this.username = username;
         this.apiToken = apiToken;
         this.issueTypeId = Long.parseLong(issueTypeId);
+        this.issueTransitionId = issueTransitionId;
         this.projectKey = projectKey;
         this.emailMap = new HashMap<>();
     }
@@ -33,7 +35,7 @@ public class JiraClient extends NetworkServiceClient {
     public void createIssue(JiraTicket jiraTicket)
             throws IOException {
         String endpoint = jiraUrl + "/rest/api/3/issue";
-        String requestBody = getRequestBody(jiraTicket);
+        String requestBody = getTicketBody(jiraTicket);
         sendPostRequest(endpoint, requestBody);
     }
 
@@ -41,7 +43,7 @@ public class JiraClient extends NetworkServiceClient {
         System.out.println("Closed Jira Client");
     }
 
-    private String getRequestBody(JiraTicket jiraTicket) throws IOException {
+    private String getTicketBody(JiraTicket jiraTicket) throws IOException {
 
         String assigneeId = getIdByEmail(jiraTicket.getEmail());
 
@@ -64,7 +66,8 @@ public class JiraClient extends NetworkServiceClient {
                 "} ] " +
                 "} ] " +
                 "}, " +
-                "\"issuetype\": { \"id\": \"" + issueTypeId + "\" } } }";
+                "\"issuetype\": { \"id\": \"" + issueTypeId + "\" } }, " +
+                "\"transition\": { \"id\": \"" + issueTransitionId + "\" } }";
         return requestBody;
     }
 
@@ -100,8 +103,9 @@ public class JiraClient extends NetworkServiceClient {
         final String email = dotenv.get("JIRA_MAIL");
         final String token = dotenv.get("JIRA_TOKEN");
         final String issueTypeId = dotenv.get("JIRA_ISSUE_TYPE");
+        final String issueTransitionId = dotenv.get("JIRA_ISSUE_TRANSITION");
         final String projectKey = dotenv.get("JIRA_PROJECT_KEY");
-        JiraClient jiraClient = new JiraClient(jiraUrl, email, token, issueTypeId, projectKey);
+        JiraClient jiraClient = new JiraClient(jiraUrl, email, token, issueTypeId, issueTransitionId, projectKey);
         return jiraClient;
     }
 }
