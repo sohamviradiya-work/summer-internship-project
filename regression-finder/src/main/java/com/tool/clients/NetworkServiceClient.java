@@ -22,14 +22,23 @@ public abstract class NetworkServiceClient {
             os.write(input, 0, input.length);
         }
 
-        StringBuilder response = new StringBuilder();
+        int status = connection.getResponseCode();
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+        BufferedReader reader;
+        if (status == HttpURLConnection.HTTP_CREATED) {
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        } else {
+            reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+            StringBuilder errorResponse = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                response.append(line);
+                errorResponse.append(line);
             }
+            reader.close();
+            connection.disconnect();
+            throw new IOException("HTTP request failed with status code " + status + ": " + errorResponse.toString());
         }
+        
         connection.disconnect();
     }
     protected String sendGetRequest(String endpoint) throws IOException {
