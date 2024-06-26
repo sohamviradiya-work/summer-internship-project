@@ -5,8 +5,10 @@ import java.net.*;
 import java.util.Base64;
 import java.util.HashMap;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.items.JiraTicket;
 import com.tool.Config;
 
@@ -22,7 +24,8 @@ public class JiraClient extends NetworkServiceClient {
     private final String projectKey;
     private final String issueTransitionId;
 
-    public JiraClient(String jiraUrl, String username, String apiToken, String issueTypeId, String issueTransitionId, String projectKey) {
+    public JiraClient(String jiraUrl, String username, String apiToken, String issueTypeId, String issueTransitionId,
+            String projectKey) {
         this.jiraUrl = jiraUrl;
         this.username = username;
         this.apiToken = apiToken;
@@ -47,27 +50,46 @@ public class JiraClient extends NetworkServiceClient {
 
         String assigneeId = getIdByEmail(jiraTicket.getEmail());
 
-        String assigneeEntry = "";
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-        if (assigneeId != null)
-            assigneeEntry = "\"assignee\": { \"id\": \"" + assigneeId + "\" }, ";
+        ObjectNode fieldsNode = mapper.createObjectNode();
+        ObjectNode projectNode = fieldsNode.putObject("project");
+        projectNode.put("key", projectKey);
 
-        String requestBody = "{ \"fields\": { \"project\": { \"key\": \"" + projectKey + "\" }, " +
-                "\"summary\": \"" + jiraTicket.getSummary() + "\", " +
-                assigneeEntry +
-                "\"description\": { " +
-                "\"type\": \"doc\", " +
-                "\"version\": 1, " +
-                "\"content\": [ { " +
-                "\"type\": \"paragraph\", " +
-                "\"content\": [ { " +
-                "\"text\": \"" + jiraTicket.getDescription() + "\", " +
-                "\"type\": \"text\" " +
-                "} ] " +
-                "} ] " +
-                "}, " +
-                "\"issuetype\": { \"id\": \"" + issueTypeId + "\" } }, " +
-                "\"transition\": { \"id\": \"" + issueTransitionId + "\" } }";
+        fieldsNode.put("summary", jiraTicket.getSummary());
+
+        if (assigneeId != null) {
+            ObjectNode assigneeNode = fieldsNode.putObject("assignee");
+            assigneeNode.put("id", assigneeId);
+        }
+
+        ObjectNode descriptionNode = fieldsNode.putObject("description");
+        descriptionNode.put("type", "doc");
+        descriptionNode.put("version", 1);
+
+        ObjectNode descriptionContentNode = mapper.createObjectNode();
+        descriptionContentNode.put("text", jiraTicket.getDescription());
+        descriptionContentNode.put("type", "text");
+
+        ObjectNode paragraphNode = mapper.createObjectNode();
+        paragraphNode.put("type", "paragraph");
+        paragraphNode.putArray("content").add(descriptionContentNode);
+
+        descriptionNode.putArray("content").add(paragraphNode);
+
+        ObjectNode issuetypeNode = fieldsNode.putObject("issuetype");
+        issuetypeNode.put("id", issueTypeId);
+
+        ObjectNode transitionNode = mapper.createObjectNode();
+        transitionNode.put("id", issueTransitionId);
+
+        ObjectNode requestBodyNode = mapper.createObjectNode();
+        requestBodyNode.set("fields", fieldsNode);
+        requestBodyNode.set("transition", transitionNode);
+
+        String requestBody = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestBodyNode);
+
         return requestBody;
     }
 
