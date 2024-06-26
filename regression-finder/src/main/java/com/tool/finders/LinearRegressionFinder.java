@@ -16,8 +16,8 @@ import com.tool.writers.interfaces.ItemWriter;
 
 public class LinearRegressionFinder implements Finder {
 
-    protected ProjectInstance projectInstance;
-    private ItemWriter<RegressionBlame> blameWriter;
+    public ProjectInstance projectInstance;
+    public ItemWriter<RegressionBlame> blameWriter;
 
     public LinearRegressionFinder(ProjectInstance projectInstance, ItemWriter<RegressionBlame> blameWriter) {
         this.projectInstance = projectInstance;
@@ -34,9 +34,10 @@ public class LinearRegressionFinder implements Finder {
                 break;
 
             ProjectCommit currentCommit = projectCommits.get(i);
-            ProjectCommit previousCommit = projectCommits.get(Math.min(i + 1,projectCommits.size() - 1));
+            ProjectCommit previousCommit = projectCommits.get(Math.min(i + 1, projectCommits.size() - 1));
 
-            if (currentCommit.getCommitId().compareTo(previousCommit.getCommitId())!=0 && !projectInstance.isRunRequired(currentCommit, previousCommit))
+            if (currentCommit.getCommitId().compareTo(previousCommit.getCommitId()) != 0
+                    && !projectInstance.isRunRequired(currentCommit, previousCommit))
                 continue;
 
             ArrayList<TestIdentifier> newFailedTests = new ArrayList<>();
@@ -47,18 +48,18 @@ public class LinearRegressionFinder implements Finder {
             for (TestIdentifier testIdentifier : failedTests) {
                 if (newFailedTestsSet.contains(testIdentifier))
                     newFailedTests.add(testIdentifier);
-                else if(currentCommit.getCommitId().compareTo(previousCommit.getCommitId())!=0)
-                    putBlame(testIdentifier, previousCommit);
+                else if (currentCommit.getCommitId().compareTo(previousCommit.getCommitId()) != 0)
+                    projectInstance.putBlame(blameWriter, testIdentifier, previousCommit);
             }
             failedTests = newFailedTests;
         }
 
         if (startIndex > 0) {
             for (TestIdentifier testIdentifier : failedTests)
-                putBlame(testIdentifier, projectCommits.get(startIndex));
+                projectInstance.putBlame(blameWriter, testIdentifier, projectCommits.get(startIndex));
             return;
         }
-        if(failedTests.size() > 0)
+        if (failedTests.size() > 0)
             putBlameOnAuthor(failedTests, projectCommits);
     }
 
@@ -68,12 +69,7 @@ public class LinearRegressionFinder implements Finder {
         runForCommitsAndTests(projectCommits, 0, projectCommits.size() - 1, testIdentifiers);
     }
 
-    public void putBlame(TestIdentifier testIdentifier, ProjectCommit projectCommit)
-            throws IOException, GitAPIException {
-        blameWriter.write(RegressionBlame.constructBlame(testIdentifier, projectCommit, true));
-    }
-
-    public void putBlameOnAuthor(ArrayList<TestIdentifier> testIdentifiers,  ArrayList<ProjectCommit> projectCommits)
+    public void putBlameOnAuthor(ArrayList<TestIdentifier> testIdentifiers, ArrayList<ProjectCommit> projectCommits)
             throws IOException, GitAPIException {
         blameWriter.writeAll(projectInstance.blameTestsOnAuthor(testIdentifiers, projectCommits));
     }

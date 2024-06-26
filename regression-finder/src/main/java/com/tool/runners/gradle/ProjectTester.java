@@ -12,7 +12,6 @@ import org.gradle.tooling.events.ProgressListener;
 
 import com.tool.Config;
 
-
 public class ProjectTester {
     private TestLauncher testLauncher;
     private OutputStream logStream;
@@ -24,10 +23,11 @@ public class ProjectTester {
 
     public static ProjectTester mountProjectTester(ProjectManager projectManager, OutputStream logStream) {
         TestLauncher testLauncher = projectManager.getConnection().newTestLauncher();
-        return new ProjectTester(testLauncher,logStream);
+        return new ProjectTester(testLauncher, logStream);
     }
 
-    public ArrayList<ProgressEvent> runTestsForProject(String testProjectName, HashMap<String, List<String>> testMethods) {
+    public ArrayList<ProgressEvent> runTestsForProject(String testProjectName,
+            HashMap<String, List<String>> testMethods) {
         for (String testClass : testMethods.keySet()) {
             testLauncher.withTaskAndTestMethods(testProjectName + ":test", testClass, testMethods.get(testClass));
         }
@@ -40,8 +40,9 @@ public class ProjectTester {
                 events.add(event);
             }
         }, OperationType.TEST);
+
         try {
-            System.out.println(Config.ANSI_PURPLE + "Building " + testProjectName + Config.ANSI_RESET);
+            System.out.println(Config.ANSI_PURPLE + "Running " + testProjectName + Config.ANSI_RESET);
             testLauncher.setStandardOutput(logStream);
             testLauncher.run();
         } catch (Exception e) {

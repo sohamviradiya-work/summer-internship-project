@@ -2,6 +2,7 @@ package com.items;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import com.items.interfaces.CSVItem;
 import com.tool.Config;
@@ -15,10 +16,19 @@ public class TestResult implements CSVItem {
 
     private Result result;
     private TestIdentifier testIdentifier;
+    private String stackTrace;
 
     public TestResult(String testClass, String testMethod, String testProject, String result) {
         this.testIdentifier = new TestIdentifier(testProject, testClass, testMethod);
         this.result = parseResult(result);
+        this.stackTrace = null;
+    }
+
+
+    public TestResult(String testClass, String testMethod, String testProject, String result,String stackTrace) {
+        this.testIdentifier = new TestIdentifier(testProject, testClass, testMethod);
+        this.result = parseResult(result);
+        this.stackTrace = stackTrace;
     }
 
     private static Result parseResult(String result) {
@@ -42,11 +52,15 @@ public class TestResult implements CSVItem {
         return result;
     }
 
+    public String getStackTrace() {
+        return stackTrace;
+    }
+
     public TestIdentifier getIdentifier() {
         return testIdentifier;
     }
 
-    public static HashSet<TestIdentifier> extractFailingTests(ArrayList<TestResult> testResults) {
+    public static HashSet<TestIdentifier> extractFailingTests(List<TestResult> testResults) {
         HashSet<TestIdentifier> failingTests = new HashSet<>();
         for (TestResult testResult : testResults) {
             if (testResult.getResult() == TestResult.Result.FAILED){
@@ -57,7 +71,7 @@ public class TestResult implements CSVItem {
         return failingTests;
     }
 
-    public static HashSet<TestIdentifier> extractNotFailingTests(ArrayList<TestResult> testResults,
+    public static HashSet<TestIdentifier> extractNotFailingTests(List<TestResult> testResults,
             ArrayList<TestIdentifier> allTests) {
         HashSet<TestIdentifier> passingTests = new HashSet<>(allTests);
         for (TestResult testResult : testResults) {

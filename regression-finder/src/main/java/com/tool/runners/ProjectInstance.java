@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import com.items.TestIdentifier;
 import com.items.TestResult;
 import com.tool.runners.git.GitWorker;
 import com.tool.runners.gradle.GradleWorker;
+import com.tool.writers.interfaces.ItemWriter;
 
 public class ProjectInstance {
 
@@ -23,15 +25,21 @@ public class ProjectInstance {
     private GradleWorker gradleWorker;
     private GitWorker gitWorker;
     private String testSrcPath;
+    HashMap<TestIdentifier, String> lastFailureTrace;
 
     public ProjectInstance(GradleWorker gradleWorker, GitWorker gitWorker, String testSrcPath) {
         this.gradleWorker = gradleWorker;
         this.gitWorker = gitWorker;
         this.testSrcPath = testSrcPath;
+        this.lastFailureTrace = new HashMap<>();
     }
 
     public GitWorker getGitWorker() {
         return gitWorker;
+    }
+
+    public String getLastFailCause(TestIdentifier testIdentifier) {
+        return lastFailureTrace.get(testIdentifier);
     }
 
     public void close(String mainBranch) throws IOException, GitAPIException {
@@ -39,12 +47,18 @@ public class ProjectInstance {
         this.gradleWorker.close();
     }
 
-    public ArrayList<TestResult> runTestsForCommit(List<TestIdentifier> testIdentifiers,
+    public List<TestResult> runTestsForCommit(List<TestIdentifier> testIdentifiers,
             ProjectCommit projectCommit, ProjectCommit previousCommit) throws GitAPIException, IOException {
         gitWorker.checkoutToCommit(projectCommit);
 
         syncIfRequired(projectCommit, previousCommit);
-        return gradleWorker.runTests(testIdentifiers);
+        List<TestResult> testResults = gradleWorker.runTests(testIdentifiers);
+
+        for (TestResult testResult : testResults) {
+            if (testResult.getStackTrace() != null)
+                lastFailureTrace.put(testResult.getIdentifier(), testResult.getStackTrace());
+        }
+        return testResults;
     }
 
     public ArrayList<TestResult> runAllTestsForCommit(ProjectCommit projectCommit) throws GitAPIException, IOException {
@@ -99,7 +113,7 @@ public class ProjectInstance {
             if (projectCommitsSet.contains(authorCommit.getCommitId()))
                 regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, authorCommit, false));
         }
-        if(regressionBlames.isEmpty())
+        if (regressionBlames.isEmpty())
             regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, ProjectCommit.getLastPhaseCommit(), false));
         return regressionBlames;
     }
@@ -116,12 +130,19 @@ public class ProjectInstance {
 
         projectCommits.forEach(projectCommit -> projectCommitSet.add(projectCommit.getCommitId()));
 
-        projectCommitSet.remove(projectCommits.get(0).getCommitId());
-
         for (TestIdentifier testIdentifier : testIdentifiers) {
             regressionBlames.addAll(blameTestOnAuthor(testIdentifier, projectCommitSet));
         }
         return regressionBlames;
+    }
+
+    public void putBlame(ItemWriter<RegressionBlame> blameWriter, TestIdentifier testIdentifier,
+            ProjectCommit projectCommit)
+            throws IOException, GitAPIException {
+
+        if (getLastFailCause(testIdentifier) != null)
+            blameWriter.write(RegressionBlame.constructBlame(testIdentifier, projectCommit, true,
+                    getLastFailCause(testIdentifier)));
     }
 
     public static ProjectInstance mountLocalProject(String rootPath, String testSrcPath, String gradleVersion,

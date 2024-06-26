@@ -2,6 +2,7 @@ package com.tool.finders;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -27,14 +28,14 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
     private void bisectForCommitsAndTest(ArrayList<ProjectCommit> projectCommits, int startIndex, int endIndex,
             int lastIndex, ArrayList<TestIdentifier> testIdentifiers, boolean left)
             throws GitAPIException, IOException {
-                
+
         if (testIdentifiers.isEmpty())
             return;
 
         if (startIndex >= endIndex - 1) {
             if (startIndex == endIndex) {
                 for (TestIdentifier testIdentifier : testIdentifiers) {
-                    putBlame(testIdentifier, projectCommits.get(startIndex));
+                    projectInstance.putBlame(blameWriter, testIdentifier, projectCommits.get(startIndex));
                 }
             } else
                 super.runForCommitsAndTests(projectCommits, startIndex, startIndex, testIdentifiers);
@@ -54,12 +55,11 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
             return;
         }
 
-        ArrayList<TestResult> testResults = this.projectInstance.runTestsForCommit(testIdentifiers,
+        List<TestResult> testResults = this.projectInstance.runTestsForCommit(testIdentifiers,
                 projectCommits.get(midIndex), projectCommits.get(lastIndex));
 
         ArrayList<TestIdentifier> failedTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
-        ArrayList<TestIdentifier> passedTests = new ArrayList<>(
-                TestResult.extractNotFailingTests(testResults, testIdentifiers));
+        ArrayList<TestIdentifier> passedTests = new ArrayList<>(TestResult.extractNotFailingTests(testResults, testIdentifiers));
 
         if (!failedTests.isEmpty())
             bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, failedTests, true);

@@ -9,10 +9,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.gradle.tooling.Failure;
+import org.gradle.tooling.TestExecutionException;
 import org.gradle.tooling.events.ProgressEvent;
+import org.gradle.tooling.events.test.TestFailureResult;
 import org.gradle.tooling.events.test.TestOperationResult;
 import org.gradle.tooling.events.test.internal.DefaultJvmTestOperationDescriptor;
-import org.gradle.tooling.events.test.internal.DefaultTestFailureResult;
 import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
 import org.gradle.tooling.events.test.internal.DefaultTestSkippedResult;
 
@@ -88,7 +90,7 @@ public class GradleWorker {
         for (ProgressEvent event : events) {
 
             logEvent(event);
-            
+
             if (event instanceof DefaultTestFinishEvent) {
                 TestResult testResult = GradleWorker.extractResult(event, testProjectName);
                 if (testResult != null) {
@@ -100,7 +102,8 @@ public class GradleWorker {
     }
 
     private void logEvent(ProgressEvent event) throws IOException {
-        String eventInfoString = event.getDisplayName() + " at " + Date.from(Instant.ofEpochMilli(event.getEventTime())) + "\n";
+        String eventInfoString = event.getDisplayName() + " at " + Date.from(Instant.ofEpochMilli(event.getEventTime()))
+                + "\n";
         logStream.write(eventInfoString.getBytes());
     }
 
@@ -116,14 +119,26 @@ public class GradleWorker {
         if (testClassName == null || testMethodName == null)
             return null;
 
-        if (result instanceof DefaultTestFailureResult)
+        testMethodName = testMethodName.replace("(", "").replace(")", "");
+
+        if (result instanceof TestFailureResult) {
             resultString = "FAILED";
-        else if (result instanceof DefaultTestSkippedResult)
+            
+            TestFailureResult failureResult = (TestFailureResult) result;
+            
+            StringBuilder failCause = new StringBuilder();
+            for (Failure failure : failureResult.getFailures()) {
+                String[] lines = failure.getDescription().split("\n");
+                for (int i = 0; i < Math.min(5, lines.length); i++) {
+                    failCause.append(lines[i]).append("\n");
+                }
+            }
+
+            return new TestResult(testClassName, testMethodName, testProjectName, resultString, failCause.toString());
+        } else if (result instanceof DefaultTestSkippedResult)
             resultString = "SKIPPED";
         else
             resultString = "PASSED";
-
-        testMethodName = testMethodName.replace("(", "").replace(")", "");
 
         return new TestResult(testClassName, testMethodName, testProjectName, resultString);
     }

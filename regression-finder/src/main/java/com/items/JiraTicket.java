@@ -1,7 +1,5 @@
 package com.items;
 
-import com.items.RegressionBlame.BlameType;
-
 public class JiraTicket {
     private String summary;
     private String description;
@@ -31,7 +29,10 @@ public class JiraTicket {
     
         String description = "Your commit " + regressionBlame.projectCommit.getCommitId() + " caused the test "
                 + regressionBlame.testIdentifier.getTestProject() + ":" + regressionBlame.testIdentifier.getTestClass() + "."
-                + regressionBlame.testIdentifier.getTestMethod() + " to fail";
+                + regressionBlame.testIdentifier.getTestMethod() + " to fail... \n";
+
+        if(regressionBlame.getStackTrace()!=null)
+            description = description + regressionBlame.getStackTrace();
     
         if (regressionBlame.projectCommit.getCommitId().compareTo("LAST PHASE") == 0) {
             summary = "This failing test was changed in the last phase";

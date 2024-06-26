@@ -3,6 +3,7 @@ package com.tool.finders;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -43,7 +44,7 @@ public class BatchRegressionFinder extends LinearRegressionFinder {
             ArrayList<TestIdentifier> newFailedTests = new ArrayList<>();
             ArrayList<TestIdentifier> batchTests = new ArrayList<>();
 
-            ArrayList<TestResult> testResults = projectInstance.runTestsForCommit(failedTests, projectCommits.get(i),
+            List<TestResult> testResults = projectInstance.runTestsForCommit(failedTests, projectCommits.get(i),
                     projectCommits.get(lastIndex));
 
             HashSet<TestIdentifier> newFailedTestsSet = TestResult.extractFailingTests(testResults);
