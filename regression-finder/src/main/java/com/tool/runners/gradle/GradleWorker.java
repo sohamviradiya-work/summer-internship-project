@@ -1,5 +1,6 @@
 package com.tool.runners.gradle;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,14 +10,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.gradle.tooling.Failure;
-import org.gradle.tooling.TestExecutionException;
 import org.gradle.tooling.events.ProgressEvent;
-import org.gradle.tooling.events.test.TestFailureResult;
-import org.gradle.tooling.events.test.TestOperationResult;
-import org.gradle.tooling.events.test.internal.DefaultJvmTestOperationDescriptor;
 import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
-import org.gradle.tooling.events.test.internal.DefaultTestSkippedResult;
 
 import com.items.TestIdentifier;
 import com.items.TestResult;
@@ -48,28 +43,15 @@ public class GradleWorker {
 
     private ArrayList<TestResult> runTestsForProject(String testProjectName,
             HashMap<String, List<String>> testMethods) throws IOException {
-        ProjectTester projectTester = ProjectTester.mountProjectTester(projectManager, logStream);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ProjectTester projectTester = ProjectTester.mountProjectTester(projectManager, outputStream);
         ArrayList<ProgressEvent> events = projectTester.runTestsForProject(testProjectName, testMethods);
-        return extractResults(testProjectName, events);
-    }
 
-    public ArrayList<TestResult> runAllTests() throws IOException {
+        String logs = outputStream.toString();
 
-        List<String> subProjects = projectManager.getSubProjects();
-        ArrayListWriter<TestResult> testResultsWriter = ArrayListWriter.create();
-        for (String testProjectName : subProjects) {
-            testResultsWriter.writeAll(runAllTestsForProject(testProjectName));
-        }
+        logStream.write(logs.getBytes());
 
-        ArrayList<TestResult> testResults = testResultsWriter.getList();
-
-        return testResults;
-    }
-
-    private ArrayList<TestResult> runAllTestsForProject(String testProjectName) throws IOException {
-        ProjectBuilder projectBuilder = ProjectBuilder.mountProjectBuilder(projectManager, logStream);
-        ArrayList<ProgressEvent> events = projectBuilder.runAlltestsForProject(testProjectName);
-        return extractResults(testProjectName, events);
+        return extractResults(testProjectName, events, logs);
     }
 
     public void syncDependencies() {
@@ -85,14 +67,15 @@ public class GradleWorker {
     }
 
     private ArrayList<TestResult> extractResults(String testProjectName,
-            ArrayList<ProgressEvent> events) throws IOException {
+            ArrayList<ProgressEvent> events, String logs) throws IOException {
         ArrayList<TestResult> testResults = new ArrayList<>();
+
         for (ProgressEvent event : events) {
 
             logEvent(event);
 
             if (event instanceof DefaultTestFinishEvent) {
-                TestResult testResult = GradleWorker.extractResult(event, testProjectName);
+                TestResult testResult = ResultExtractor.extractResult(event, testProjectName, logs);
                 if (testResult != null) {
                     testResults.add(testResult);
                 }
@@ -105,41 +88,5 @@ public class GradleWorker {
         String eventInfoString = event.getDisplayName() + " at " + Date.from(Instant.ofEpochMilli(event.getEventTime()))
                 + "\n";
         logStream.write(eventInfoString.getBytes());
-    }
-
-    public static TestResult extractResult(ProgressEvent event, String testProjectName) {
-        DefaultJvmTestOperationDescriptor descriptor = (DefaultJvmTestOperationDescriptor) event.getDescriptor();
-
-        TestOperationResult result = ((DefaultTestFinishEvent) event).getResult();
-        String resultString;
-
-        String testClassName = descriptor.getClassName();
-        String testMethodName = descriptor.getMethodName();
-
-        if (testClassName == null || testMethodName == null)
-            return null;
-
-        testMethodName = testMethodName.replace("(", "").replace(")", "");
-
-        if (result instanceof TestFailureResult) {
-            resultString = "FAILED";
-            
-            TestFailureResult failureResult = (TestFailureResult) result;
-            
-            StringBuilder failCause = new StringBuilder();
-            for (Failure failure : failureResult.getFailures()) {
-                String[] lines = failure.getDescription().split("\n");
-                for (int i = 0; i < Math.min(5, lines.length); i++) {
-                    failCause.append(lines[i]).append("\n");
-                }
-            }
-
-            return new TestResult(testClassName, testMethodName, testProjectName, resultString, failCause.toString());
-        } else if (result instanceof DefaultTestSkippedResult)
-            resultString = "SKIPPED";
-        else
-            resultString = "PASSED";
-
-        return new TestResult(testClassName, testMethodName, testProjectName, resultString);
     }
 }

@@ -61,11 +61,6 @@ public class ProjectInstance {
         return testResults;
     }
 
-    public ArrayList<TestResult> runAllTestsForCommit(ProjectCommit projectCommit) throws GitAPIException, IOException {
-        gitWorker.checkoutToCommit(projectCommit);
-        return gradleWorker.runAllTests();
-    }
-
     public void syncIfRequired(ProjectCommit commitA, ProjectCommit commitB) {
         if (isSyncRequired(commitA, commitB))
             gradleWorker.syncDependencies();

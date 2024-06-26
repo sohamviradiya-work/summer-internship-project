@@ -9,7 +9,6 @@ import org.gradle.tooling.TestLauncher;
 import org.gradle.tooling.events.OperationType;
 import org.gradle.tooling.events.ProgressEvent;
 import org.gradle.tooling.events.ProgressListener;
-
 import com.tool.Config;
 
 public class ProjectTester {
@@ -31,7 +30,7 @@ public class ProjectTester {
         for (String testClass : testMethods.keySet()) {
             testLauncher.withTaskAndTestMethods(testProjectName + ":test", testClass, testMethods.get(testClass));
         }
-        testLauncher.addArguments("--parallel", "--console=verbose");
+        testLauncher.addArguments("--parallel", "--console=verbose","--stacktrace");
 
         ArrayList<ProgressEvent> events = new ArrayList<>();
         testLauncher.addProgressListener(new ProgressListener() {
