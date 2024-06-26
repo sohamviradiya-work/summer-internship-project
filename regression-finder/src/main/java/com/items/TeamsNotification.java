@@ -30,6 +30,9 @@ public class TeamsNotification {
         String content = "Your commit " + regressionBlame.projectCommit.getCommitId() + " caused the test "
                 + regressionBlame.testIdentifier.getTestProject() + ":" + regressionBlame.testIdentifier.getTestClass() + "."
                 + regressionBlame.testIdentifier.getTestMethod() + " to fail";
+
+        if(regressionBlame.getStackTrace() != null)
+            content = content + "\n" + regressionBlame.getStackTrace();
     
         if (regressionBlame.projectCommit.getCommitId().compareTo("LAST PHASE") == 0) {
             preview = "This failing test was changed in the last phase";
