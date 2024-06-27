@@ -1,6 +1,6 @@
 {
     "repositoryLink" : null,
-    "repositoryPath" : "./resources/large-repo",
+    "repositoryPath" : "../resources/large-repo",
     "branches" : ["master"],
     "days" : 20,
     "firstCommit" : "0d12dba93927a2e3b480a981ceb9d6c7415eda09",
@@ -19,6 +19,8 @@
         }
     ],
     "logToConsole": false,
+    "jiraTickets" : true,
+    "teamsNotifications" : true,
     "resultsPath" : "./results",
     "method" : "Bisect"
 }

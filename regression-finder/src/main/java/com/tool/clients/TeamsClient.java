@@ -12,15 +12,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.items.TeamsNotification;
 import com.tool.Config;
 
@@ -46,7 +42,7 @@ public class TeamsClient extends NetworkServiceClient {
 
         String payload = sendProactiveMessage(teamsNotification.getPreview(),teamsNotification.getContent(), userId);
 
-        sendPostRequest(endPoint, payload);
+        // sendPostRequest(endPoint, payload);
     }
 
     private static String sendProactiveMessage(String preview, String content,String userId) throws IOException {

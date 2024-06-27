@@ -22,6 +22,7 @@ import com.tool.runners.git.GitWorker;
 import com.tool.writers.CSVWriter;
 import com.tool.writers.JiraTicketWriter;
 import com.tool.writers.JointWriter;
+import com.tool.writers.TeamsNotificationWriter;
 import com.tool.writers.interfaces.ItemWriter;
 
 public class RegressionTool {
@@ -33,8 +34,12 @@ public class RegressionTool {
         
         JointWriter<RegressionBlame> blameWriter = JointWriter.create();
         blameWriter.addWriter(CSVWriter.create(config.resultsPath + "/blame.csv"));
-        // blameWriter.addWriter(JiraTicketWriter.create());
-        // blameWriter.addWriter(TeamsNotificationWriter.create());
+
+        if(config.jiraTickets)
+            blameWriter.addWriter(JiraTicketWriter.create());
+        
+        if(config.teamsNotifications)
+            blameWriter.addWriter(TeamsNotificationWriter.create());
 
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(config.repositoryPath, config.testSrcPath,
                 gradleVersion, logStream);
