@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.items.TeamsNotification;
 import com.tool.Config;
 
@@ -26,48 +27,99 @@ import io.github.cdimascio.dotenv.DotenvException;
 public class TeamsClient extends NetworkServiceClient {
 
     private final HashMap<String, String> emailMap;
-    private String accessToken;
+    private String clientSecret;
+    private String clientId;
+    private String tenantId;
+    private String installationId;
 
-    private TeamsClient(String accessToken) {
+    private TeamsClient(String tenantId, String clientId, String clientSecret, String installationId) {
         this.emailMap = new HashMap<>();
-        emailMap.put("sohamviradiya.work@gmail.com", "soham.viradiya@sprinklr.com");
-        this.accessToken = accessToken;
+        this.tenantId = tenantId;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.installationId = installationId;
     }
 
-    public void sendNotification(TeamsNotification teamsNotification) throws IOException {
+    public void createNotification(TeamsNotification teamsNotification)
+            throws IOException, DotenvException, URISyntaxException {
 
-        String userId = "";
+        String userId = getIdByEmail(teamsNotification.getEmail());
 
-        String endPoint = "";
+        String endPoint = "https://graph.microsoft.com/v1.0/users/" + userId + "/teamwork/sendActivityNotification";
 
-        String payload = sendProactiveMessage(teamsNotification.getPreview(),teamsNotification.getContent(), userId);
+        String payload = getBody(teamsNotification.getPreview(), teamsNotification.getContent(), userId);
 
-        // sendPostRequest(endPoint, payload);
+        sendPostRequest(endPoint, payload);
     }
 
-    private static String sendProactiveMessage(String preview, String content,String userId) throws IOException {
-        System.out.println("preview: " + preview);
-        System.out.println("content: " + content);
-        return "";
+    private String getBody(String preview, String content, String userId) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+            ObjectNode payload = objectMapper.createObjectNode();
+            
+            ObjectNode topic = payload.putObject("topic");
+            topic.put("source", "entityUrl");
+            topic.put("value", "https://graph.microsoft.com/v1.0/users/" + userId + "/teamwork/installedApps/" + installationId);
+
+            payload.put("activityType", "taskCreated");
+            
+            ObjectNode previewText = payload.putObject("previewText");
+            previewText.put("content", preview);
+            
+            ObjectNode templateParameter = objectMapper.createObjectNode();
+            templateParameter.put("name", "regression-blame");
+            templateParameter.put("value", content);
+
+            payload.putArray("templateParameters").add(templateParameter);
+
+
+
+        return objectMapper.writeValueAsString(payload);
     }
 
-    protected String getAuthHeader() {
-        return "Bearer " + accessToken;
+    protected String getAuthHeader() throws DotenvException, IOException, URISyntaxException {
+        return "Bearer " + getAccessToken();
     }
 
     public static TeamsClient create() throws DotenvException, IOException, URISyntaxException {
-
         Dotenv dotenv = Dotenv.configure().directory(Config.getProjectRoot()).load();
-
         final String tenantId = dotenv.get("TEAMS_TENANT_ID");
         final String clientId = dotenv.get("TEAMS_CLIENT_ID");
         final String clientSecret = dotenv.get("TEAMS_CLIENT_SECRET");
-        final String token = getAccessToken(tenantId, clientId, clientSecret);
-        return new TeamsClient(token);
+        final String installationId = dotenv.get("TEAMS_APP_ID");
+        return new TeamsClient(tenantId, clientId, clientSecret, installationId);
     }
 
-    private static String getAccessToken(String tenantId, String clientId, String clientSecret)
-            throws IOException, DotenvException, URISyntaxException {
+    private String getIdByEmail(String email) throws IOException, DotenvException, URISyntaxException {
+        if (email == "LAST PHASE")
+            return null;
+
+        if (!emailMap.containsKey(email)) {
+            String endpoint = "https://graph.microsoft.com/v1.0/users?$filter=mail eq '" + email + "'";
+            String response = sendGetRequest(endpoint);
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonResponse = mapper.readTree(response);
+            String id = jsonResponse.get("value").get(0).get("id").asText();
+            emailMap.put(email, id);
+        }
+        return emailMap.get(email);
+    }
+
+    private static String getFormDataString(Map<String, String> formData) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+        for (Map.Entry<String, String> entry : formData.entrySet()) {
+            if (result.length() > 0) {
+                result.append("&");
+            }
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
+        return result.toString();
+    }
+
+    private String getAccessToken() throws IOException, DotenvException, URISyntaxException {
 
         String authority = "https://login.microsoftonline.com/" + tenantId;
         String scope = "https://graph.microsoft.com/.default";
@@ -108,17 +160,4 @@ public class TeamsClient extends NetworkServiceClient {
         return accessToken;
     }
 
-
-    private static String getFormDataString(Map<String, String> formData) throws UnsupportedEncodingException {
-        StringBuilder result = new StringBuilder();
-        for (Map.Entry<String, String> entry : formData.entrySet()) {
-            if (result.length() > 0) {
-                result.append("&");
-            }
-            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-        }
-        return result.toString();
-    }
 }

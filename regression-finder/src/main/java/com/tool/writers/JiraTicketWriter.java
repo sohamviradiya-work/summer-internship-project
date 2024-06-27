@@ -33,7 +33,7 @@ public class JiraTicketWriter<T extends JiraItem> implements ItemWriter<T> {
         futures.add(executorService.submit(() -> {
             try {
                 writeIssue(item);
-            } catch (IOException e) {
+            } catch (IOException | DotenvException | URISyntaxException e) {
                 e.printStackTrace();
             }
         }));
@@ -57,7 +57,7 @@ public class JiraTicketWriter<T extends JiraItem> implements ItemWriter<T> {
         }
     }
 
-    protected void writeIssue(T item) throws IOException {
+    protected void writeIssue(T item) throws IOException, DotenvException, URISyntaxException {
         this.client.createIssue(item.toJiraTicket());
     }
 

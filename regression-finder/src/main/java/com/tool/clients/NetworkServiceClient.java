@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
+
+import io.github.cdimascio.dotenv.DotenvException;
 
 public abstract class NetworkServiceClient {
     
-    protected void sendPostRequest(String endpoint, String requestBody) throws IOException {
+    protected void sendPostRequest(String endpoint, String requestBody) throws IOException, DotenvException, URISyntaxException {
         URL url = new URL(endpoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -41,7 +44,7 @@ public abstract class NetworkServiceClient {
         
         connection.disconnect();
     }
-    protected String sendGetRequest(String endpoint) throws IOException {
+    protected String sendGetRequest(String endpoint) throws IOException, DotenvException, URISyntaxException {
         URL url = new URL(endpoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -74,6 +77,6 @@ public abstract class NetworkServiceClient {
         return response.toString();
     }
 
-    protected abstract String getAuthHeader();
+    protected abstract String getAuthHeader() throws DotenvException, IOException, URISyntaxException;
 
 }

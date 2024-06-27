@@ -36,7 +36,7 @@ public class JiraClient extends NetworkServiceClient {
     }
 
     public void createIssue(JiraTicket jiraTicket)
-            throws IOException {
+            throws IOException, DotenvException, URISyntaxException {
         String endpoint = jiraUrl + "/rest/api/3/issue";
         String requestBody = getTicketBody(jiraTicket);
         sendPostRequest(endpoint, requestBody);
@@ -46,7 +46,7 @@ public class JiraClient extends NetworkServiceClient {
         System.out.println("Closed Jira Client");
     }
 
-    private String getTicketBody(JiraTicket jiraTicket) throws IOException {
+    private String getTicketBody(JiraTicket jiraTicket) throws IOException, DotenvException, URISyntaxException {
 
         String assigneeId = getIdByEmail(jiraTicket.getEmail());
 
@@ -93,7 +93,7 @@ public class JiraClient extends NetworkServiceClient {
         return requestBody;
     }
 
-    private String getIdByEmail(String email) throws IOException {
+    private String getIdByEmail(String email) throws IOException, DotenvException, URISyntaxException {
 
         if (email == "LAST PHASE")
             return null;

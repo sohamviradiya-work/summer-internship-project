@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,8 @@ import org.mockito.MockitoAnnotations;
 import com.items.TeamsNotification;
 import com.items.interfaces.TeamsItem;
 import com.tool.clients.TeamsClient;
+
+import io.github.cdimascio.dotenv.DotenvException;
 
 public class TeamsNotificationWriterTest {
     
@@ -33,7 +36,7 @@ public class TeamsNotificationWriterTest {
     }
 
     @Test
-    void testWriteSingleItem() throws IOException {
+    void testWriteSingleItem() throws IOException, DotenvException, URISyntaxException {
         TeamsItem teamsItem = mock(TeamsItem.class);
         when(teamsItem.toTeamsNotification()).thenReturn(new TeamsNotification("test preview", "test content", "test@email.com"));
 
@@ -42,7 +45,7 @@ public class TeamsNotificationWriterTest {
 
         ArgumentCaptor<TeamsNotification> captor = ArgumentCaptor.forClass(TeamsNotification.class);
 
-        verify(teamsClient, times(1)).sendNotification(captor.capture());
+        verify(teamsClient, times(1)).createNotification(captor.capture());
 
         TeamsNotification capturedTicket = captor.getValue();
         assertEquals("test preview", capturedTicket.getPreview());
@@ -51,7 +54,7 @@ public class TeamsNotificationWriterTest {
     }
 
     @Test
-    void testWriteMultipleItems() throws IOException {
+    void testWriteMultipleItems() throws IOException, DotenvException, URISyntaxException {
         TeamsItem teamsItem1 = mock(TeamsItem.class);
         when(teamsItem1.toTeamsNotification()).thenReturn(new TeamsNotification("summary1", "description1", "email1@example.com"));
 
@@ -64,14 +67,14 @@ public class TeamsNotificationWriterTest {
 
         ArgumentCaptor<TeamsNotification> captor = ArgumentCaptor.forClass(TeamsNotification.class);
 
-        verify(teamsClient, times(2)).sendNotification(captor.capture());
+        verify(teamsClient, times(2)).createNotification(captor.capture());
 
         List<TeamsNotification> capturedTickets = captor.getAllValues();
         assertEquals(2, capturedTickets.size());
     }
 
     @Test
-    void testWriteAll() throws IOException {
+    void testWriteAll() throws IOException, DotenvException, URISyntaxException {
         TeamsItem teamsItem1 = mock(TeamsItem.class);
         when(teamsItem1.toTeamsNotification()).thenReturn(new TeamsNotification("summary1", "description1", "email1@example.com"));
 
@@ -87,7 +90,7 @@ public class TeamsNotificationWriterTest {
 
         ArgumentCaptor<TeamsNotification> captor = ArgumentCaptor.forClass(TeamsNotification.class);
 
-        verify(teamsClient, times(3)).sendNotification(captor.capture());
+        verify(teamsClient, times(3)).createNotification(captor.capture());
 
         List<TeamsNotification> capturedTickets = captor.getAllValues();
         assertEquals(3, capturedTickets.size());
