@@ -14,16 +14,13 @@ import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
-import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.sshd.JGitKeyCache;
 import org.eclipse.jgit.transport.sshd.SshdSessionFactory;
 import org.eclipse.jgit.transport.sshd.SshdSessionFactoryBuilder;
 import org.eclipse.jgit.util.FS;
 
-import com.items.ProjectCommit;
 
 public class RepositoryCloner {
 
@@ -66,23 +63,6 @@ public class RepositoryCloner {
                 .setShallowSince(shallowSinceInstant)
                 .setDirectory(dir)
                 .call();
-    }
-
-    static int computeDepth(Git git, String commitToFind)
-            throws GitAPIException, IOException {
-        Iterable<RevCommit> commits = git.log().call();
-
-        ProjectCommit firstCommit = ProjectCommit.getprojectCommitFromRevCommit(null, git.getRepository().parseCommit(ObjectId.fromString(commitToFind)));
-
-        int count = 0;
-        for (RevCommit commit : commits) {
-            count++;
-            ProjectCommit projectCommit = ProjectCommit.getprojectCommitFromRevCommit(null, commit);
-
-            if (projectCommit.getDateMilli() < firstCommit.getDateMilli())
-                break;
-        }
-        return count;
     }
 
     static void cloneBranchToLocal(Git git, Ref ref) {
