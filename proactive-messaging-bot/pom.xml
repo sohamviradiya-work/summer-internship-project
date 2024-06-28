@@ -5,7 +5,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.microsoft.bot.sample</groupId>
+    <groupId>com.bot</groupId>
     <artifactId>bot-proactive</artifactId>
     <version>sample</version>
     <packaging>jar</packaging>
@@ -41,7 +41,7 @@
         <java.version>1.8</java.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <start-class>com.microsoft.bot.sample.proactive.Application</start-class>
+        <start-class>com.bot.Application</start-class>
     </properties>
 
     <repositories>
@@ -137,7 +137,7 @@
                             <goal>repackage</goal>
                         </goals>
                         <configuration>
-                            <mainClass>com.microsoft.bot.sample.proactive.Application</mainClass>
+                            <mainClass>com.bot.Application</mainClass>
                         </configuration>
                     </execution>
                 </executions>

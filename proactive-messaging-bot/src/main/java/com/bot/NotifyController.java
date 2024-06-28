@@ -1,5 +1,5 @@
 
-package com.microsoft.bot.sample.proactive;
+package com.bot;
 
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
 import com.microsoft.bot.integration.Configuration;

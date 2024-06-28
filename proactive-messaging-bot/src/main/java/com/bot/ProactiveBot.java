@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-package com.microsoft.bot.sample.proactive;
+package com.bot;
 
 import com.codepoetics.protonpack.collectors.CompletableFutures;
 import com.microsoft.bot.builder.ActivityHandler;
@@ -83,7 +83,7 @@ public class ProactiveBot extends ActivityHandler {
                 .map(
                         channel -> turnContext
                                 .sendActivity(MessageFactory.text(String.format(
-                                        "Please send your mail in format: Add mail: \"<abc@mail.com>\"", port))))
+                                        "Please send your mail in format: Add mail: <abc@mail.com>", port))))
                 .collect(CompletableFutures.toFutureList())
                 .thenApply(resourceResponses -> null);
     }
