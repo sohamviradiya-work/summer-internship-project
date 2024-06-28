@@ -38,7 +38,7 @@ public class TeamsNotificationWriterTest {
     @Test
     void testWriteSingleItem() throws IOException, DotenvException, URISyntaxException {
         TeamsItem teamsItem = mock(TeamsItem.class);
-        when(teamsItem.toTeamsNotification()).thenReturn(new TeamsNotification("test preview", "test content", "test@email.com"));
+        when(teamsItem.toTeamsNotification()).thenReturn(new TeamsNotification("test content", "test@email.com"));
 
         teamsNotificationWriter.write(teamsItem);
         teamsNotificationWriter.close();
@@ -48,7 +48,6 @@ public class TeamsNotificationWriterTest {
         verify(teamsClient, times(1)).createNotification(captor.capture());
 
         TeamsNotification capturedTicket = captor.getValue();
-        assertEquals("test preview", capturedTicket.getPreview());
         assertEquals("test content", capturedTicket.getContent());
         assertEquals("test@email.com", capturedTicket.getEmail());
     }
@@ -56,10 +55,10 @@ public class TeamsNotificationWriterTest {
     @Test
     void testWriteMultipleItems() throws IOException, DotenvException, URISyntaxException {
         TeamsItem teamsItem1 = mock(TeamsItem.class);
-        when(teamsItem1.toTeamsNotification()).thenReturn(new TeamsNotification("summary1", "description1", "email1@example.com"));
+        when(teamsItem1.toTeamsNotification()).thenReturn(new TeamsNotification("description1", "email1@example.com"));
 
         TeamsItem teamsItem2 = mock(TeamsItem.class);
-        when(teamsItem2.toTeamsNotification()).thenReturn(new TeamsNotification("summary2", "description2", "email2@example.com"));
+        when(teamsItem2.toTeamsNotification()).thenReturn(new TeamsNotification("description2", "email2@example.com"));
 
         teamsNotificationWriter.write(teamsItem1);
         teamsNotificationWriter.write(teamsItem2);
@@ -76,13 +75,13 @@ public class TeamsNotificationWriterTest {
     @Test
     void testWriteAll() throws IOException, DotenvException, URISyntaxException {
         TeamsItem teamsItem1 = mock(TeamsItem.class);
-        when(teamsItem1.toTeamsNotification()).thenReturn(new TeamsNotification("summary1", "description1", "email1@example.com"));
+        when(teamsItem1.toTeamsNotification()).thenReturn(new TeamsNotification( "description1", "email1@example.com"));
 
         TeamsItem teamsItem2 = mock(TeamsItem.class);
-        when(teamsItem2.toTeamsNotification()).thenReturn(new TeamsNotification("summary2", "description2", "email2@example.com"));
+        when(teamsItem2.toTeamsNotification()).thenReturn(new TeamsNotification("description2", "email2@example.com"));
 
         TeamsItem teamsItem3 = mock(TeamsItem.class);
-        when(teamsItem3.toTeamsNotification()).thenReturn(new TeamsNotification("summary3", "description3", "email3@example.com"));
+        when(teamsItem3.toTeamsNotification()).thenReturn(new TeamsNotification("description3", "email3@example.com"));
 
         List<TeamsItem> items = List.of(teamsItem1, teamsItem2, teamsItem3);
         teamsNotificationWriter.writeAll(items);

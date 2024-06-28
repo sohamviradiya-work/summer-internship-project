@@ -20,7 +20,7 @@
     ],
     "logToConsole": false,
     "jiraTickets" : true,
-    "teamsNotifications" : false,
+    "teamsNotifications" : true,
     "resultsPath" : "./results",
     "method" : "Bisect"
 }
