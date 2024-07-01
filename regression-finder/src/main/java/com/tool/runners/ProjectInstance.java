@@ -106,10 +106,12 @@ public class ProjectInstance {
         ArrayList<RegressionBlame> regressionBlames = new ArrayList<>();
         for (ProjectCommit authorCommit : authorCommits) {
             if (projectCommitsSet.contains(authorCommit.getCommitId()))
-                regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, authorCommit, false));
+                regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, authorCommit, false,
+                        getLastFailCause(testIdentifier)));
         }
         if (regressionBlames.isEmpty())
-            regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, ProjectCommit.getLastPhaseCommit(), false));
+            regressionBlames.add(RegressionBlame.constructBlame(testIdentifier, ProjectCommit.getLastPhaseCommit(),
+                    false, getLastFailCause(testIdentifier)));
         return regressionBlames;
     }
 
