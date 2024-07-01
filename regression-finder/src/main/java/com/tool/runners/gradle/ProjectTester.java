@@ -15,6 +15,15 @@ public class ProjectTester {
     private TestLauncher testLauncher;
     private OutputStream logStream;
 
+
+    public class CompilationException extends Exception {
+
+        public CompilationException(String string) {
+            super(string);
+        }
+        
+    }
+
     private ProjectTester(TestLauncher testLauncher, OutputStream logStream) {
         this.testLauncher = testLauncher;
         this.logStream = logStream;
@@ -26,11 +35,11 @@ public class ProjectTester {
     }
 
     public ArrayList<ProgressEvent> runTestsForProject(String testProjectName,
-            HashMap<String, List<String>> testMethods) {
+            HashMap<String, List<String>> testMethods) throws CompilationException {
         for (String testClass : testMethods.keySet()) {
             testLauncher.withTaskAndTestMethods(testProjectName + ":test", testClass, testMethods.get(testClass));
         }
-        testLauncher.addArguments("--parallel", "--console=verbose","--stacktrace");
+        testLauncher.addArguments("--parallel", "--console=verbose", "--stacktrace");
 
         ArrayList<ProgressEvent> events = new ArrayList<>();
         testLauncher.addProgressListener(new ProgressListener() {
@@ -45,7 +54,8 @@ public class ProjectTester {
             testLauncher.setStandardOutput(logStream);
             testLauncher.run();
         } catch (Exception e) {
-
+            if(events.isEmpty()) // no test fail events, but run still failed
+                throw new CompilationException("Compilation Failed");
         }
         return events;
     }

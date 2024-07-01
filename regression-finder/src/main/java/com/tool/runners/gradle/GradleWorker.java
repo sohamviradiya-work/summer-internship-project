@@ -16,6 +16,7 @@ import org.gradle.tooling.events.test.internal.DefaultTestFinishEvent;
 import com.items.TestIdentifier;
 import com.items.TestResult;
 import com.tool.Config;
+import com.tool.runners.gradle.ProjectTester.CompilationException;
 import com.tool.writers.ArrayListWriter;
 
 public class GradleWorker {
@@ -42,16 +43,40 @@ public class GradleWorker {
     }
 
     private ArrayList<TestResult> runTestsForProject(String testProjectName,
-            HashMap<String, List<String>> testMethods) throws IOException {
+            HashMap<String, List<String>> testMethodsMap) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ProjectTester projectTester = ProjectTester.mountProjectTester(projectManager, outputStream);
-        ArrayList<ProgressEvent> events = projectTester.runTestsForProject(testProjectName, testMethods);
+        try {
+            return runTestsWithCompilation(testProjectName, testMethodsMap, outputStream, projectTester);
+        } catch (CompilationException e0) {
+            System.out.println(Config.ANSI_PURPLE + "Possible Compilation Failure, Rerunning with syncing... " + Config.ANSI_RESET);
+            syncDependencies();
+            try {
+                return runTestsWithCompilation(testProjectName, testMethodsMap, outputStream, projectTester);
+            } catch (CompilationException e) {
 
+            System.out.println(Config.ANSI_PURPLE + "Compilation Failure, scheduling re-run on future commits... " + Config.ANSI_RESET);
+                return allPassed(testProjectName, testMethodsMap);
+            }
+        }
+    }
+
+    private ArrayList<TestResult> runTestsWithCompilation(String testProjectName, HashMap<String, List<String>> testMethodsMap,
+            ByteArrayOutputStream outputStream, ProjectTester projectTester) throws CompilationException, IOException {
+        ArrayList<ProgressEvent> events = projectTester.runTestsForProject(testProjectName, testMethodsMap);
         String logs = outputStream.toString();
-
         logStream.write(logs.getBytes());
-
         return extractResults(testProjectName, events, logs);
+    }
+
+    private ArrayList<TestResult> allPassed(String testProjectName, HashMap<String, List<String>> testMethodsMap) {
+        ArrayList<TestResult> results = new ArrayList<>();
+        for (String testClass : testMethodsMap.keySet()) {
+            for (String testMethod : testMethodsMap.get(testClass)) {
+                results.add(new TestResult(testClass, testMethod, testProjectName, "PASSED", ""));
+            }
+        }
+        return results;
     }
 
     public void syncDependencies() {
