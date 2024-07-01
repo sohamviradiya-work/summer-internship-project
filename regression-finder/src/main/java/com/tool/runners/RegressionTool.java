@@ -55,7 +55,7 @@ public class RegressionTool {
 
         long start = System.currentTimeMillis();
 
-        String initialBranch = "";
+        String initialBranch = null;
         for (String branch : branchWiseCommitList.keySet()) {
             ArrayList<ProjectCommit> projectCommits = branchWiseCommitList.get(branch);
             ProjectCommit lastCommit = projectCommits.get(projectCommits.size() - 1);
@@ -64,6 +64,12 @@ public class RegressionTool {
             gitWorker.checkoutToCommit(lastCommit);
             initialBranch = branch;
         }
+
+        if(initialBranch==null){
+            System.out.println("No commits meet the criteria, fix days and first commit parameter");
+            return 0;
+        }
+
 
         long end = System.currentTimeMillis();
 

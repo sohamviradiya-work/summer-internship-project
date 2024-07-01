@@ -129,8 +129,7 @@ public class GitWorker {
 
         List<Ref> branches = git.branchList().call();
 
-        RevCommit firstRevCommit = repository.parseCommit(ObjectId.fromString(firstCommitId));
-        ProjectCommit firstCommit = ProjectCommit.getprojectCommitFromRevCommit(null, firstRevCommit);
+        ProjectCommit firstCommit =  firstCommitId==null ? null : ProjectCommit.getprojectCommitFromRevCommit(null, repository.parseCommit(ObjectId.fromString(firstCommitId)));
 
         for (Ref branch : branches) {
 
@@ -152,7 +151,8 @@ public class GitWorker {
                 if (firstCommit != null && projectCommit.getDateMilli() < firstCommit.getDateMilli())
                     break;
 
-                if (projectCommit.getDateMilli() < System.currentTimeMillis() - days * Config.MILLISECONDS_PER_DAY)
+                if (days > 0 && projectCommit.getDateMilli() < System.currentTimeMillis()
+                        - days * Config.MILLISECONDS_PER_DAY)
                     break;
 
                 if (assignedCommits.contains(projectCommit.getCommitId()))
@@ -167,7 +167,7 @@ public class GitWorker {
                 if (commit.getParentCount() == 0)
                     break;
 
-                if (projectCommit.getCommitId().equals(firstCommit.getCommitId()))
+                if (firstCommit!=null && projectCommit.getCommitId().equals(firstCommit.getCommitId()))
                     break;
 
                 commit = revWalk.parseCommit(commit.getParent(0).getId());
