@@ -36,7 +36,7 @@ public class RegressionBlame implements CSVItem, JiraItem, TeamsItem {
     public String toCSVString() {
         return testIdentifier.getTestProject() + "," + testIdentifier.getTestClass() + ","
                 + testIdentifier.getTestMethod() + "," + projectCommit.getCommitId() + "," + projectCommit.getAuthor()
-                + "," + type.toString();
+                + "," + type.toString() + "," + stackTrace.replace("\n", "|");
     }
 
     @Override
