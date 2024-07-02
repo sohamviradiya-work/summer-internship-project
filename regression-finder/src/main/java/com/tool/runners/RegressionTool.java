@@ -75,7 +75,6 @@ public class RegressionTool {
 
         projectInstance.close(initialBranch);
         finder.close();
-        blameWriter.close();
 
         return end - start;
     }
