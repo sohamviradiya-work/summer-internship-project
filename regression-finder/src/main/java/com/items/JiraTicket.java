@@ -1,19 +1,14 @@
 package com.items;
 
 public class JiraTicket {
-    private String summary;
     private String description;
     private String email;
 
-    public JiraTicket(String summary, String description, String email) {
-        this.summary = summary;
+    public JiraTicket(String description, String email) {
         this.description = description;
         this.email = email;
     }
 
-    public String getSummary() {
-        return summary;
-    }
 
     public String getDescription() {
         return description;
@@ -24,8 +19,6 @@ public class JiraTicket {
     }
 
     static JiraTicket convert(RegressionBlame regressionBlame) {
-        String summary = "Your commit " + regressionBlame.projectCommit.getCommitId() + " at " + regressionBlame.projectCommit.getDateString()
-                + " failed some tests";
     
         String description = "Your commit " + regressionBlame.projectCommit.getCommitId() + " caused the test "
                 + regressionBlame.testIdentifier.getTestProject() + ":" + regressionBlame.testIdentifier.getTestClass() + "."
@@ -35,14 +28,12 @@ public class JiraTicket {
             description = description + regressionBlame.getStackTrace();
     
         if (regressionBlame.projectCommit.getCommitId().compareTo("LAST PHASE") == 0) {
-            summary = "This failing test was changed in the last phase";
     
             description = "Test " + regressionBlame.testIdentifier.getTestProject() + ": "
                     + regressionBlame.testIdentifier.getTestClass() + "." + regressionBlame.testIdentifier.getTestMethod()
                     + " was changed in the last phase, which has been failing since last phase";
         } else if (regressionBlame.type == RegressionBlame.BlameType.TEST_WRITE) {
-            summary = "Your commit " + regressionBlame.projectCommit.getCommitId() + " at " + regressionBlame.projectCommit.getDateString()
-            + " changed some tests which are failing";
+            
             
             description = "Your commit " + regressionBlame.projectCommit.getCommitId() + " changed the test "
                     + regressionBlame.testIdentifier.getTestProject() + ": "
@@ -50,7 +41,7 @@ public class JiraTicket {
                     + " which has been failing since last phase";
         }
     
-        return new JiraTicket(summary, description, regressionBlame.projectCommit.getAuthor());
+        return new JiraTicket(description, regressionBlame.projectCommit.getAuthor());
     }
 }
 

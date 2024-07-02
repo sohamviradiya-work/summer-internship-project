@@ -35,61 +35,66 @@ public class JiraTicketWriterTest {
     @Test
     void testWriteSingleItem() throws IOException, DotenvException, URISyntaxException {
         JiraItem jiraItem = mock(JiraItem.class);
-        when(jiraItem.toJiraTicket()).thenReturn(new JiraTicket("test summary", "test description", "test@email.com"));
+        when(jiraItem.toJiraTicket()).thenReturn(new JiraTicket( "test description", "test@email.com"));
 
         jiraTicketWriter.write(jiraItem);
         jiraTicketWriter.close();
 
-        ArgumentCaptor<JiraTicket> captor = ArgumentCaptor.forClass(JiraTicket.class);
+        ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(jiraClient, times(1)).createIssue(captor.capture());
+        verify(jiraClient, times(1)).createIssue(emailCaptor.capture(),descriptionCaptor.capture());
 
-        JiraTicket capturedTicket = captor.getValue();
-        assertEquals("test summary", capturedTicket.getSummary());
-        assertEquals("test description", capturedTicket.getDescription());
-        assertEquals("test@email.com", capturedTicket.getEmail());
+        assertEquals("test description\n\n", descriptionCaptor.getValue());
+        assertEquals("test@email.com", emailCaptor.getValue());
     }
 
     @Test
-    void testWriteMultipleItems() throws IOException, DotenvException, URISyntaxException {
+    void testWriteMultipleItemsSingleMail() throws IOException, DotenvException, URISyntaxException {
         JiraItem jiraItem1 = mock(JiraItem.class);
-        when(jiraItem1.toJiraTicket()).thenReturn(new JiraTicket("summary1", "description1", "email1@example.com"));
+        when(jiraItem1.toJiraTicket()).thenReturn(new JiraTicket("description1", "email1@example.com"));
 
         JiraItem jiraItem2 = mock(JiraItem.class);
-        when(jiraItem2.toJiraTicket()).thenReturn(new JiraTicket("summary2", "description2", "email2@example.com"));
-
-        jiraTicketWriter.write(jiraItem1);
-        jiraTicketWriter.write(jiraItem2);
-        jiraTicketWriter.close();
-
-        ArgumentCaptor<JiraTicket> captor = ArgumentCaptor.forClass(JiraTicket.class);
-
-        verify(jiraClient, times(2)).createIssue(captor.capture());
-
-        List<JiraTicket> capturedTickets = captor.getAllValues();
-        assertEquals(2, capturedTickets.size());
-    }
-
-    @Test
-    void testWriteAll() throws IOException, DotenvException, URISyntaxException {
-        JiraItem jiraItem1 = mock(JiraItem.class);
-        when(jiraItem1.toJiraTicket()).thenReturn(new JiraTicket("summary1", "description1", "email1@example.com"));
-
-        JiraItem jiraItem2 = mock(JiraItem.class);
-        when(jiraItem2.toJiraTicket()).thenReturn(new JiraTicket("summary2", "description2", "email2@example.com"));
+        when(jiraItem2.toJiraTicket()).thenReturn(new JiraTicket("description2", "email1@example.com"));
 
         JiraItem jiraItem3 = mock(JiraItem.class);
-        when(jiraItem3.toJiraTicket()).thenReturn(new JiraTicket("summary3", "description3", "email3@example.com"));
+        when(jiraItem3.toJiraTicket()).thenReturn(new JiraTicket("description3", "email1@example.com"));
 
         List<JiraItem> items = List.of(jiraItem1, jiraItem2, jiraItem3);
         jiraTicketWriter.writeAll(items);
         jiraTicketWriter.close();
 
-        ArgumentCaptor<JiraTicket> captor = ArgumentCaptor.forClass(JiraTicket.class);
+        ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(jiraClient, times(3)).createIssue(captor.capture());
+        verify(jiraClient, times(1)).createIssue(emailCaptor.capture(),descriptionCaptor.capture());
 
-        List<JiraTicket> capturedTickets = captor.getAllValues();
-        assertEquals(3, capturedTickets.size());
+        List<String> capturedEmails = emailCaptor.getAllValues();
+        assertEquals(1, capturedEmails.size());    
     }
+
+    @Test
+    void testWriteMultipleItemsMultipleMail() throws IOException, DotenvException, URISyntaxException {
+        JiraItem jiraItem1 = mock(JiraItem.class);
+        when(jiraItem1.toJiraTicket()).thenReturn(new JiraTicket("description1", "email1@example.com"));
+
+        JiraItem jiraItem2 = mock(JiraItem.class);
+        when(jiraItem2.toJiraTicket()).thenReturn(new JiraTicket("description2", "email2@example.com"));
+
+        JiraItem jiraItem3 = mock(JiraItem.class);
+        when(jiraItem3.toJiraTicket()).thenReturn(new JiraTicket("description3", "email1@example.com"));
+
+        List<JiraItem> items = List.of(jiraItem1, jiraItem2, jiraItem3);
+        jiraTicketWriter.writeAll(items);
+        jiraTicketWriter.close();
+
+        ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(jiraClient, times(2)).createIssue(emailCaptor.capture(),descriptionCaptor.capture());
+
+        List<String> capturedEmails = emailCaptor.getAllValues();
+        assertEquals(2, capturedEmails.size());    
+    }
+
 }

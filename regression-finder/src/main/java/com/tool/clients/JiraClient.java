@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.items.JiraTicket;
 import com.tool.Config;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -35,20 +34,17 @@ public class JiraClient extends NetworkServiceClient {
         this.emailMap = new HashMap<>();
     }
 
-    public void createIssue(JiraTicket jiraTicket)
-            throws IOException, DotenvException, URISyntaxException {
+    public void createIssue(String email, String description)
+            throws IOException, URISyntaxException {
         String endpoint = jiraUrl + "/rest/api/3/issue";
-        String requestBody = getTicketBody(jiraTicket);
+        String requestBody = initiateTicketBody(email, description);
         sendPostRequest(endpoint, requestBody);
     }
 
-    public void close() {
-        System.out.println("Closed Jira Client");
-    }
+    private String initiateTicketBody(String email, String description)
+            throws IOException, DotenvException, URISyntaxException {
 
-    private String getTicketBody(JiraTicket jiraTicket) throws IOException, DotenvException, URISyntaxException {
-
-        String assigneeId = getIdByEmail(jiraTicket.getEmail());
+        String assigneeId = getIdByEmail(email);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -57,7 +53,7 @@ public class JiraClient extends NetworkServiceClient {
         ObjectNode projectNode = fieldsNode.putObject("project");
         projectNode.put("key", projectKey);
 
-        fieldsNode.put("summary", jiraTicket.getSummary());
+        fieldsNode.put("summary", "Your commits caused some regressions");
 
         if (assigneeId != null) {
             ObjectNode assigneeNode = fieldsNode.putObject("assignee");
@@ -69,7 +65,7 @@ public class JiraClient extends NetworkServiceClient {
         descriptionNode.put("version", 1);
 
         ObjectNode descriptionContentNode = mapper.createObjectNode();
-        descriptionContentNode.put("text", jiraTicket.getDescription());
+        descriptionContentNode.put("text", description);
         descriptionContentNode.put("type", "text");
 
         ObjectNode paragraphNode = mapper.createObjectNode();
