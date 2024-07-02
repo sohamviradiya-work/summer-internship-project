@@ -148,9 +148,6 @@ public class GitWorker {
             while (commit != null) {
                 ProjectCommit projectCommit = ProjectCommit.getprojectCommitFromRevCommit(branchName, commit);
 
-                if (firstCommit != null && projectCommit.getDateMilli() < firstCommit.getDateMilli())
-                    break;
-
                 if (days > 0 && projectCommit.getDateMilli() < System.currentTimeMillis()
                         - days * Config.MILLISECONDS_PER_DAY)
                     break;
