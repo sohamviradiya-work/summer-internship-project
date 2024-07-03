@@ -19,7 +19,7 @@ public class TeamsClient extends NetworkServiceClient {
     }
 
     public void createNotification(TeamsNotification teamsNotification)
-            throws IOException, DotenvException, URISyntaxException {
+            throws IOException, URISyntaxException {
         String endPoint = apiUrl + "/api/notify?email=" + teamsNotification.getEmail(); 
         String payload = getBody(teamsNotification);
         sendPostRequest(endPoint, payload);
@@ -36,7 +36,7 @@ public class TeamsClient extends NetworkServiceClient {
         return objectMapper.writeValueAsString(payload);
     }
 
-    protected String getAuthHeader() throws DotenvException, IOException, URISyntaxException {
+    protected String getAuthHeader() throws IOException, URISyntaxException {
         return "";
     }
 

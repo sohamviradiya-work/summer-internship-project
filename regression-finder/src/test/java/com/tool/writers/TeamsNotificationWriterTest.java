@@ -20,8 +20,6 @@ import com.items.TeamsNotification;
 import com.items.interfaces.TeamsItem;
 import com.tool.clients.TeamsClient;
 
-import io.github.cdimascio.dotenv.DotenvException;
-
 public class TeamsNotificationWriterTest {
     
     @Mock
@@ -36,7 +34,7 @@ public class TeamsNotificationWriterTest {
     }
 
     @Test
-    void testWriteSingleItem() throws IOException, DotenvException, URISyntaxException {
+    void testWriteSingleItem() throws IOException, URISyntaxException {
         TeamsItem teamsItem = mock(TeamsItem.class);
         when(teamsItem.toTeamsNotification()).thenReturn(new TeamsNotification("test content", "test@email.com"));
 
@@ -53,7 +51,7 @@ public class TeamsNotificationWriterTest {
     }
 
     @Test
-    void testWriteMultipleItems() throws IOException, DotenvException, URISyntaxException {
+    void testWriteMultipleItems() throws IOException, URISyntaxException {
         TeamsItem teamsItem1 = mock(TeamsItem.class);
         when(teamsItem1.toTeamsNotification()).thenReturn(new TeamsNotification("description1", "email1@example.com"));
 
@@ -73,7 +71,7 @@ public class TeamsNotificationWriterTest {
     }
 
     @Test
-    void testWriteAll() throws IOException, DotenvException, URISyntaxException {
+    void testWriteAll() throws IOException, URISyntaxException {
         TeamsItem teamsItem1 = mock(TeamsItem.class);
         when(teamsItem1.toTeamsNotification()).thenReturn(new TeamsNotification( "description1", "email1@example.com"));
 

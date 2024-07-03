@@ -33,7 +33,7 @@ public class TeamsNotificationWriter<T extends TeamsItem> implements ItemWriter<
         futures.add(executorService.submit(() -> {
             try {
                 writeNotification(item);
-            } catch (IOException | DotenvException | URISyntaxException e) {
+            } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
         }));
@@ -57,7 +57,7 @@ public class TeamsNotificationWriter<T extends TeamsItem> implements ItemWriter<
         }
     }
 
-    protected void writeNotification(T item) throws IOException, DotenvException, URISyntaxException {
+    protected void writeNotification(T item) throws IOException, URISyntaxException {
         this.client.createNotification(item.toTeamsNotification());
     }
 

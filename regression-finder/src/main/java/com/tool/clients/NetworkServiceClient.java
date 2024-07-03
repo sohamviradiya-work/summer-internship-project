@@ -8,11 +8,10 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import io.github.cdimascio.dotenv.DotenvException;
 
 public abstract class NetworkServiceClient {
     
-    protected void sendPostRequest(String endpoint, String requestBody) throws IOException, DotenvException, URISyntaxException {
+    protected void sendPostRequest(String endpoint, String requestBody) throws IOException, URISyntaxException {
         URL url = new URL(endpoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -44,7 +43,7 @@ public abstract class NetworkServiceClient {
         
         connection.disconnect();
     }
-    protected String sendGetRequest(String endpoint) throws IOException, DotenvException, URISyntaxException {
+    protected String sendGetRequest(String endpoint) throws IOException, URISyntaxException {
         URL url = new URL(endpoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -77,6 +76,6 @@ public abstract class NetworkServiceClient {
         return response.toString();
     }
 
-    protected abstract String getAuthHeader() throws DotenvException, IOException, URISyntaxException;
+    protected abstract String getAuthHeader() throws IOException, URISyntaxException;
 
 }

@@ -42,7 +42,7 @@ public class JiraClient extends NetworkServiceClient {
     }
 
     private String initiateTicketBody(String email, String description)
-            throws IOException, DotenvException, URISyntaxException {
+            throws IOException, URISyntaxException {
 
         String assigneeId = getIdByEmail(email);
 
@@ -89,7 +89,7 @@ public class JiraClient extends NetworkServiceClient {
         return requestBody;
     }
 
-    private String getIdByEmail(String email) throws IOException, DotenvException, URISyntaxException {
+    private String getIdByEmail(String email) throws IOException, URISyntaxException {
 
         if (email == "LAST PHASE")
             return null;

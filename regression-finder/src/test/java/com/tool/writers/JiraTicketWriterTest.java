@@ -17,8 +17,6 @@ import com.items.JiraTicket;
 import com.items.interfaces.JiraItem;
 import com.tool.clients.JiraClient;
 
-import io.github.cdimascio.dotenv.DotenvException;
-
 public class JiraTicketWriterTest {
 
     @Mock
@@ -33,7 +31,7 @@ public class JiraTicketWriterTest {
     }
 
     @Test
-    void testWriteSingleItem() throws IOException, DotenvException, URISyntaxException {
+    void testWriteSingleItem() throws IOException, URISyntaxException {
         JiraItem jiraItem = mock(JiraItem.class);
         when(jiraItem.toJiraTicket()).thenReturn(new JiraTicket( "test description", "test@email.com"));
 
@@ -50,7 +48,7 @@ public class JiraTicketWriterTest {
     }
 
     @Test
-    void testWriteMultipleItemsSingleMail() throws IOException, DotenvException, URISyntaxException {
+    void testWriteMultipleItemsSingleMail() throws IOException, URISyntaxException {
         JiraItem jiraItem1 = mock(JiraItem.class);
         when(jiraItem1.toJiraTicket()).thenReturn(new JiraTicket("description1", "email1@example.com"));
 
@@ -74,7 +72,7 @@ public class JiraTicketWriterTest {
     }
 
     @Test
-    void testWriteMultipleItemsMultipleMail() throws IOException, DotenvException, URISyntaxException {
+    void testWriteMultipleItemsMultipleMail() throws IOException, URISyntaxException {
         JiraItem jiraItem1 = mock(JiraItem.class);
         when(jiraItem1.toJiraTicket()).thenReturn(new JiraTicket("description1", "email1@example.com"));
 
