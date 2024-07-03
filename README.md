@@ -1,6 +1,5 @@
 # Project Documentation: Regression Finder Tool
 
-
 ## Project Description
 The Regression Finder Tool is designed to identify the specific commit that caused a regression in a codebase. It takes a list of failed tests from a suite and maps each failure to the corresponding commit and author responsible. The tool efficiently handles large repositories and exports the results to an Excel file.
 
@@ -35,7 +34,7 @@ The Regression Finder Tool is designed to identify the specific commit that caus
    gradle wrapper
    ```
 
-### 3. Instructions for Writing the JSON Configuration:    
+### 3. Instructions for Writing the config.json:    
 
 To create the JSON configuration file for the project, follow the structure and instructions below. Each key-value pair is explained for clarity:
 
@@ -47,7 +46,6 @@ To create the JSON configuration file for the project, follow the structure and 
     "days": 20,  
     "firstCommit": "6eb82d29421fba8e8df76d06d7517a9152fd8690", 
     "testInputFile": "./tests.csv", 
-    "testSrcPath": "/src/test/java/", 
     "tests": [ 
         {
             "testProject": "calculator",
@@ -60,6 +58,7 @@ To create the JSON configuration file for the project, follow the structure and 
             "testMethod": "testCorrelationSimple"
         }
     ],
+    "testSrcPath": "/src/test/java/", 
     "logToConsole": false,  
     "resultsPath": "./results", 
     "method": "Bisect"  
@@ -76,10 +75,21 @@ To create the JSON configuration file for the project, follow the structure and 
 - **testInputFile**: Path to the CSV file containing tests. If this is null, the tests defined in the 'tests' array will be used.
 - **testSrcPath**: Path to the test source folder relative to the subproject or project root.
 - **tests**: Provide details of tests if 'testInputFile' is null. Each test should have the project, class, and method specified.
-- **logToConsole**: Set to `true` to print logs to the terminal, or `false` to send them to a file.
+- **logToConsole**: Set to `true` to print logs to the terminal, or `false` to send them to a file at `./results/.log`. 
 - **resultsPath**: Specify where to store the results, folder will be cleaned before execution and created if not exists.
+- **jiraTickets**: Boolean flag to create JIRA tickets (false).
+- **teamsNotifications**: Boolean flag to send notifications to Microsoft Teams (false).
 - **method**: Choose the method to use; options include 'Bisect', 'Linear', or 'Batch XX'.
 
+### 4. Enviroment Variables:
+
+- **JIRA_MAIL**: The email address associated with your JIRA account. (Issues will be reported by this account)
+- **JIRA_TOKEN**: The API token for your JIRA account.
+- **JIRA_SERVER**: The base URL of your JIRA server (e.g., https://your-domain.atlassian.net).
+- **JIRA_PROJECT_KEY**: The key of the JIRA project you are working with (e.g., PROJ).
+- **JIRA_ISSUE_TYPE**: Id of the issue-type you want to create or interact with
+- **JIRA_ISSUE_TRANSITION**: Id of the transition action you want to perform on a JIRA issue 
+- **TEAMS_BOT_API_URL**: The endpoint URL of the Teams bot (e.g., https://your-bot.azurewebsites.net/).
 
 ### 4. Running the Tool:  
    Execute the tool using the following command:
@@ -88,4 +98,5 @@ To create the JSON configuration file for the project, follow the structure and 
    ```
 
 ### 5. Output:  
-   The results will be generated and stored in a CSV file located at `./results/`.
+   The results will be generated and stored in a CSV file located at `./results/blame.csv`. 
+

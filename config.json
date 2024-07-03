@@ -5,7 +5,6 @@
     "days" : 20,
     "firstCommit" : "0d12dba93927a2e3b480a981ceb9d6c7415eda09",
     "testInputFile" : "./tests.csv",
-    "testSrcPath" : "/src/test/java/",
     "tests": [
         {
             "testProject": "calculator",
@@ -18,9 +17,10 @@
             "testMethod" : "testCorrelationSimple"
         }
     ],
+    "testSrcPath" : "/src/test/java/",
     "logToConsole": false,
-    "jiraTickets" : true,
-    "teamsNotifications" : true,
+    "jiraTickets" : false,
+    "teamsNotifications" : false,
     "resultsPath" : "./results",
     "method" : "Bisect"
 }
