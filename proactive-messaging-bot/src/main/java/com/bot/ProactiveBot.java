@@ -109,7 +109,7 @@ public class ProactiveBot extends ActivityHandler {
     }
 
     private CompletableFuture<Void> sendRequestToEndpoint(String email, String userId) {
-        String apiUrl = "http://localhost:3978/api/change";
+        String apiUrl = "https://regressionfinderbot-regressionfinder.azuremicroservices.io/api/change";
 
         String queryParams = String.format("id=%s&email=%s", userId, email);
 
