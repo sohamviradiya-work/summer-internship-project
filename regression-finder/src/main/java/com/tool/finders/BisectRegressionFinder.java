@@ -33,7 +33,7 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
             return;
 
         if (startIndex >= endIndex - 1) {
-            if (startIndex == endIndex) {
+            if (startIndex == endIndex && endIndex != projectCommits.size() - 1) {
                 for (TestIdentifier testIdentifier : testIdentifiers) {
                     projectInstance.putBlame(blameWriter, testIdentifier, projectCommits.get(startIndex));
                 }
@@ -59,7 +59,8 @@ public class BisectRegressionFinder extends LinearRegressionFinder {
                 projectCommits.get(midIndex), projectCommits.get(lastIndex));
 
         ArrayList<TestIdentifier> failedTests = new ArrayList<>(TestResult.extractFailingTests(testResults));
-        ArrayList<TestIdentifier> passedTests = new ArrayList<>(TestResult.extractNotFailingTests(testResults, testIdentifiers));
+        ArrayList<TestIdentifier> passedTests = new ArrayList<>(
+                TestResult.extractNotFailingTests(testResults, testIdentifiers));
 
         if (!failedTests.isEmpty())
             bisectForCommitsAndTest(projectCommits, startIndex, midIndex, midIndex, failedTests, true);
