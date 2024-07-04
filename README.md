@@ -67,9 +67,10 @@ To create the JSON configuration file for the project, follow the structure and 
         }
     ],
     "testSrcPath" : "/src/test/java/",
-    "logToConsole": false,
-    "jiraTickets" : false,
-    "teamsNotifications" : false,
+    "logToConsole": true,
+    "jiraTickets" : true,
+    "teamsNotifications" : true,
+    "reportLastPhase": true,
     "resultsPath" : "./results",
     "method" : "Bisect"
 }
@@ -87,8 +88,9 @@ To create the JSON configuration file for the project, follow the structure and 
 - **tests**: Provide details of tests if 'testInputFile' is null. Each test should have the project, class, and method specified.
 - **logToConsole**: Set to `true` to print logs to the terminal, or `false` to send them to a file at `./results/.log`.
 - **resultsPath**: Specify where to store the results, folder will be cleaned before execution and created if not exists.
-- **jiraTickets**: Boolean flag to create JIRA tickets (false).
-- **teamsNotifications**: Boolean flag to send notifications to Microsoft Teams (false).
+- **jiraTickets**: Boolean flag to create JIRA tickets.
+- **reportLastPhase**: Boolean flag to report tests which are failing since the first commit.
+- **teamsNotifications**: Boolean flag to send notifications to Microsoft Teams.
 - **method**: Choose the method to use; options include 'Bisect', 'Linear', or 'Batch XX'.
 
 <hr>

@@ -44,7 +44,7 @@ public class RegressionTool {
         ProjectInstance projectInstance = ProjectInstance.mountLocalProject(config.repositoryPath, config.testSrcPath,
                 gradleVersion, logStream);
 
-        Finder finder = createFinder(config.method, blameWriter, projectInstance);
+        Finder finder = createFinder(config.method, blameWriter, projectInstance, config.reportLastPhase);
 
         GitWorker gitWorker = projectInstance.getGitWorker();
 
@@ -80,14 +80,14 @@ public class RegressionTool {
     }
 
     private static Finder createFinder(String method, ItemWriter<RegressionBlame> blameWriter,
-            ProjectInstance projectInstance) {
+            ProjectInstance projectInstance, boolean reportLastPhase) {
         if (method.startsWith("Linear"))
-            return new LinearRegressionFinder(projectInstance, blameWriter);
+            return new LinearRegressionFinder(projectInstance, blameWriter, reportLastPhase);
         else if (method.startsWith("Bisect"))
-            return new BisectRegressionFinder(projectInstance, blameWriter);
+            return new BisectRegressionFinder(projectInstance, blameWriter, reportLastPhase);
         else if (method.startsWith("Batch")) {
             int batchSize = Integer.parseInt(method.substring(6));
-            return new BatchRegressionFinder(projectInstance, blameWriter, batchSize);
+            return new BatchRegressionFinder(projectInstance, blameWriter, batchSize, reportLastPhase);
         } else
             throw new IllegalArgumentException("Method must be one of Linear, Bisect or Batch XX received: " + method);
     }

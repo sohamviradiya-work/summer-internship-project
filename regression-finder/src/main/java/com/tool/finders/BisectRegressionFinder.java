@@ -15,8 +15,8 @@ import com.tool.writers.interfaces.ItemWriter;
 
 public class BisectRegressionFinder extends LinearRegressionFinder {
 
-    public BisectRegressionFinder(ProjectInstance projectInstance, ItemWriter<RegressionBlame> blameWriter) {
-        super(projectInstance, blameWriter);
+    public BisectRegressionFinder(ProjectInstance projectInstance, ItemWriter<RegressionBlame> blameWriter, boolean reportLastPhase) {
+        super(projectInstance, blameWriter, reportLastPhase);
     }
 
     @Override

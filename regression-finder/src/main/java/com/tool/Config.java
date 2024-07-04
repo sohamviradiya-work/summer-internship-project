@@ -33,6 +33,7 @@ public class Config {
     public boolean logToConsole;
     public boolean jiraTickets;
     public boolean teamsNotifications;
+    public boolean reportLastPhase;
 
     public static final long MILLISECONDS_PER_SECOND = 1000;
 
@@ -52,7 +53,7 @@ public class Config {
 
     public Config(String repositoryPath, String resultsPath, String testSrcPath, String method,
             ArrayList<TestIdentifier> testIdentifiers, String firstCommit, List<String> branches, long days,
-            boolean logToConsole, boolean jiraTickets, boolean teamsNotifications) {
+            boolean logToConsole, boolean jiraTickets, boolean teamsNotifications,boolean reportLastPhase) {
         this.repositoryPath = repositoryPath;
         this.resultsPath = resultsPath;
         this.testSrcPath = testSrcPath;
@@ -64,6 +65,7 @@ public class Config {
         this.logToConsole = logToConsole;
         this.jiraTickets = jiraTickets;
         this.teamsNotifications = teamsNotifications;
+        this.reportLastPhase = reportLastPhase;
     }
 
     public static Config mountConfig()
@@ -100,7 +102,7 @@ public class Config {
 
         return new Config(dryConfig.repositoryPath, dryConfig.resultsPath, dryConfig.testSrcPath, dryConfig.method,
                 testIdentifiers, dryConfig.firstCommit, dryConfig.branches, dryConfig.days, dryConfig.logToConsole,
-                dryConfig.jiraTickets, dryConfig.teamsNotifications);
+                dryConfig.jiraTickets, dryConfig.teamsNotifications, dryConfig.reportLastPhase);
     }
 
     public static String getProjectRoot() throws URISyntaxException {

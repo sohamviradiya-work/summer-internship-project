@@ -30,7 +30,7 @@ class BatchRegressionFinderTest {
     void setUp() {
         mockProjectInstance = mock(ProjectInstance.class);
         mockBlameWriter = mock(ItemWriter.class);
-        finder = new BatchRegressionFinder(mockProjectInstance, mockBlameWriter, 3); 
+        finder = new BatchRegressionFinder(mockProjectInstance, mockBlameWriter, 3,true); 
     }
 
     @Test

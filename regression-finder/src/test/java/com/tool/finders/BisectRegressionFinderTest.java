@@ -29,7 +29,7 @@ public class BisectRegressionFinderTest {
     void setUp() {
         mockProjectInstance = mock(ProjectInstance.class);
         mockBlameWriter = mock(ItemWriter.class);
-        finder = new BisectRegressionFinder(mockProjectInstance, mockBlameWriter);
+        finder = new BisectRegressionFinder(mockProjectInstance, mockBlameWriter,true);
     }
 
     @Test

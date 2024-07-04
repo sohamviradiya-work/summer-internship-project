@@ -19,8 +19,9 @@
     ],
     "testSrcPath" : "/src/test/java/",
     "logToConsole": false,
-    "jiraTickets" : false,
-    "teamsNotifications" : false,
+    "jiraTickets" : true,
+    "teamsNotifications" : true,
+    "reportLastPhase": false,
     "resultsPath" : "./results",
     "method" : "Bisect"
 }

@@ -30,7 +30,7 @@ class LinearRegressionFinderTest {
     void setUp() {
         mockProjectInstance = mock(ProjectInstance.class);
         mockBlameWriter = mock(ItemWriter.class);
-        finder = new LinearRegressionFinder(mockProjectInstance, mockBlameWriter);
+        finder = new LinearRegressionFinder(mockProjectInstance, mockBlameWriter, true);
     }
 
     @Test
@@ -47,15 +47,15 @@ class LinearRegressionFinderTest {
 
         ArgumentCaptor<ArrayList<RegressionBlame>> blameCaptor = ArgumentCaptor.forClass(ArrayList.class);
         verify(mockBlameWriter, atLeastOnce()).writeAll(blameCaptor.capture());
-        
+
         ArgumentCaptor<ProjectCommit> commitCaptor = ArgumentCaptor.forClass(ProjectCommit.class);
-        verify(mockProjectInstance, times(5)).runTestsForCommit(any(),commitCaptor.capture(), any());
+        verify(mockProjectInstance, times(5)).runTestsForCommit(any(), commitCaptor.capture(), any());
         List<ProjectCommit> capturedProjectCommits = commitCaptor.getAllValues();
-        
+
         int i = 5;
-        for(ProjectCommit projectCommit:capturedProjectCommits){
+        for (ProjectCommit projectCommit : capturedProjectCommits) {
             i--;
             assertEquals(projectCommit.toCSVString(), projectCommits.get(i).toCSVString());
-        } 
+        }
     }
 }

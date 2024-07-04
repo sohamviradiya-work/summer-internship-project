@@ -19,8 +19,8 @@ public class BatchRegressionFinder extends LinearRegressionFinder {
     private int batchSize;
 
     public BatchRegressionFinder(ProjectInstance projectInstance, ItemWriter<RegressionBlame> blameWriter,
-            int batchSize) {
-        super(projectInstance, blameWriter);
+            int batchSize,boolean reportLastPhase) {
+        super(projectInstance, blameWriter,reportLastPhase);
         this.batchSize = batchSize;
     }
 

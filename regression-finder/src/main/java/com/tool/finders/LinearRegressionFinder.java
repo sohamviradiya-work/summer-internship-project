@@ -18,10 +18,12 @@ public class LinearRegressionFinder implements Finder {
 
     public ProjectInstance projectInstance;
     public ItemWriter<RegressionBlame> blameWriter;
+    private boolean reportLastPhase;
 
-    public LinearRegressionFinder(ProjectInstance projectInstance, ItemWriter<RegressionBlame> blameWriter) {
+    public LinearRegressionFinder(ProjectInstance projectInstance, ItemWriter<RegressionBlame> blameWriter,boolean reportLastPhase) {
         this.projectInstance = projectInstance;
         this.blameWriter = blameWriter;
+        this.reportLastPhase = reportLastPhase;
     }
 
     @Override
@@ -59,6 +61,9 @@ public class LinearRegressionFinder implements Finder {
                 projectInstance.putBlame(blameWriter, testIdentifier, projectCommits.get(startIndex));
             return;
         }
+        if(!reportLastPhase)
+            return;
+            
         if (failedTests.size() > 0)
             putBlameOnAuthor(failedTests, projectCommits);
     }
