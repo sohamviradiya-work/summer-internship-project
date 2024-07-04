@@ -20,6 +20,7 @@ public class TeamsClient extends NetworkServiceClient {
 
     public void createNotification(TeamsNotification teamsNotification)
             throws IOException, URISyntaxException {
+        if(teamsNotification.getEmail()=="LAST PHASE") return;
         String endPoint = apiUrl + "/api/notify?email=" + teamsNotification.getEmail(); 
         String payload = getBody(teamsNotification);
         sendPostRequest(endPoint, payload);
